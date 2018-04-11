@@ -1,0 +1,18 @@
+# rust
+/target
+**/*.rs.bk
+
+# nodejs
+/node_modules/
+
+# test
+/tmp
+/public
+/config.toml
+
+# build
+/dist*
+
+# vim
+.*.swp
+.*.un~

@@ -1,0 +1,9 @@
+CREATE TABLE settings (
+  id BIGSERIAL PRIMARY KEY,
+  key VARCHAR(255) NOT NULL,
+  salt BYTEA,
+  value BYTEA NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+CREATE UNIQUE INDEX idx_settings_key ON settings (key);

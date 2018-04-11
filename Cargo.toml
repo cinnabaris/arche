@@ -1,0 +1,83 @@
+[package]
+name = "arche"
+version = "0.2.0"
+authors = ["Jeremy Zheng <jitang.zheng@gmail.com>"]
+description = "A complete open source e-commerce solution built with Rust and React."
+homepage = "https://github.com/cinnabaris/arche"
+license = "MIT"
+
+[profile.release]
+lto = true
+
+[features]
+default = ["postgresql"]
+postgresql = ["diesel/postgres", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2"]
+mysql = ["diesel/mysql", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2"]
+
+[dependencies]
+toml = "0.4"
+hyper = "0.11"
+language-tags = "0.2"
+log = "0.4"
+log4rs = "0.8"
+clap = "2.31"
+url = "1.7"
+sha2 = "0.7"
+md-5 = "0.7"
+base64 = "0.9"
+rocket = "0.3"
+rocket_codegen = "0.3"
+handlebars = "0.30"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+serde-xml-rs = "0.2"
+r2d2 = "0.8"
+r2d2_redis = "0.7"
+redis = "0.8"
+rust-ini = "0.10"
+hex = "0.3"
+regex = "0.2"
+flate2 = "1.0"
+eui48 = "0.3"
+geo = "0.7"
+maxminddb = "0.9"
+lettre = "0.8"
+lettre_email = "0.8"
+mime = "0.3"
+rusoto_core = "0.32"
+rusoto_sqs = "0.32"
+rusoto_sns = "0.32"
+rusoto_s3 = "0.32"
+diesel = "1.2"
+validator = "0.6"
+validator_derive = "0.6"
+sodiumoxide = "*"
+frank_jwt = "*"
+sys-info = "*"
+
+[dependencies.chrono]
+version = "0.4"
+features = ["serde"]
+
+[dependencies.amqp]
+version = "0.1"
+default-features = false
+
+[dependencies.rocket_contrib]
+version = "0.3"
+default-features = false
+features = ["json", "uuid", "handlebars_templates"]
+
+[dependencies.uuid]
+version = "0.6"
+features = ["v4"]
+
+[dependencies.rocket_cors]
+git = "https://github.com/lawliet89/rocket_cors"
+
+[dependencies.epub]
+git = "https://github.com/cinnabaris/epub.git"
+
+[dependencies.stardict]
+git = "https://github.com/cinnabaris/stardict.git"
