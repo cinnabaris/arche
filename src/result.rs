@@ -1,29 +1,30 @@
-use std::{env, error, fmt, io, num, result, string, time};
 use std::error::Error as StdError;
+use std::{env, error, fmt, io, num, result, string, time};
 
-use log;
-use redis;
-use r2d2;
-use handlebars;
-use rocket;
-use ini;
-use stardict;
-use epub;
-use frank_jwt;
-use serde_json;
-use serde_xml_rs;
 use amqp;
 use base64;
-use log4rs;
-use url;
-use regex;
 use clap;
+use diesel;
+use epub;
+use frank_jwt;
+use handlebars;
+use ini;
+use language_tags;
 use lettre;
 use lettre_email;
-use language_tags;
+use log;
+use log4rs;
+use r2d2;
+use redis;
+use regex;
+use rocket;
+use serde_json;
+use serde_xml_rs;
+use stardict;
 use sys_info;
 use toml;
-use diesel;
+use url;
+use validator;
 
 pub type Result<T> = result::Result<T, Error>;
 
@@ -60,6 +61,7 @@ pub enum Error {
     TomlDe(toml::de::Error),
     TomlSer(toml::ser::Error),
     Diesel(diesel::result::Error),
+    Validation(validator::ValidationErrors),
     WithDescription(String),
 }
 
@@ -97,6 +99,7 @@ impl fmt::Display for Error {
             Error::TomlDe(ref err) => err.fmt(f),
             Error::TomlSer(ref err) => err.fmt(f),
             Error::Diesel(ref err) => err.fmt(f),
+            Error::Validation(ref err) => err.fmt(f),
             Error::WithDescription(ref desc) => write!(f, "{}", desc),
         }
     }
@@ -136,6 +139,7 @@ impl StdError for Error {
             Error::TomlDe(ref err) => err.description(),
             Error::TomlSer(ref err) => err.description(),
             Error::Diesel(ref err) => err.description(),
+            Error::Validation(ref err) => err.description(),
             Error::WithDescription(ref desc) => &desc,
         }
     }
@@ -172,6 +176,7 @@ impl StdError for Error {
             Error::TomlDe(ref err) => Some(err),
             Error::TomlSer(ref err) => Some(err),
             Error::Diesel(ref err) => Some(err),
+            Error::Validation(ref err) => Some(err),
             _ => None,
         }
     }
@@ -375,5 +380,11 @@ impl From<toml::ser::Error> for Error {
 impl From<diesel::result::Error> for Error {
     fn from(err: diesel::result::Error) -> Error {
         Error::Diesel(err)
+    }
+}
+
+impl From<validator::ValidationErrors> for Error {
+    fn from(err: validator::ValidationErrors) -> Error {
+        Error::Validation(err)
     }
 }

@@ -1,7 +1,7 @@
 use validator::Validate;
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
-pub struct FmInstall {
+pub struct FmSignUp {
     #[validate(length(min = "2", max = "32"))]
     pub name: String,
     #[validate(email)]

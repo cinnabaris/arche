@@ -1,14 +1,23 @@
 use std::collections::BTreeMap;
+use std::net::SocketAddr;
 use std::ops::Deref;
 
+use diesel::Connection as DieselConnection;
 use rocket::http::RawStr;
 use rocket::State;
 use rocket_contrib::Json;
+use serde_json::Value;
+use validator::Validate;
 
 use super::super::cache::{self, Cache};
-use super::super::i18n::Locale;
+use super::super::env;
+use super::super::i18n::{Lang, Locale};
 use super::super::orm::Connection as Db;
-use super::super::result::Result;
+use super::super::result::{Error, Result};
+use super::super::security::Encryptor;
+use super::super::settings::Setting;
+use super::c_users::FmSignUp;
+use super::models::{Log, Policy, Role, User, ROLE_ADMIN, ROLE_ROOT};
 
 #[get("/locales/<lang>")]
 fn get_locales(ch: State<Cache>, db: Db, lang: &RawStr) -> Result<Json<BTreeMap<String, String>>> {
@@ -20,127 +29,104 @@ fn get_locales(ch: State<Cache>, db: Db, lang: &RawStr) -> Result<Json<BTreeMap<
     Ok(Json(items))
 }
 
-// #[get("/layout")]
-// fn get_layout(
-//     db: Connection,
-//     l: Lang,
-//     cfg: State<env::Config>,
-//     sec: State<Sodium>,
-// ) -> Result<Json<Value>> {
-//     let db = db.deref();
-//     let sec = sec.deref();
-//     let Lang(l) = l;
-//
-//     // site info
-//     let mut site = BTreeMap::new();
-//     for it in vec!["title", "subhead", "keywords", "description", "copyright"] {
-//         let code = String::from("site.") + it;
-//         site.entry(it)
-//             .or_insert(json!(t!(db, &l, &code, None::<Value>)));
-//     }
-//     // author
-//     site.insert(
-//         "author",
-//         json!(match Setting::get(db, sec, s!("site.author")) {
-//             Ok(v) => {
-//                 let it: BTreeMap<String, String> = try!(serde_json::from_slice(&v));
-//                 it
-//             }
-//             Err(_) => {
-//                 let mut it = BTreeMap::new();
-//                 it.insert("name".to_string(), "who-am-i".to_string());
-//                 it.insert("email".to_string(), "master@change-me.com".to_string());
-//                 it
-//             }
-//         }),
-//     );
-//     // favicon
-//     site.insert(
-//         "favicon",
-//         json!(match Setting::get(db, sec, s!("site.favicon")) {
-//             Ok(v) => try!(String::from_utf8(v)),
-//             Err(_) => "/favicon.png".to_string(),
-//         }),
-//     );
-//
-//     // i18n
-//     site.insert("locale", json!(l));
-//     site.insert("languages", json!(cfg.languages));
-//
-//     Ok(Json(json!(site)))
-// }
+#[get("/layout")]
+fn get_layout(
+    db: Db,
+    l: Lang,
+    cfg: State<env::Config>,
+    sec: State<Encryptor>,
+) -> Result<Json<Value>> {
+    let sec = sec.deref();
+    let Lang(l) = l;
 
-// #[post("/install", data = "<form>")]
-// fn post_install(
-//     db: DB,
-//     sec: State<Sodium>,
-//     ip: SocketAddr,
-//     l: Lang,
-//     form: Json<FmInstall>,
-// ) -> Result<Json<Value>> {
-//     let db = db.deref();
-//     let sec = sec.deref();
-//     let Lang(l) = l;
-//     let ip = ip.ip();
-//
-//     try!(validator::email(db, &l, &form.email));
-//     try!(validator::username(db, &l, &form.name));
-//     try!(validator::password(db, &l, &form.password));
-//
-//     let tx = try!(db.transaction());
-//
-//     // check database is empty
-//     let count = try!(User::count(&tx));
-//     if count > 0 {
-//         return e!(
-//             ErrorKind::Validator,
-//             &tx,
-//             &l,
-//             s!("nut.errors.database-not-empty"),
-//             None::<Value>
-//         );
-//     }
-//     // add email user
-//     let user = try!(User::add_by_email(
-//         &tx,
-//         sec,
-//         &form.name,
-//         &form.email,
-//         &form.password
-//     ));
-//     l!(
-//         &tx,
-//         &user,
-//         &l,
-//         ip,
-//         s!("nut.logs.user.sign-up"),
-//         None::<Value>
-//     );
-//     // confirm user
-//     try!(User::confirm(&tx, &user));
-//     l!(
-//         &tx,
-//         &user,
-//         &l,
-//         ip,
-//         s!("nut.logs.user.confirm"),
-//         None::<Value>
-//     );
-//     // add roles
-//     for n in vec![ROLE_ROOT, ROLE_ADMIN] {
-//         let role = try!(Role::get(&tx, &n.to_string(), &None, &None));
-//         try!(Policy::apply(&tx, &user, &role, Duration::weeks(100)));
-//         l!(
-//             &tx,
-//             &user,
-//             &l,
-//             ip,
-//             s!("nut.logs.user.apply"),
-//             Some(json!({ "name": n }))
-//         );
-//     }
-//
-//     try!(tx.commit());
-//
-//     Ok(Json(json!({})))
-// }
+    // site info
+    let mut site = BTreeMap::new();
+
+    for it in vec!["title", "subhead", "keywords", "description", "copyright"] {
+        let code = String::from("site.") + it;
+        site.entry(it)
+            .or_insert(json!(Locale::t(&db, &l, &code, None::<Value>)));
+    }
+    // author
+    site.insert(
+        "author",
+        json!(match Setting::get(&db, sec, &s!("site.author")) {
+            Ok(v) => v,
+            Err(_) => {
+                let mut it = BTreeMap::new();
+                it.insert(s!("name"), s!("who-am-i"));
+                it.insert(s!("email"), s!("master@change-me.com"));
+                it
+            }
+        }),
+    );
+    // favicon
+    site.insert(
+        "favicon",
+        json!(match Setting::get(&db, sec, &s!("site.favicon")) {
+            Ok(v) => v,
+            Err(_) => s!("/favicon.png"),
+        }),
+    );
+
+    // i18n
+    site.insert("locale", json!(l));
+    site.insert("languages", json!(cfg.languages));
+
+    Ok(Json(json!(site)))
+}
+
+#[post("/install", data = "<form>")]
+fn post_install(db: Db, remote: SocketAddr, l: Lang, form: Json<FmSignUp>) -> Result<Json<Value>> {
+    let Lang(l) = l;
+    form.validate()?;
+
+    db.transaction::<_, Error, _>(|| {
+        // check database is empty
+        let count = try!(User::count(&db));
+        if count > 0 {
+            return Err(Locale::e(
+                &db,
+                &l,
+                &s!("nut.errors.database-not-empty"),
+                None::<Value>,
+            ));
+        }
+        // add email user
+        let user = User::add_by_email(&db, &form.name, &form.email, &form.password)?;
+        Log::add(
+            &db,
+            &user,
+            &l,
+            &remote,
+            &s!("nut.logs.user.sign-up"),
+            None::<Value>,
+        )?;
+        // confirm user
+        User::confirm(&db, &user)?;
+        Log::add(
+            &db,
+            &user,
+            &l,
+            &remote,
+            &s!("nut.logs.user.confirm"),
+            None::<Value>,
+        )?;
+        // add roles
+        for n in vec![ROLE_ROOT, ROLE_ADMIN] {
+            let role = try!(Role::get(&db, &s!(n), &None, &None));
+            Policy::apply(&db, &user, &role, 365 * 120)?;
+            Log::add(
+                &db,
+                &user,
+                &l,
+                &remote,
+                &s!("nut.logs.user.apply"),
+                Some(json!({ "name": n })),
+            )?;
+        }
+        Ok(())
+    })?;
+
+    Ok(Json(json!({})))
+}
