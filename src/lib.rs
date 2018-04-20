@@ -58,6 +58,7 @@ pub mod cache;
 pub mod console;
 pub mod env;
 pub mod i18n;
+pub mod jwt;
 pub mod orm;
 pub mod queue;
 pub mod result;

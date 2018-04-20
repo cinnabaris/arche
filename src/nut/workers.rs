@@ -25,11 +25,11 @@ pub struct Smtp {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct Email {
-    to: String,
-    subject: String,
-    body: String,
-    attachments: BTreeMap<PathBuf, String>,
+pub struct Email {
+    pub to: String,
+    pub subject: String,
+    pub body: String,
+    pub attachments: BTreeMap<PathBuf, String>,
 }
 
 pub trait SendEmail {
@@ -43,6 +43,7 @@ impl SendEmail for Consumer {
             log::debug!("send email to {}: {}\n{}", it.to, it.subject, it.body);
             return Ok(());
         }
+        // TODO
         // let smtp = try!(Setting::get(db, sec, &"site.smtp".to_string()));
         // let smtp: Smtp = try!(serde_json::from_slice(&smtp));
         let smtp: Smtp = Default::default();
@@ -69,29 +70,3 @@ impl SendEmail for Consumer {
         Ok(())
     }
 }
-
-// pub fn send_email<MQ: Queue>(mq: &MQ, to: String, subject: String, body: String) -> Result<()> {
-//     mq.publish(
-//         &SEND_EMAIL.to_string(),
-//         &mime::APPLICATION_JSON.as_ref().to_string(),
-//         8,
-//         try!(serde_json::to_vec(&EmailJob {
-//             to: to,
-//             subject: subject,
-//             body: body,
-//             attachments: BTreeMap::new(),
-//         },))
-//             .as_slice(),
-//     )
-// }
-//
-// pub fn do_send_email<D: postgres::GenericConnection, S: Security>(
-//     db: &D,
-//     sec: &S,
-//     payload: &[u8],
-//     perform: bool,
-// ) -> Result<()> {
-
-//
-
-// }

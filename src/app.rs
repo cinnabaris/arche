@@ -5,6 +5,7 @@ use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 
 use base64;
+use frank_jwt::Algorithm;
 use handlebars::Handlebars;
 use log;
 use rocket;
@@ -12,7 +13,7 @@ use rocket_contrib::Template;
 use toml;
 
 use super::result::Result;
-use super::{cache, env, i18n, orm, router, security};
+use super::{cache, env, i18n, jwt, orm, queue, router, security};
 
 pub fn server() -> Result<()> {
     let etc = parse_config()?;
@@ -29,6 +30,11 @@ pub fn server() -> Result<()> {
         .manage(orm::pool(&etc.database)?)
         .manage(cache::new(&etc.cache.url, etc.cache.namespace.clone())?)
         .manage(security::Encryptor::new(etc.secret_key()?.as_slice())?)
+        .manage(queue::new(etc.queue.url.clone(), etc.queue.name.clone()))
+        .manage(jwt::Jwt::new(
+            etc.secret_key()?.as_slice(),
+            Algorithm::HS512,
+        ))
         .manage(etc.clone());
 
     for (pt, rt) in router::routes() {
@@ -74,7 +80,8 @@ pub fn generate_config() -> Result<()> {
             url: s!("redis://:@localhost:6379/6"),
         },
         queue: env::Queue {
-            rabbitmq: Some(s!("rabbitmq://guest:guest@localhost:5672/arche")),
+            url: s!("rabbitmq://guest:guest@localhost:5672/arche"),
+            name: s!("tasks"),
         },
         aws: Some(env::Aws {
             access_key_id: s!("change-me"),

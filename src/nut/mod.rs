@@ -6,12 +6,15 @@ pub mod workers;
 use rocket::Route;
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
-    vec![(
-        "/api",
-        routes!(
-            c_home::get_locales,
-            c_home::get_layout,
-            c_home::post_install
+    vec![
+        (
+            "/api",
+            routes!(
+                c_home::get_locales,
+                c_home::get_layout,
+                c_home::post_install
+            ),
         ),
-    )]
+        ("/api/users", routes!(c_users::post_sign_up)),
+    ]
 }

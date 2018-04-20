@@ -106,7 +106,8 @@ pub struct Cache {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Queue {
-    pub rabbitmq: Option<String>,
+    pub url: String,
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

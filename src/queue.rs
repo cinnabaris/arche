@@ -3,6 +3,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use amqp::{self, protocol, Basic, Channel, Session, Table};
 use log;
 use rocket::config::Environment;
+use serde::ser::Serialize;
+use serde_json;
 use uuid::Uuid;
 
 use super::nut::workers::{SendEmail, SEND_EMAIL};
@@ -16,6 +18,21 @@ pub fn new(url: String, queue: String) -> Queue {
         url: url,
         queue: queue,
     };
+}
+
+pub fn put<T: Serialize>(
+    qu: &Queue,
+    _type: &String,
+    content_type: &String,
+    priority: u8,
+    task: &T,
+) -> Result<()> {
+    qu.publish(
+        _type,
+        content_type,
+        priority,
+        serde_json::to_vec(task)?.as_slice(),
+    )
 }
 
 //-----------------------------------------------------------------------------
