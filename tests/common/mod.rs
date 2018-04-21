@@ -1,19 +1,11 @@
 use std::str;
 
-use arche;
 use futures::{Future, Stream};
-use hyper::header::{ContentLength, ContentType};
+use hyper::header::{Authorization, Bearer, ContentLength, ContentType};
 use hyper::{Body, Chunk, Client, Method, Request, StatusCode};
 use serde::ser::Serialize;
 use serde_json::{self, Value};
 use tokio_core::reactor::Core;
-
-pub const ADMIN_USER: &'static str = "aaa@aaa.com";
-pub const MEMBER_USER: &'static str = "bbb@bbb.com";
-
-pub fn tokens(uid: &String) -> String {
-    "".to_string()
-}
 
 pub fn html(uri: &String, status: StatusCode) {
     let body = http(uri, Method::Get, None, None::<Value>, status);
@@ -52,6 +44,10 @@ fn http<B: Serialize>(
     let uri = url.parse().unwrap();
     let mut req: Request<Body> = Request::new(method, uri);
     req.headers_mut().set(ContentType::json());
+    if let Some(token) = token {
+        req.headers_mut()
+            .set(Authorization(Bearer { token: token }));
+    }
 
     if let Some(body) = body {
         let body = serde_json::to_vec(&body).unwrap();

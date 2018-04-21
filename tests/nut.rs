@@ -11,8 +11,12 @@ use serde_json::Value;
 mod common;
 
 #[test]
-fn users() {
+fn pages() {
     common::html(&"/".to_string(), StatusCode::Ok);
+}
+
+#[test]
+fn users_non_sign_in() {
     common::api(
         &"/users/sign-up".to_string(),
         Method::Post,
