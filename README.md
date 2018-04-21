@@ -52,6 +52,14 @@ make
 cargo build  --no-default-features  --features "mysql"
 ```
 
+-   testing
+
+```bash
+diesel database reset
+cargo run
+python -m unittest -v
+```
+
 ## Editor Plugins(atom)
 
 enable autosave
