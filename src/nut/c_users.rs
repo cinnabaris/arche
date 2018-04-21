@@ -31,7 +31,7 @@ fn get_confirm_token(
 ) -> Flash<Redirect> {
     let call = || -> Result<String> {
         let Lang(lang) = lang;
-        let token = try!(jwt.parse(&s!(token)));
+        let token = jwt.parse(&s!(token))?;
 
         if let Some(act) = token["act"].as_str() {
             if act == ACT_CONFIRM {
@@ -194,7 +194,7 @@ fn send_email(
     act: &'static str,
 ) -> Result<()> {
     let mut payload = json!({"email":email, "act":act});
-    let token = try!(jwt.sum(&mut payload, Duration::from_secs(60 * 60 * 3)));
+    let token = jwt.sum(&mut payload, Duration::from_secs(60 * 60 * 3))?;
     let subject = Locale::t(
         db,
         lang,

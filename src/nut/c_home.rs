@@ -94,7 +94,7 @@ fn post_install(db: Db, remote: SocketAddr, l: Lang, form: Json<FmSignUp>) -> Re
 
     db.transaction::<_, Error, _>(|| {
         // check database is empty
-        let count = try!(User::count(&db));
+        let count = User::count(&db)?;
         if count > 0 {
             return Err(Locale::e(
                 &db,
@@ -125,7 +125,7 @@ fn post_install(db: Db, remote: SocketAddr, l: Lang, form: Json<FmSignUp>) -> Re
         )?;
         // add roles
         for n in vec![ROLE_ROOT, ROLE_ADMIN] {
-            let role = try!(Role::get(&db, &s!(n), &None, &None));
+            let role = Role::get(&db, &s!(n), &None, &None)?;
             Policy::apply(&db, &user, &role, 365 * 120)?;
             Log::add(
                 &db,

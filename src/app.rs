@@ -138,18 +138,16 @@ pub fn generate_config() -> Result<()> {
             }),
         },
     };
-    let buf = try!(toml::to_vec(&cfg));
+    let buf = toml::to_vec(&cfg)?;
 
     let name = config_file();
     log::info!("generate file {}", name);
-    let mut file = try!(
-        fs::OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .mode(0o600)
-            .open(name)
-    );
-    try!(file.write_all(&buf));
+    let mut file = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .open(name)?;
+    file.write_all(&buf)?;
     return Ok(());
 }
 
@@ -191,7 +189,7 @@ pub fn generate_nginx() -> Result<()> {
 fn parse_config() -> Result<env::Config> {
     let name = config_file();
     log::info!("load config from file {}", name);
-    let mut file = try!(fs::File::open(name));
+    let mut file = fs::File::open(name)?;
     let mut buf = Vec::new();
     file.read_to_end(&mut buf)?;
     let cfg: env::Config = toml::from_slice(&buf)?;

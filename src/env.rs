@@ -53,7 +53,7 @@ impl Config {
     }
 
     pub fn secret_key(&self) -> Result<Vec<u8>> {
-        let buf = try!(base64::decode(&self.secret_key));
+        let buf = base64::decode(&self.secret_key)?;
         return Ok(buf);
     }
 }

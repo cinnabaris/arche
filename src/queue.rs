@@ -8,8 +8,9 @@ use serde_json;
 use uuid::Uuid;
 
 use super::nut::workers::{SendEmail, SEND_EMAIL};
+use super::orm::{Connection as Db, Pool as DbPool};
 use super::result::{Error, Result};
-use super::{orm, security};
+use super::security;
 
 pub type Queue = RabbitMQ;
 
@@ -41,12 +42,12 @@ pub fn put<T: Serialize>(
 pub struct Consumer {
     name: String,
     env: Environment,
-    db: orm::Pool,
+    db: DbPool,
     encryptor: security::Encryptor,
 }
 
 impl Consumer {
-    pub fn new(name: String, env: Environment, db: orm::Pool, enc: security::Encryptor) -> Self {
+    pub fn new(name: String, env: Environment, db: DbPool, enc: security::Encryptor) -> Self {
         Self {
             name: name,
             env: env,
@@ -62,8 +63,9 @@ impl Consumer {
         _content_type: &String,
         payload: &[u8],
     ) -> Result<()> {
+        let db = Db(self.db.get()?);
         match &_type[..] {
-            SEND_EMAIL => self.send_email(payload, self.env.is_prod()),
+            SEND_EMAIL => self.send_email(&db, &self.encryptor, payload, self.env.is_prod()),
             _ => Err(Error::WithDescription(format!("bad task type {}", _type))),
         }
     }
@@ -119,9 +121,9 @@ impl RabbitMQ {
     where
         F: Fn(&mut Channel) -> Result<()>,
     {
-        let mut ss = try!(Session::open_url(&self.url));
-        let mut ch = try!(ss.open_channel(1));
-        try!(ch.queue_declare(
+        let mut ss = Session::open_url(&self.url)?;
+        let mut ch = ss.open_channel(1)?;
+        ch.queue_declare(
             &self.queue[..],
             false, // passive,
             true,  // durable
@@ -129,11 +131,11 @@ impl RabbitMQ {
             false, // auto_delete
             false, // nowait
             Table::new(),
-        ));
+        )?;
 
-        try!(f(&mut ch));
+        f(&mut ch)?;
 
-        try!(ch.close(200, "Bye"));
+        ch.close(200, "Bye")?;
         ss.close(200, "Good Bye");
 
         Ok(())
@@ -171,7 +173,7 @@ impl Provider for RabbitMQ {
         return self.open(|ch| {
             let id = Uuid::new_v4().to_string();
             log::info!("push task into queue {}@{}", id, self.queue);
-            try!(ch.basic_publish(
+            ch.basic_publish(
                 "",
                 &self.queue[..],
                 true,
@@ -180,12 +182,12 @@ impl Provider for RabbitMQ {
                     content_type: Some(content_type.to_string()),
                     _type: Some(_type.to_string()),
                     priority: Some(priority),
-                    timestamp: Some(try!(SystemTime::now().duration_since(UNIX_EPOCH)).as_secs()),
+                    timestamp: Some(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs()),
                     message_id: Some(id),
                     ..Default::default()
                 },
                 payload.to_vec(),
-            ));
+            )?;
             return Ok(());
         });
     }

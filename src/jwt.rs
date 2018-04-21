@@ -54,16 +54,16 @@ impl Jwt {
     }
 
     pub fn sum(&self, payload: &mut Value, ttl: Duration) -> Result<String> {
-        let nbf = try!(SystemTime::now().duration_since(UNIX_EPOCH));
+        let nbf = SystemTime::now().duration_since(UNIX_EPOCH)?;
         let exp = nbf.add(ttl);
         payload["nbf"] = json!(nbf.as_secs());
         payload["exp"] = json!(exp.as_secs());
-        let token = try!(encode(json!({}), &self.key, payload, self.alg));
+        let token = encode(json!({}), &self.key, payload, self.alg)?;
         return Ok(token);
     }
 
     pub fn parse(&self, token: &String) -> Result<Value> {
-        let (header, payload) = try!(decode(token, &self.key, self.alg));
+        let (header, payload) = decode(token, &self.key, self.alg)?;
         if let Some(nbf) = payload["nbf"].as_u64() {
             if let Some(exp) = payload["exp"].as_u64() {
                 let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();

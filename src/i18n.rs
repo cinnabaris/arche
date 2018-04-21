@@ -47,12 +47,12 @@ impl Lang {
         // 1. Check URL arguments.
         if let Outcome::Success(Params(it)) = req.guard::<Params>() {
             if let Some(l) = it.get(&key) {
-                return Ok(Some(try!(LanguageTag::from_str(l))));
+                return Ok(Some(LanguageTag::from_str(l)?));
             }
         }
         // 2. Get language information from cookies.
         if let Some(ck) = req.cookies().get(&key[..]) {
-            return Ok(Some(try!(LanguageTag::from_str(ck.value()))));
+            return Ok(Some(LanguageTag::from_str(ck.value())?));
         }
         // 3. Get language information from 'Accept-Language'.
         // https://www.w3.org/International/questions/qa-accept-lang-locales
