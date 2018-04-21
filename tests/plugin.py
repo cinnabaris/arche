@@ -9,6 +9,7 @@ class Plugin(unittest.TestCase):
     INTERNAL_SERVER = 500
 
     HOST = 'http://localhost:8080'
+    TOKEN = ".tokens.json"
 
     def post_json(self, uri, token=None, params=None, status=200):
         uri = self.api(uri)
