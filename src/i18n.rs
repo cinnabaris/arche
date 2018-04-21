@@ -5,7 +5,6 @@ use std::str::FromStr;
 use std::{ffi, fs};
 
 use chrono::{NaiveDateTime, Utc};
-use diesel::connection::Connection as DieselDb;
 use diesel::insert_into;
 use diesel::prelude::*;
 use handlebars::Handlebars;

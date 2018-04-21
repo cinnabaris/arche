@@ -115,6 +115,29 @@ impl User {
             .execute(db.deref())?;
         Ok(())
     }
+
+    pub fn lock(db: &Db, user: &i64, ok: bool) -> Result<()> {
+        let it = users::dsl::users.filter(users::dsl::id.eq(user));
+        let now = Utc::now().naive_utc();
+        update(it)
+            .set((
+                users::dsl::locked_at.eq(if ok { Some(now) } else { None }),
+                users::dsl::updated_at.eq(&now),
+            ))
+            .execute(db.deref())?;
+        Ok(())
+    }
+
+    pub fn password(db: &Db, user: &i64, password: &String) -> Result<()> {
+        let it = users::dsl::users.filter(users::dsl::id.eq(user));
+        update(it)
+            .set((
+                users::dsl::password.eq(&hash::sum(password.as_bytes())?),
+                users::dsl::updated_at.eq(Utc::now().naive_utc()),
+            ))
+            .execute(db.deref())?;
+        Ok(())
+    }
 }
 
 // ----------------------------------------------------------------------------

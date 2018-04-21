@@ -21,7 +21,11 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
             routes!(
                 c_users::post_sign_up,
                 c_users::get_confirm_token,
-                c_users::post_confirm
+                c_users::post_confirm,
+                c_users::get_unlock_token,
+                c_users::post_unlock,
+                c_users::post_forgot_password,
+                c_users::post_reset_password
             ),
         ),
     ]

@@ -48,6 +48,7 @@ Must be one of the following:
 
 The scope should refer to a module in arche that is being touched. Examples:
 
+-   all
 -   nut
 -   forum
 
