@@ -7,6 +7,7 @@ use rocket::Route;
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![
+        ("/", routes!(c_home::index)),
         (
             "/api",
             routes!(
@@ -15,6 +16,13 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
                 c_home::post_install
             ),
         ),
-        ("/api/users", routes!(c_users::post_sign_up)),
+        (
+            "/api/users",
+            routes!(
+                c_users::post_sign_up,
+                c_users::get_confirm_token,
+                c_users::post_confirm
+            ),
+        ),
     ]
 }

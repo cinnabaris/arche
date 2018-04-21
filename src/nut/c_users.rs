@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::error::Error as StdError;
 use std::net::SocketAddr;
 use std::ops::Deref;
 use std::time::Duration;
@@ -6,6 +7,7 @@ use std::time::Duration;
 use diesel::Connection as DieselConnection;
 use mime;
 use rocket::http::RawStr;
+use rocket::response::{Flash, Redirect};
 use rocket::State;
 use rocket_contrib::Json;
 use serde_json::Value;
@@ -26,44 +28,53 @@ fn get_confirm_token(
     jwt: State<Jwt>,
     token: &RawStr,
     lang: Lang,
-) -> Result<Json<Value>> {
-    let Lang(lang) = lang;
-    let token = try!(jwt.parse(&s!(token)));
+) -> Flash<Redirect> {
+    let call = || -> Result<String> {
+        let Lang(lang) = lang;
+        let token = try!(jwt.parse(&s!(token)));
 
-    if let Some(act) = token["act"].as_str() {
-        if act == ACT_CONFIRM {
-            if let Some(email) = token["email"].as_str() {
-                db.transaction::<_, Error, _>(|| {
-                    let user = User::get_by_email(&db, &s!(email))?;
-                    if let Some(_) = user.confirmed_at {
-                        return Err(Locale::e(
+        if let Some(act) = token["act"].as_str() {
+            if act == ACT_CONFIRM {
+                if let Some(email) = token["email"].as_str() {
+                    if let Ok(_) = db.transaction::<_, Error, _>(|| {
+                        let user = User::get_by_email(&db, &s!(email))?;
+                        if let Some(_) = user.confirmed_at {
+                            return Err(Locale::e(
+                                &db,
+                                &lang,
+                                &s!("nut.errors.user-already-confirm"),
+                                None::<Value>,
+                            ));
+                        }
+                        User::confirm(&db, &user.id)?;
+                        Log::add(
                             &db,
+                            &user.id,
                             &lang,
-                            &s!("nut.errors.user-already-confirm"),
+                            &remote,
+                            &s!("nut.logs.user.confirm"),
                             None::<Value>,
-                        ));
-                    }
-                    User::confirm(&db, &user.id)?;
-                    Log::add(
-                        &db,
-                        &user.id,
-                        &lang,
-                        &remote,
-                        &s!("nut.logs.user.confirm"),
-                        None::<Value>,
-                    )?;
-                    return Ok(());
-                })?;
+                        )?;
+                        Ok(())
+                    }) {
+                        return Ok(Locale::t(&db, &lang, &s!("flash.success"), None::<Value>));
+                    };
+                }
             }
         }
-    }
 
-    Err(Locale::e(
-        &db,
-        &lang,
-        &s!("errors.bad-request"),
-        None::<Value>,
-    ))
+        Err(Locale::e(
+            &db,
+            &lang,
+            &s!("errors.bad-request"),
+            None::<Value>,
+        ))
+    };
+
+    match call() {
+        Ok(msg) => Flash::success(Redirect::to("/"), &msg),
+        Err(e) => Flash::error(Redirect::to("/"), e.description()),
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Validate)]

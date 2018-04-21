@@ -1,8 +1,8 @@
 use std::env::current_dir;
-use std::fs;
 use std::io::{Read, Write};
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
+use std::{fs, thread};
 
 use base64;
 use frank_jwt::Algorithm;
@@ -10,12 +10,36 @@ use handlebars::Handlebars;
 use log;
 use rocket;
 use rocket_contrib::Template;
+use sys_info;
 use toml;
 
+use super::queue::{self, Provider as QueueProvider};
 use super::result::Result;
-use super::{cache, env, i18n, jwt, orm, queue, router, security};
+use super::{cache, env, i18n, jwt, orm, router, security};
 
 pub fn server() -> Result<()> {
+    // worker
+    thread::spawn(|| loop {
+        let worker = || -> Result<()> {
+            let name = sys_info::hostname()?;
+            log::info!("Starting worker thread {}", name);
+            let etc = parse_config()?;
+            queue::new(etc.queue.url.clone(), etc.queue.name.clone()).consume(
+                queue::Consumer::new(
+                    name,
+                    etc.env()?,
+                    orm::pool(&etc.database)?,
+                    security::Encryptor::new(etc.secret_key()?.as_slice())?,
+                ),
+            )?;
+            Ok(())
+        };
+        match worker() {
+            Ok(_) => log::info!("exiting worker"),
+            Err(e) => log::error!("{:?}", e),
+        }
+    });
+    // http
     let etc = parse_config()?;
     let cfg = rocket::config::Config::build(etc.env()?)
         .address("localhost")
@@ -23,9 +47,18 @@ pub fn server() -> Result<()> {
         .secret_key(etc.secret_key.clone())
         .port(etc.http.port)
         .limits(etc.http.limits())
-        .extra("template_dir", "templates")
+        .extra(
+            "template_dir",
+            match Path::new("themes")
+                .join(&etc.http.theme)
+                .join("views")
+                .to_str()
+            {
+                Some(v) => v,
+                None => "views",
+            },
+        )
         .finalize()?;
-
     let mut app = rocket::custom(cfg, false)
         .manage(orm::pool(&etc.database)?)
         .manage(cache::new(&etc.cache.url, etc.cache.namespace.clone())?)
@@ -36,6 +69,10 @@ pub fn server() -> Result<()> {
             Algorithm::HS512,
         ))
         .manage(etc.clone());
+
+    if !etc.is_prod() {
+        app = app.mount("/", routes!(router::get_assets))
+    }
 
     for (pt, rt) in router::routes() {
         app = app.mount(pt, rt);

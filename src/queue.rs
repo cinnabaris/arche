@@ -46,6 +46,15 @@ pub struct Consumer {
 }
 
 impl Consumer {
+    pub fn new(name: String, env: Environment, db: orm::Pool, enc: security::Encryptor) -> Self {
+        Self {
+            name: name,
+            env: env,
+            db: db,
+            encryptor: enc,
+        }
+    }
+
     fn run(
         &self,
         _type: &String,
@@ -97,7 +106,7 @@ pub trait Provider: Send + Sync {
         priority: u8,
         payload: &[u8],
     ) -> Result<()>;
-    fn consume(&self, name: &String, consumer: Consumer) -> Result<()>;
+    fn consume(&self, consumer: Consumer) -> Result<()>;
 }
 
 pub struct RabbitMQ {
@@ -132,17 +141,18 @@ impl RabbitMQ {
 }
 
 impl Provider for RabbitMQ {
-    fn consume(&self, name: &String, consumer: Consumer) -> Result<()> {
+    fn consume(&self, consumer: Consumer) -> Result<()> {
         self.open(|ch| {
+            let name = consumer.name.clone();
             let consumer = consumer.clone();
             let it = ch.basic_consume(
                 consumer,
                 self.queue.clone(),
-                name.clone(), // consumer_tag
-                false,        // no_local
-                false,        // no_ack
-                false,        // exclusive
-                false,        // nowait
+                name,  // consumer_tag
+                false, // no_local
+                false, // no_ack
+                false, // exclusive
+                false, // nowait
                 Table::new(),
             )?;
             log::info!("Starting consumer {:?}", it);

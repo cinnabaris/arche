@@ -4,8 +4,9 @@ use std::ops::Deref;
 
 use diesel::Connection as DieselConnection;
 use rocket::http::RawStr;
+use rocket::request::FlashMessage;
 use rocket::State;
-use rocket_contrib::Json;
+use rocket_contrib::{Json, Template};
 use serde_json::Value;
 use validator::Validate;
 
@@ -18,6 +19,16 @@ use super::super::security::Encryptor;
 use super::super::settings::Setting;
 use super::c_users::FmSignUp;
 use super::models::{Log, Policy, Role, User, ROLE_ADMIN, ROLE_ROOT};
+
+#[get("/")]
+fn index(flash: Option<FlashMessage>) -> Template {
+    let mut layout = json!({"lang":"en-US", "aaa":111, "bbb":"hi"});
+    if let Some(flash) = flash {
+        // let items = flash.map(|msg| (msg.name(), msg.msg())).collect();
+        layout["flash"] = json!(flash.msg());
+    }
+    Template::render("index", layout)
+}
 
 #[get("/locales/<lang>")]
 fn get_locales(ch: State<Cache>, db: Db, lang: &RawStr) -> Result<Json<BTreeMap<String, String>>> {

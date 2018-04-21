@@ -1,6 +1,9 @@
-use rocket::{self, Catcher, Route};
+use std::path::{Path, PathBuf};
 
-use super::nut;
+use rocket::response::NamedFile;
+use rocket::{self, Catcher, Route, State};
+
+use super::{env, nut};
 
 pub fn catchers() -> Vec<Catcher> {
     errors![not_found, bad_request]
@@ -13,6 +16,16 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
 }
 
 //-----------------------------------------------------------------------------
+
+#[get("/assets/<file..>")]
+pub fn get_assets(cfg: State<env::Config>, file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(
+        Path::new("themes")
+            .join(&cfg.http.theme)
+            .join("assets")
+            .join(file),
+    ).ok()
+}
 
 #[error(404)]
 fn not_found() -> &'static str {
