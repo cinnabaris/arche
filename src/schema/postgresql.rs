@@ -1136,6 +1136,17 @@ table! {
     }
 }
 
+table! {
+    votes (id) {
+        id -> Int8,
+        resource_type -> Varchar,
+        resource_id -> Int8,
+        point -> Int4,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     forum_categories,
     forum_posts,
@@ -1221,4 +1232,5 @@ allow_tables_to_appear_in_same_query!(
     spree_variants,
     spree_zone_members,
     spree_zones,
+    votes,
 );

@@ -1,7 +1,7 @@
 use std::env::current_dir;
 use std::io::{Read, Write};
 use std::os::unix::fs::OpenOptionsExt;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::{fs, thread};
 
 use base64;
@@ -84,15 +84,6 @@ pub fn server() -> Result<()> {
         .launch();
 
     Ok(())
-}
-
-pub fn i18n_sync(dir: String) -> Result<()> {
-    let etc = parse_config()?;
-    let pool = orm::pool(&etc.database)?;
-    let db = orm::Connection(pool.get()?);
-    let (total, inserted) = i18n::Locale::sync(&db, Path::new(&dir).to_path_buf())?;
-    log::info!("total {}, inserted {}", total, inserted);
-    return Ok(());
 }
 
 pub fn generate_config() -> Result<()> {
@@ -184,7 +175,32 @@ pub fn generate_nginx() -> Result<()> {
     return Ok(());
 }
 
+pub fn db_seed() -> Result<()> {
+    let root = Path::new("db").join("seed");
+    load_locales(&root)?;
+    load_countries(&root)?;
+    Ok(())
+}
+
 //-----------------------------------------------------------------------------
+
+fn load_countries(root: &PathBuf) -> Result<()> {
+    // https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
+    let file = root.join("countries.json");
+    log::info!("load countries from {:?}...", &file);
+    Ok(())
+}
+
+fn load_locales(root: &PathBuf) -> Result<()> {
+    let dir = root.join("locales");
+    log::info!("load locales from {:?}...", &dir);
+    let etc = parse_config()?;
+    let pool = orm::pool(&etc.database)?;
+    let db = orm::Connection(pool.get()?);
+    let (total, inserted) = i18n::Locale::sync(&db, dir)?;
+    log::info!("total {}, inserted {}", total, inserted);
+    Ok(())
+}
 
 fn parse_config() -> Result<env::Config> {
     let name = config_file();

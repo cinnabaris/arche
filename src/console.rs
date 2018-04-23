@@ -10,15 +10,7 @@ pub fn run() -> Result<()> {
     let generate_nginx = clap::SubCommand::with_name("generate:nginx").about("Generate nginx.conf");
     let generate_config =
         clap::SubCommand::with_name("generate:config").about("Generate config file(toml)");
-    let i18n_sync = clap::SubCommand::with_name("i18n:sync")
-        .about("Sync locale items from filesystem")
-        .arg(
-            clap::Arg::with_name("dir")
-                .short("d")
-                .help("Locales dir")
-                .required(true)
-                .takes_value(true),
-        );
+    let db_seed = clap::SubCommand::with_name("db:seed").about("Loads the seed data(db/seed)");
 
     let matches = clap::App::new(env::NAME)
         .version(env::VERSION)
@@ -28,7 +20,7 @@ pub fn run() -> Result<()> {
         .after_help(env::HOMEPAGE)
         .subcommand(generate_nginx)
         .subcommand(generate_config)
-        .subcommand(i18n_sync)
+        .subcommand(db_seed)
         .get_matches();
 
     if let Some(_) = matches.subcommand_matches("generate:nginx") {
@@ -37,10 +29,8 @@ pub fn run() -> Result<()> {
     if let Some(_) = matches.subcommand_matches("generate:config") {
         return app::generate_config();
     }
-    if let Some(matches) = matches.subcommand_matches("i18n:sync") {
-        if let Some(dir) = matches.value_of("dir") {
-            return app::i18n_sync(String::from(dir));
-        }
+    if let Some(_) = matches.subcommand_matches("db:seed") {
+        return app::db_seed();
     }
 
     return app::server();
