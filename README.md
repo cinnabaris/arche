@@ -2,7 +2,7 @@
 
 A complete open source e-commerce solution built with Rust and React(STILL IN DEVELOPMENT).
 
-Inspired by [Spree](https://github.com/spree/spree)
+Inspired by [Spree](https://github.com/spree/spree) and [NodeBB](https://github.com/NodeBB/NodeBB).
 
 ## Install
 
@@ -93,6 +93,21 @@ npm config set prefix '~/.npm-global'
 local   all             all                                     peer  
 TO:
 local   all             all                                     md5
+```
+
+-   forgot mysql root password
+
+create file  /tmp/reset.mysqld
+
+```sql
+SET PASSWORD FOR root@localhost = PASSWORD('blah');
+```
+
+edit file /etc/mysql/my.cnf
+
+```text
+[mysqld]
+init-file=/tmp/reset.mysqld
 ```
 
 -   RabbitMQ

@@ -1,4 +1,61 @@
 table! {
+    forum_categories (id) {
+        id -> Int8,
+        name -> Varchar,
+        color -> Varchar,
+        icon -> Varchar,
+        description -> Nullable<Varchar>,
+        parent_id -> Nullable<Int8>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_posts (id) {
+        id -> Int8,
+        body -> Text,
+        user_id -> Int8,
+        post_id -> Int8,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_tags (id) {
+        id -> Int8,
+        name -> Varchar,
+        background_color -> Varchar,
+        text_color -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_topics (id) {
+        id -> Int8,
+        title -> Varchar,
+        body -> Text,
+        user_id -> Int8,
+        category_id -> Int8,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_topics_tags (id) {
+        id -> Int8,
+        topic_id -> Int8,
+        tag_id -> Int8,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     friendly_id_slugs (id) {
         id -> Int8,
         slug -> Varchar,
@@ -16,8 +73,8 @@ table! {
         lang -> Varchar,
         code -> Varchar,
         message -> Text,
-        updated_at -> Timestamp,
         created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -27,8 +84,8 @@ table! {
         key -> Varchar,
         salt -> Nullable<Bytea>,
         value -> Bytea,
-        updated_at -> Timestamp,
         created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -1080,6 +1137,11 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
+    forum_categories,
+    forum_posts,
+    forum_tags,
+    forum_topics,
+    forum_topics_tags,
     friendly_id_slugs,
     locales,
     settings,
