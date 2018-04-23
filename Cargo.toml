@@ -11,8 +11,8 @@ lto = true
 
 [features]
 default = ["postgresql"]
-postgresql = ["diesel/postgres", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2"]
-mysql = ["diesel/mysql", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2"]
+postgresql = ["diesel/postgres", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2", "diesel/64-column-tables"]
+mysql = ["diesel/mysql", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2", "diesel/64-column-tables"]
 
 [dependencies]
 toml = "0.4"

@@ -1,8 +1,8 @@
 table! {
     friendly_id_slugs (id) {
-        id -> Int4,
+        id -> Int8,
         slug -> Varchar,
-        sluggable_id -> Int4,
+        sluggable_id -> Int8,
         sluggable_type -> Nullable<Varchar>,
         scope -> Nullable<Varchar>,
         created_at -> Nullable<Timestamp>,
@@ -16,8 +16,8 @@ table! {
         lang -> Varchar,
         code -> Varchar,
         message -> Text,
-        updated_at -> Timestamptz,
-        created_at -> Timestamptz,
+        updated_at -> Timestamp,
+        created_at -> Timestamp,
     }
 }
 
@@ -27,14 +27,14 @@ table! {
         key -> Varchar,
         salt -> Nullable<Bytea>,
         value -> Bytea,
-        updated_at -> Timestamptz,
-        created_at -> Timestamptz,
+        updated_at -> Timestamp,
+        created_at -> Timestamp,
     }
 }
 
 table! {
     spree_addresses (id) {
-        id -> Int4,
+        id -> Int8,
         firstname -> Nullable<Varchar>,
         lastname -> Nullable<Varchar>,
         address1 -> Nullable<Varchar>,
@@ -45,8 +45,8 @@ table! {
         state_name -> Nullable<Varchar>,
         alternative_phone -> Nullable<Varchar>,
         company -> Nullable<Varchar>,
-        state_id -> Nullable<Int4>,
-        country_id -> Nullable<Int4>,
+        state_id -> Nullable<Int8>,
+        country_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -54,11 +54,11 @@ table! {
 
 table! {
     spree_adjustments (id) {
-        id -> Int4,
+        id -> Int8,
         source_type -> Nullable<Varchar>,
-        source_id -> Nullable<Int4>,
+        source_id -> Nullable<Int8>,
         adjustable_type -> Nullable<Varchar>,
-        adjustable_id -> Nullable<Int4>,
+        adjustable_id -> Nullable<Int8>,
         amount -> Nullable<Numeric>,
         label -> Nullable<Varchar>,
         mandatory -> Nullable<Bool>,
@@ -66,16 +66,16 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         state -> Nullable<Varchar>,
-        order_id -> Int4,
+        order_id -> Int8,
         included -> Nullable<Bool>,
     }
 }
 
 table! {
     spree_assets (id) {
-        id -> Int4,
+        id -> Int8,
         viewable_type -> Nullable<Varchar>,
-        viewable_id -> Nullable<Int4>,
+        viewable_id -> Nullable<Int8>,
         attachment_width -> Nullable<Int4>,
         attachment_height -> Nullable<Int4>,
         attachment_file_size -> Nullable<Int4>,
@@ -93,11 +93,11 @@ table! {
 
 table! {
     spree_calculators (id) {
-        id -> Int4,
+        id -> Int8,
         #[sql_name = "type"]
         type_ -> Nullable<Varchar>,
         calculable_type -> Nullable<Varchar>,
-        calculable_id -> Nullable<Int4>,
+        calculable_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         preferences -> Nullable<Text>,
@@ -107,7 +107,7 @@ table! {
 
 table! {
     spree_countries (id) {
-        id -> Int4,
+        id -> Int8,
         iso_name -> Nullable<Varchar>,
         iso -> Nullable<Varchar>,
         iso3 -> Nullable<Varchar>,
@@ -121,28 +121,28 @@ table! {
 
 table! {
     spree_credit_cards (id) {
-        id -> Int4,
+        id -> Int8,
         month -> Nullable<Varchar>,
         year -> Nullable<Varchar>,
         cc_type -> Nullable<Varchar>,
         last_digits -> Nullable<Varchar>,
-        address_id -> Nullable<Int4>,
+        address_id -> Nullable<Int8>,
         gateway_customer_profile_id -> Nullable<Varchar>,
         gateway_payment_profile_id -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         name -> Nullable<Varchar>,
-        user_id -> Nullable<Int4>,
-        payment_method_id -> Nullable<Int4>,
+        user_id -> Nullable<Int8>,
+        payment_method_id -> Nullable<Int8>,
         default -> Bool,
     }
 }
 
 table! {
     spree_customer_returns (id) {
-        id -> Int4,
+        id -> Int8,
         number -> Nullable<Varchar>,
-        stock_location_id -> Nullable<Int4>,
+        stock_location_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -150,7 +150,7 @@ table! {
 
 table! {
     spree_gateways (id) {
-        id -> Int4,
+        id -> Int8,
         #[sql_name = "type"]
         type_ -> Nullable<Varchar>,
         name -> Nullable<Varchar>,
@@ -167,32 +167,32 @@ table! {
 
 table! {
     spree_inventory_units (id) {
-        id -> Int4,
+        id -> Int8,
         state -> Nullable<Varchar>,
-        variant_id -> Nullable<Int4>,
-        order_id -> Nullable<Int4>,
-        shipment_id -> Nullable<Int4>,
+        variant_id -> Nullable<Int8>,
+        order_id -> Nullable<Int8>,
+        shipment_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         pending -> Nullable<Bool>,
-        line_item_id -> Nullable<Int4>,
+        line_item_id -> Nullable<Int8>,
         quantity -> Nullable<Int4>,
-        original_return_item_id -> Nullable<Int4>,
+        original_return_item_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_line_items (id) {
-        id -> Int4,
-        variant_id -> Nullable<Int4>,
-        order_id -> Nullable<Int4>,
+        id -> Int8,
+        variant_id -> Nullable<Int8>,
+        order_id -> Nullable<Int8>,
         quantity -> Int4,
         price -> Numeric,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         currency -> Nullable<Varchar>,
         cost_price -> Nullable<Numeric>,
-        tax_category_id -> Nullable<Int4>,
+        tax_category_id -> Nullable<Int8>,
         adjustment_total -> Nullable<Numeric>,
         additional_tax_total -> Nullable<Numeric>,
         promo_total -> Nullable<Numeric>,
@@ -205,9 +205,9 @@ table! {
 
 table! {
     spree_log_entries (id) {
-        id -> Int4,
+        id -> Int8,
         source_type -> Nullable<Varchar>,
-        source_id -> Nullable<Int4>,
+        source_id -> Nullable<Int8>,
         details -> Nullable<Text>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -216,15 +216,15 @@ table! {
 
 table! {
     spree_option_type_prototypes (id) {
-        prototype_id -> Nullable<Int4>,
-        option_type_id -> Nullable<Int4>,
         id -> Int8,
+        prototype_id -> Nullable<Int8>,
+        option_type_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_option_types (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         presentation -> Nullable<Varchar>,
         position -> Int4,
@@ -235,11 +235,11 @@ table! {
 
 table! {
     spree_option_values (id) {
-        id -> Int4,
+        id -> Int8,
         position -> Nullable<Int4>,
         name -> Nullable<Varchar>,
         presentation -> Nullable<Varchar>,
-        option_type_id -> Nullable<Int4>,
+        option_type_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -247,32 +247,32 @@ table! {
 
 table! {
     spree_option_value_variants (id) {
-        variant_id -> Nullable<Int4>,
-        option_value_id -> Nullable<Int4>,
         id -> Int8,
+        variant_id -> Nullable<Int8>,
+        option_value_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_order_promotions (id) {
-        order_id -> Nullable<Int4>,
-        promotion_id -> Nullable<Int4>,
         id -> Int8,
+        order_id -> Nullable<Int8>,
+        promotion_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_orders (id) {
-        id -> Int4,
+        id -> Int8,
         number -> Nullable<Varchar>,
         item_total -> Numeric,
         total -> Numeric,
         state -> Nullable<Varchar>,
         adjustment_total -> Numeric,
-        user_id -> Nullable<Int4>,
+        user_id -> Nullable<Int8>,
         completed_at -> Nullable<Timestamp>,
-        bill_address_id -> Nullable<Int4>,
-        ship_address_id -> Nullable<Int4>,
+        bill_address_id -> Nullable<Int8>,
+        ship_address_id -> Nullable<Int8>,
         payment_total -> Nullable<Numeric>,
         shipment_state -> Nullable<Varchar>,
         payment_state -> Nullable<Varchar>,
@@ -282,21 +282,21 @@ table! {
         updated_at -> Timestamp,
         currency -> Nullable<Varchar>,
         last_ip_address -> Nullable<Varchar>,
-        created_by_id -> Nullable<Int4>,
+        created_by_id -> Nullable<Int8>,
         shipment_total -> Numeric,
         additional_tax_total -> Nullable<Numeric>,
         promo_total -> Nullable<Numeric>,
         channel -> Nullable<Varchar>,
         included_tax_total -> Numeric,
         item_count -> Nullable<Int4>,
-        approver_id -> Nullable<Int4>,
+        approver_id -> Nullable<Int8>,
         approved_at -> Nullable<Timestamp>,
         confirmation_delivered -> Nullable<Bool>,
         considered_risky -> Nullable<Bool>,
         guest_token -> Nullable<Varchar>,
         canceled_at -> Nullable<Timestamp>,
-        canceler_id -> Nullable<Int4>,
-        store_id -> Nullable<Int4>,
+        canceler_id -> Nullable<Int8>,
+        store_id -> Nullable<Int8>,
         state_lock_version -> Int4,
         taxable_adjustment_total -> Numeric,
         non_taxable_adjustment_total -> Numeric,
@@ -305,9 +305,9 @@ table! {
 
 table! {
     spree_payment_capture_events (id) {
-        id -> Int4,
+        id -> Int8,
         amount -> Nullable<Numeric>,
-        payment_id -> Nullable<Int4>,
+        payment_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -315,7 +315,7 @@ table! {
 
 table! {
     spree_payment_methods (id) {
-        id -> Int4,
+        id -> Int8,
         #[sql_name = "type"]
         type_ -> Nullable<Varchar>,
         name -> Nullable<Varchar>,
@@ -333,12 +333,12 @@ table! {
 
 table! {
     spree_payments (id) {
-        id -> Int4,
+        id -> Int8,
         amount -> Numeric,
-        order_id -> Nullable<Int4>,
+        order_id -> Nullable<Int8>,
         source_type -> Nullable<Varchar>,
-        source_id -> Nullable<Int4>,
-        payment_method_id -> Nullable<Int4>,
+        source_id -> Nullable<Int8>,
+        payment_method_id -> Nullable<Int8>,
         state -> Nullable<Varchar>,
         response_code -> Nullable<Varchar>,
         avs_response -> Nullable<Varchar>,
@@ -352,7 +352,7 @@ table! {
 
 table! {
     spree_preferences (id) {
-        id -> Int4,
+        id -> Int8,
         value -> Nullable<Text>,
         key -> Nullable<Varchar>,
         created_at -> Timestamp,
@@ -362,8 +362,8 @@ table! {
 
 table! {
     spree_prices (id) {
-        id -> Int4,
-        variant_id -> Int4,
+        id -> Int8,
+        variant_id -> Int8,
         amount -> Nullable<Numeric>,
         currency -> Nullable<Varchar>,
         deleted_at -> Nullable<Timestamp>,
@@ -372,10 +372,10 @@ table! {
 
 table! {
     spree_product_option_types (id) {
-        id -> Int4,
+        id -> Int8,
         position -> Nullable<Int4>,
-        product_id -> Nullable<Int4>,
-        option_type_id -> Nullable<Int4>,
+        product_id -> Nullable<Int8>,
+        option_type_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -383,18 +383,18 @@ table! {
 
 table! {
     spree_product_promotion_rules (id) {
-        product_id -> Nullable<Int4>,
-        promotion_rule_id -> Nullable<Int4>,
         id -> Int8,
+        product_id -> Nullable<Int8>,
+        promotion_rule_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_product_properties (id) {
-        id -> Int4,
+        id -> Int8,
         value -> Nullable<Varchar>,
-        product_id -> Nullable<Int4>,
-        property_id -> Nullable<Int4>,
+        product_id -> Nullable<Int8>,
+        property_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         position -> Nullable<Int4>,
@@ -403,7 +403,7 @@ table! {
 
 table! {
     spree_products (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Varchar,
         description -> Nullable<Text>,
         available_on -> Nullable<Timestamp>,
@@ -411,8 +411,8 @@ table! {
         slug -> Nullable<Varchar>,
         meta_description -> Nullable<Text>,
         meta_keywords -> Nullable<Varchar>,
-        tax_category_id -> Nullable<Int4>,
-        shipping_category_id -> Nullable<Int4>,
+        tax_category_id -> Nullable<Int8>,
+        shipping_category_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         promotionable -> Nullable<Bool>,
@@ -423,26 +423,26 @@ table! {
 
 table! {
     spree_products_taxons (id) {
-        product_id -> Nullable<Int4>,
-        taxon_id -> Nullable<Int4>,
         id -> Int8,
+        product_id -> Nullable<Int8>,
+        taxon_id -> Nullable<Int8>,
         position -> Nullable<Int4>,
     }
 }
 
 table! {
     spree_promotion_action_line_items (id) {
-        id -> Int4,
-        promotion_action_id -> Nullable<Int4>,
-        variant_id -> Nullable<Int4>,
+        id -> Int8,
+        promotion_action_id -> Nullable<Int8>,
+        variant_id -> Nullable<Int8>,
         quantity -> Nullable<Int4>,
     }
 }
 
 table! {
     spree_promotion_actions (id) {
-        id -> Int4,
-        promotion_id -> Nullable<Int4>,
+        id -> Int8,
+        promotion_id -> Nullable<Int8>,
         position -> Nullable<Int4>,
         #[sql_name = "type"]
         type_ -> Nullable<Varchar>,
@@ -452,7 +452,7 @@ table! {
 
 table! {
     spree_promotion_categories (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -462,10 +462,10 @@ table! {
 
 table! {
     spree_promotion_rules (id) {
-        id -> Int4,
-        promotion_id -> Nullable<Int4>,
-        user_id -> Nullable<Int4>,
-        product_group_id -> Nullable<Int4>,
+        id -> Int8,
+        promotion_id -> Nullable<Int8>,
+        user_id -> Nullable<Int8>,
+        product_group_id -> Nullable<Int8>,
         #[sql_name = "type"]
         type_ -> Nullable<Varchar>,
         created_at -> Timestamp,
@@ -477,23 +477,23 @@ table! {
 
 table! {
     spree_promotion_rule_taxons (id) {
-        id -> Int4,
-        taxon_id -> Nullable<Int4>,
-        promotion_rule_id -> Nullable<Int4>,
+        id -> Int8,
+        taxon_id -> Nullable<Int8>,
+        promotion_rule_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_promotion_rule_users (id) {
-        user_id -> Nullable<Int4>,
-        promotion_rule_id -> Nullable<Int4>,
         id -> Int8,
+        user_id -> Nullable<Int8>,
+        promotion_rule_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_promotions (id) {
-        id -> Int4,
+        id -> Int8,
         description -> Nullable<Varchar>,
         expires_at -> Nullable<Timestamp>,
         starts_at -> Nullable<Timestamp>,
@@ -507,13 +507,13 @@ table! {
         path -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        promotion_category_id -> Nullable<Int4>,
+        promotion_category_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_properties (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         presentation -> Varchar,
         created_at -> Timestamp,
@@ -523,15 +523,15 @@ table! {
 
 table! {
     spree_property_prototypes (id) {
-        prototype_id -> Nullable<Int4>,
-        property_id -> Nullable<Int4>,
         id -> Int8,
+        prototype_id -> Nullable<Int8>,
+        property_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_prototypes (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -540,15 +540,15 @@ table! {
 
 table! {
     spree_prototype_taxons (id) {
-        id -> Int4,
-        taxon_id -> Nullable<Int4>,
-        prototype_id -> Nullable<Int4>,
+        id -> Int8,
+        taxon_id -> Nullable<Int8>,
+        prototype_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_refund_reasons (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         active -> Nullable<Bool>,
         mutable -> Nullable<Bool>,
@@ -559,34 +559,34 @@ table! {
 
 table! {
     spree_refunds (id) {
-        id -> Int4,
-        payment_id -> Nullable<Int4>,
+        id -> Int8,
+        payment_id -> Nullable<Int8>,
         amount -> Numeric,
         transaction_id -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        refund_reason_id -> Nullable<Int4>,
-        reimbursement_id -> Nullable<Int4>,
+        refund_reason_id -> Nullable<Int8>,
+        reimbursement_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_reimbursement_credits (id) {
-        id -> Int4,
+        id -> Int8,
         amount -> Numeric,
-        reimbursement_id -> Nullable<Int4>,
-        creditable_id -> Nullable<Int4>,
+        reimbursement_id -> Nullable<Int8>,
+        creditable_id -> Nullable<Int8>,
         creditable_type -> Nullable<Varchar>,
     }
 }
 
 table! {
     spree_reimbursements (id) {
-        id -> Int4,
+        id -> Int8,
         number -> Nullable<Varchar>,
         reimbursement_status -> Nullable<Varchar>,
-        customer_return_id -> Nullable<Int4>,
-        order_id -> Nullable<Int4>,
+        customer_return_id -> Nullable<Int8>,
+        order_id -> Nullable<Int8>,
         total -> Nullable<Numeric>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -595,7 +595,7 @@ table! {
 
 table! {
     spree_reimbursement_types (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         active -> Nullable<Bool>,
         mutable -> Nullable<Bool>,
@@ -608,7 +608,7 @@ table! {
 
 table! {
     spree_return_authorization_reasons (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         active -> Nullable<Bool>,
         mutable -> Nullable<Bool>,
@@ -619,24 +619,24 @@ table! {
 
 table! {
     spree_return_authorizations (id) {
-        id -> Int4,
+        id -> Int8,
         number -> Nullable<Varchar>,
         state -> Nullable<Varchar>,
-        order_id -> Nullable<Int4>,
+        order_id -> Nullable<Int8>,
         memo -> Nullable<Text>,
         created_at -> Nullable<Timestamp>,
         updated_at -> Nullable<Timestamp>,
-        stock_location_id -> Nullable<Int4>,
-        return_authorization_reason_id -> Nullable<Int4>,
+        stock_location_id -> Nullable<Int8>,
+        return_authorization_reason_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_return_items (id) {
-        id -> Int4,
-        return_authorization_id -> Nullable<Int4>,
-        inventory_unit_id -> Nullable<Int4>,
-        exchange_variant_id -> Nullable<Int4>,
+        id -> Int8,
+        return_authorization_id -> Nullable<Int8>,
+        inventory_unit_id -> Nullable<Int8>,
+        exchange_variant_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         pre_tax_amount -> Numeric,
@@ -644,43 +644,43 @@ table! {
         additional_tax_total -> Numeric,
         reception_status -> Nullable<Varchar>,
         acceptance_status -> Nullable<Varchar>,
-        customer_return_id -> Nullable<Int4>,
-        reimbursement_id -> Nullable<Int4>,
+        customer_return_id -> Nullable<Int8>,
+        reimbursement_id -> Nullable<Int8>,
         acceptance_status_errors -> Nullable<Text>,
-        preferred_reimbursement_type_id -> Nullable<Int4>,
-        override_reimbursement_type_id -> Nullable<Int4>,
+        preferred_reimbursement_type_id -> Nullable<Int8>,
+        override_reimbursement_type_id -> Nullable<Int8>,
         resellable -> Bool,
     }
 }
 
 table! {
     spree_roles (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
     }
 }
 
 table! {
     spree_role_users (id) {
-        role_id -> Nullable<Int4>,
-        user_id -> Nullable<Int4>,
         id -> Int8,
+        role_id -> Nullable<Int8>,
+        user_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_shipments (id) {
-        id -> Int4,
+        id -> Int8,
         tracking -> Nullable<Varchar>,
         number -> Nullable<Varchar>,
         cost -> Nullable<Numeric>,
         shipped_at -> Nullable<Timestamp>,
-        order_id -> Nullable<Int4>,
-        address_id -> Nullable<Int4>,
+        order_id -> Nullable<Int8>,
+        address_id -> Nullable<Int8>,
         state -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        stock_location_id -> Nullable<Int4>,
+        stock_location_id -> Nullable<Int8>,
         adjustment_total -> Nullable<Numeric>,
         additional_tax_total -> Nullable<Numeric>,
         promo_total -> Nullable<Numeric>,
@@ -693,7 +693,7 @@ table! {
 
 table! {
     spree_shipping_categories (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -702,9 +702,9 @@ table! {
 
 table! {
     spree_shipping_method_categories (id) {
-        id -> Int4,
-        shipping_method_id -> Int4,
-        shipping_category_id -> Int4,
+        id -> Int8,
+        shipping_method_id -> Int8,
+        shipping_category_id -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -712,7 +712,7 @@ table! {
 
 table! {
     spree_shipping_methods (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         display_on -> Nullable<Varchar>,
         deleted_at -> Nullable<Timestamp>,
@@ -720,39 +720,39 @@ table! {
         updated_at -> Timestamp,
         tracking_url -> Nullable<Varchar>,
         admin_name -> Nullable<Varchar>,
-        tax_category_id -> Nullable<Int4>,
+        tax_category_id -> Nullable<Int8>,
         code -> Nullable<Varchar>,
     }
 }
 
 table! {
     spree_shipping_method_zones (id) {
-        shipping_method_id -> Nullable<Int4>,
-        zone_id -> Nullable<Int4>,
         id -> Int8,
+        shipping_method_id -> Nullable<Int8>,
+        zone_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_shipping_rates (id) {
-        id -> Int4,
-        shipment_id -> Nullable<Int4>,
-        shipping_method_id -> Nullable<Int4>,
+        id -> Int8,
+        shipment_id -> Nullable<Int8>,
+        shipping_method_id -> Nullable<Int8>,
         selected -> Nullable<Bool>,
         cost -> Nullable<Numeric>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        tax_rate_id -> Nullable<Int4>,
+        tax_rate_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_state_changes (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         previous_state -> Nullable<Varchar>,
-        stateful_id -> Nullable<Int4>,
-        user_id -> Nullable<Int4>,
+        stateful_id -> Nullable<Int8>,
+        user_id -> Nullable<Int8>,
         stateful_type -> Nullable<Varchar>,
         next_state -> Nullable<Varchar>,
         created_at -> Timestamp,
@@ -762,19 +762,19 @@ table! {
 
 table! {
     spree_states (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         abbr -> Nullable<Varchar>,
-        country_id -> Nullable<Int4>,
+        country_id -> Nullable<Int8>,
         updated_at -> Nullable<Timestamp>,
     }
 }
 
 table! {
     spree_stock_items (id) {
-        id -> Int4,
-        stock_location_id -> Nullable<Int4>,
-        variant_id -> Nullable<Int4>,
+        id -> Int8,
+        stock_location_id -> Nullable<Int8>,
+        variant_id -> Nullable<Int8>,
         count_on_hand -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -785,7 +785,7 @@ table! {
 
 table! {
     spree_stock_locations (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -793,9 +793,9 @@ table! {
         address1 -> Nullable<Varchar>,
         address2 -> Nullable<Varchar>,
         city -> Nullable<Varchar>,
-        state_id -> Nullable<Int4>,
+        state_id -> Nullable<Int8>,
         state_name -> Nullable<Varchar>,
-        country_id -> Nullable<Int4>,
+        country_id -> Nullable<Int8>,
         zipcode -> Nullable<Varchar>,
         phone -> Nullable<Varchar>,
         active -> Nullable<Bool>,
@@ -807,25 +807,25 @@ table! {
 
 table! {
     spree_stock_movements (id) {
-        id -> Int4,
-        stock_item_id -> Nullable<Int4>,
+        id -> Int8,
+        stock_item_id -> Nullable<Int8>,
         quantity -> Nullable<Int4>,
         action -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         originator_type -> Nullable<Varchar>,
-        originator_id -> Nullable<Int4>,
+        originator_id -> Nullable<Int8>,
     }
 }
 
 table! {
     spree_stock_transfers (id) {
-        id -> Int4,
+        id -> Int8,
         #[sql_name = "type"]
         type_ -> Nullable<Varchar>,
         reference -> Nullable<Varchar>,
-        source_location_id -> Nullable<Int4>,
-        destination_location_id -> Nullable<Int4>,
+        source_location_id -> Nullable<Int8>,
+        destination_location_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         number -> Nullable<Varchar>,
@@ -834,7 +834,7 @@ table! {
 
 table! {
     spree_store_credit_categories (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -843,13 +843,13 @@ table! {
 
 table! {
     spree_store_credit_events (id) {
-        id -> Int4,
-        store_credit_id -> Int4,
+        id -> Int8,
+        store_credit_id -> Int8,
         action -> Varchar,
         amount -> Nullable<Numeric>,
         authorization_code -> Varchar,
         user_total_amount -> Numeric,
-        originator_id -> Nullable<Int4>,
+        originator_id -> Nullable<Int8>,
         originator_type -> Nullable<Varchar>,
         deleted_at -> Nullable<Timestamp>,
         created_at -> Timestamp,
@@ -859,19 +859,19 @@ table! {
 
 table! {
     spree_store_credits (id) {
-        id -> Int4,
-        user_id -> Nullable<Int4>,
-        category_id -> Nullable<Int4>,
-        created_by_id -> Nullable<Int4>,
+        id -> Int8,
+        user_id -> Nullable<Int8>,
+        category_id -> Nullable<Int8>,
+        created_by_id -> Nullable<Int8>,
         amount -> Numeric,
         amount_used -> Numeric,
         memo -> Nullable<Text>,
         deleted_at -> Nullable<Timestamp>,
         currency -> Nullable<Varchar>,
         amount_authorized -> Numeric,
-        originator_id -> Nullable<Int4>,
+        originator_id -> Nullable<Int8>,
         originator_type -> Nullable<Varchar>,
-        type_id -> Nullable<Int4>,
+        type_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -879,7 +879,7 @@ table! {
 
 table! {
     spree_store_credit_types (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         priority -> Nullable<Int4>,
         created_at -> Timestamp,
@@ -889,7 +889,7 @@ table! {
 
 table! {
     spree_stores (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         url -> Nullable<Varchar>,
         meta_description -> Nullable<Text>,
@@ -906,12 +906,12 @@ table! {
 
 table! {
     spree_taggings (id) {
-        id -> Int4,
-        tag_id -> Nullable<Int4>,
+        id -> Int8,
+        tag_id -> Nullable<Int8>,
         taggable_type -> Nullable<Varchar>,
-        taggable_id -> Nullable<Int4>,
+        taggable_id -> Nullable<Int8>,
         tagger_type -> Nullable<Varchar>,
-        tagger_id -> Nullable<Int4>,
+        tagger_id -> Nullable<Int8>,
         context -> Nullable<Varchar>,
         created_at -> Nullable<Timestamp>,
     }
@@ -919,7 +919,7 @@ table! {
 
 table! {
     spree_tags (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         taggings_count -> Nullable<Int4>,
     }
@@ -927,7 +927,7 @@ table! {
 
 table! {
     spree_tax_categories (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         description -> Nullable<Varchar>,
         is_default -> Nullable<Bool>,
@@ -940,7 +940,7 @@ table! {
 
 table! {
     spree_taxonomies (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -950,12 +950,12 @@ table! {
 
 table! {
     spree_taxons (id) {
-        id -> Int4,
-        parent_id -> Nullable<Int4>,
+        id -> Int8,
+        parent_id -> Nullable<Int8>,
         position -> Nullable<Int4>,
         name -> Varchar,
         permalink -> Nullable<Varchar>,
-        taxonomy_id -> Nullable<Int4>,
+        taxonomy_id -> Nullable<Int8>,
         lft -> Nullable<Int4>,
         rgt -> Nullable<Int4>,
         icon_file_name -> Nullable<Varchar>,
@@ -974,10 +974,10 @@ table! {
 
 table! {
     spree_tax_rates (id) {
-        id -> Int4,
+        id -> Int8,
         amount -> Nullable<Numeric>,
-        zone_id -> Nullable<Int4>,
-        tax_category_id -> Nullable<Int4>,
+        zone_id -> Nullable<Int8>,
+        tax_category_id -> Nullable<Int8>,
         included_in_price -> Nullable<Bool>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -989,7 +989,7 @@ table! {
 
 table! {
     spree_trackers (id) {
-        id -> Int4,
+        id -> Int8,
         analytics_id -> Nullable<Varchar>,
         active -> Nullable<Bool>,
         created_at -> Timestamp,
@@ -1000,7 +1000,7 @@ table! {
 
 table! {
     spree_users (id) {
-        id -> Int4,
+        id -> Int8,
         encrypted_password -> Nullable<Varchar>,
         password_salt -> Nullable<Varchar>,
         email -> Nullable<Varchar>,
@@ -1016,8 +1016,8 @@ table! {
         current_sign_in_ip -> Nullable<Varchar>,
         last_sign_in_ip -> Nullable<Varchar>,
         login -> Nullable<Varchar>,
-        ship_address_id -> Nullable<Int4>,
-        bill_address_id -> Nullable<Int4>,
+        ship_address_id -> Nullable<Int8>,
+        bill_address_id -> Nullable<Int8>,
         authentication_token -> Nullable<Varchar>,
         unlock_token -> Nullable<Varchar>,
         locked_at -> Nullable<Timestamp>,
@@ -1035,7 +1035,7 @@ table! {
 
 table! {
     spree_variants (id) {
-        id -> Int4,
+        id -> Int8,
         sku -> Varchar,
         weight -> Nullable<Numeric>,
         height -> Nullable<Numeric>,
@@ -1043,12 +1043,12 @@ table! {
         depth -> Nullable<Numeric>,
         deleted_at -> Nullable<Timestamp>,
         is_master -> Nullable<Bool>,
-        product_id -> Nullable<Int4>,
+        product_id -> Nullable<Int8>,
         cost_price -> Nullable<Numeric>,
         position -> Nullable<Int4>,
         cost_currency -> Nullable<Varchar>,
         track_inventory -> Nullable<Bool>,
-        tax_category_id -> Nullable<Int4>,
+        tax_category_id -> Nullable<Int8>,
         updated_at -> Timestamp,
         discontinue_on -> Nullable<Timestamp>,
         created_at -> Timestamp,
@@ -1057,10 +1057,10 @@ table! {
 
 table! {
     spree_zone_members (id) {
-        id -> Int4,
+        id -> Int8,
         zoneable_type -> Nullable<Varchar>,
-        zoneable_id -> Nullable<Int4>,
-        zone_id -> Nullable<Int4>,
+        zoneable_id -> Nullable<Int8>,
+        zone_id -> Nullable<Int8>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -1068,7 +1068,7 @@ table! {
 
 table! {
     spree_zones (id) {
-        id -> Int4,
+        id -> Int8,
         name -> Nullable<Varchar>,
         description -> Nullable<Varchar>,
         default_tax -> Nullable<Bool>,

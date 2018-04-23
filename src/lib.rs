@@ -1,4 +1,5 @@
 #![feature(plugin, use_extern_macros, custom_attribute)]
+#![recursion_limit = "128"] // https://github.com/diesel-rs/diesel/issues/1127
 #![plugin(rocket_codegen)]
 extern crate rocket;
 
@@ -75,4 +76,5 @@ pub mod nut;
 pub mod ops;
 pub mod pos;
 pub mod reading;
+pub mod spree;
 pub mod survey;
