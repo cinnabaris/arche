@@ -11,7 +11,7 @@
 // use rocket::State;
 // use rocket_contrib::Json;
 // use serde_json::Value;
-use validator::Validate;
+
 //
 // use super::super::i18n::{Lang, Locale};
 // use super::super::jwt::{Home, Jwt};
@@ -369,15 +369,6 @@ use validator::Validate;
 //     Ok(Json(json!({})))
 // }
 //
-#[derive(Serialize, Deserialize, Debug, Validate)]
-pub struct FmSignUp {
-    #[validate(length(min = "2", max = "32"))]
-    pub name: String,
-    #[validate(email)]
-    pub email: String,
-    #[validate(length(min = "6"))]
-    pub password: String,
-}
 
 // #[post("/sign-up", data = "<form>")]
 // fn post_sign_up(

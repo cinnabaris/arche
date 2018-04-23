@@ -60,8 +60,8 @@ table! {
         id -> Int8,
         slug -> Varchar,
         sluggable_id -> Int8,
-        sluggable_type -> Nullable<Varchar>,
-        scope -> Nullable<Varchar>,
+        sluggable_type -> Varchar,
+        scope -> Varchar,
         created_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,
     }
@@ -92,18 +92,18 @@ table! {
 table! {
     spree_addresses (id) {
         id -> Int8,
-        firstname -> Nullable<Varchar>,
-        lastname -> Nullable<Varchar>,
-        address1 -> Nullable<Varchar>,
+        firstname -> Varchar,
+        lastname -> Varchar,
+        address1 -> Varchar,
         address2 -> Nullable<Varchar>,
-        city -> Nullable<Varchar>,
-        zipcode -> Nullable<Varchar>,
-        phone -> Nullable<Varchar>,
-        state_name -> Nullable<Varchar>,
+        city -> Varchar,
+        zipcode -> Varchar,
+        phone -> Varchar,
+        state_name -> Varchar,
         alternative_phone -> Nullable<Varchar>,
         company -> Nullable<Varchar>,
-        state_id -> Nullable<Int8>,
-        country_id -> Nullable<Int8>,
+        state_id -> Int8,
+        country_id -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -112,12 +112,12 @@ table! {
 table! {
     spree_adjustments (id) {
         id -> Int8,
-        source_type -> Nullable<Varchar>,
-        source_id -> Nullable<Int8>,
-        adjustable_type -> Nullable<Varchar>,
-        adjustable_id -> Nullable<Int8>,
-        amount -> Nullable<Numeric>,
-        label -> Nullable<Varchar>,
+        source_type -> Varchar,
+        source_id -> Int8,
+        adjustable_type -> Varchar,
+        adjustable_id -> Int8,
+        amount -> Numeric,
+        label -> Varchar,
         mandatory -> Nullable<Bool>,
         eligible -> Nullable<Bool>,
         created_at -> Timestamp,
@@ -713,15 +713,19 @@ table! {
 table! {
     spree_roles (id) {
         id -> Int8,
-        name -> Nullable<Varchar>,
+        name -> Varchar,
     }
 }
 
 table! {
     spree_role_users (id) {
         id -> Int8,
-        role_id -> Nullable<Int8>,
-        user_id -> Nullable<Int8>,
+        role_id -> Int8,
+        user_id -> Int8,
+        nbf -> Date,
+        exp -> Date,
+        created_at -> Nullable<Timestamp>,
+        updated_at -> Nullable<Timestamp>,
     }
 }
 
@@ -1058,9 +1062,9 @@ table! {
 table! {
     spree_users (id) {
         id -> Int8,
-        encrypted_password -> Nullable<Varchar>,
+        encrypted_password -> Varchar,
         password_salt -> Nullable<Varchar>,
-        email -> Nullable<Varchar>,
+        email -> Varchar,
         remember_token -> Nullable<Varchar>,
         persistence_token -> Nullable<Varchar>,
         reset_password_token -> Nullable<Varchar>,

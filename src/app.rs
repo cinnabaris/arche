@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::{fs, thread};
 
 use base64;
+use diesel::Connection as DieselConnection;
 use frank_jwt::Algorithm;
 use handlebars::Handlebars;
 use log;
@@ -13,9 +14,10 @@ use rocket_contrib::Template;
 use sys_info;
 use toml;
 
+use super::orm::{self, Connection as Db};
 use super::queue::{self, Provider as QueueProvider};
-use super::result::Result;
-use super::{cache, env, i18n, jwt, orm, router, security};
+use super::result::{Error, Result};
+use super::{cache, env, i18n, jwt, router, security, spree};
 
 pub fn server() -> Result<()> {
     // worker
@@ -176,42 +178,34 @@ pub fn generate_nginx() -> Result<()> {
 }
 
 pub fn db_seed() -> Result<()> {
+    let etc = parse_config()?;
+    let pool = orm::pool(&etc.database)?;
+    let db = orm::Connection(pool.get()?);
     let root = Path::new("db").join("seed");
-    load_locales(&root)?;
-    load_regions(&root)?;
-    init_administrator()?;
+
+    db.transaction::<_, Error, _>(|| {
+        load_locales(&db, &root)?;
+        spree::seed::load(&db, &root)?;
+        Ok(())
+    })
+}
+
+pub fn db_dump() -> Result<()> {
+    // TODO
+    Ok(())
+}
+
+pub fn db_restore(_name: &String) -> Result<()> {
+    // TODO
     Ok(())
 }
 
 //-----------------------------------------------------------------------------
 
-fn init_administrator() -> Result<()> {
-    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/roles.rb
-    // https://github.com/spree/spree_auth_devise/blob/master/db/default/users.rb
-    Ok(())
-}
-
-fn load_regions(root: &PathBuf) -> Result<()> {
-    // https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
-    // https://github.com/carmen-ruby/carmen
-    let dir = root.join("carmen");
-    log::info!("load countries from {:?}...", &dir);
-    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/countries.rb
-    log::info!("load states from {:?}...", &dir);
-    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
-    log::info!("add 'EU_VAT' zone");
-    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
-    log::info!("add 'North America' zone");
-    Ok(())
-}
-
-fn load_locales(root: &PathBuf) -> Result<()> {
+fn load_locales(db: &Db, root: &PathBuf) -> Result<()> {
     let dir = root.join("locales");
     log::info!("load locales from {:?}...", &dir);
-    let etc = parse_config()?;
-    let pool = orm::pool(&etc.database)?;
-    let db = orm::Connection(pool.get()?);
-    let (total, inserted) = i18n::Locale::sync(&db, dir)?;
+    let (total, inserted) = i18n::Locale::sync(db, dir)?;
     log::info!("total {}, inserted {}", total, inserted);
     Ok(())
 }

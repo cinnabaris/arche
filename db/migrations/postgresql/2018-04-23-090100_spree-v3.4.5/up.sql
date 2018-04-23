@@ -1,71 +1,71 @@
 CREATE TABLE friendly_id_slugs (
     id BIGSERIAL PRIMARY KEY,
-    slug character varying NOT NULL,
+    slug varchar(255) NOT NULL,
     sluggable_id BIGINT NOT NULL,
-    sluggable_type character varying(50),
-    scope character varying,
-    created_at timestamp without time zone,
+    sluggable_type varchar(50) NOT NULL,
+    scope varchar NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW(),
     deleted_at timestamp without time zone
 );
 
 CREATE TABLE spree_addresses (
     id BIGSERIAL PRIMARY KEY,
-    firstname character varying,
-    lastname character varying,
-    address1 character varying,
-    address2 character varying,
-    city character varying,
-    zipcode character varying,
-    phone character varying,
-    state_name character varying,
-    alternative_phone character varying,
-    company character varying,
-    state_id BIGINT,
-    country_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    firstname varchar(32) NOT NULL,
+    lastname varchar(32) NOT NULL,
+    address1 varchar(255) NOT NULL,
+    address2 varchar(255),
+    city varchar(64) NOT NULL,
+    zipcode varchar(16) NOT NULL,
+    phone varchar(32) NOT NULL,
+    state_name varchar(64) NOT NULL,
+    alternative_phone varchar(32),
+    company varchar(255),
+    state_id BIGINT NOT NULL,
+    country_id BIGINT NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_adjustments (
     id BIGSERIAL PRIMARY KEY,
-    source_type character varying,
-    source_id BIGINT,
-    adjustable_type character varying,
-    adjustable_id BIGINT,
-    amount numeric(10,2),
-    label character varying,
+    source_type varchar(255) NOT NULL,
+    source_id BIGINT NOT NULL,
+    adjustable_type varchar(255) NOT NULL,
+    adjustable_id BIGINT NOT NULL,
+    amount numeric(10,2) NOT NULL,
+    label varchar(255) NOT NULL,
     mandatory boolean,
     eligible boolean DEFAULT true,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    state character varying,
+    state varchar,
     order_id BIGINT NOT NULL,
     included boolean DEFAULT false
 );
 
 CREATE TABLE spree_assets (
     id BIGSERIAL PRIMARY KEY,
-    viewable_type character varying,
+    viewable_type varchar,
     viewable_id BIGINT,
     attachment_width integer,
     attachment_height integer,
     attachment_file_size integer,
     "position" integer,
-    attachment_content_type character varying,
-    attachment_file_name character varying,
-    type character varying(75),
+    attachment_content_type varchar,
+    attachment_file_name varchar,
+    type varchar(75),
     attachment_updated_at timestamp without time zone,
     alt text,
-    created_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT NOW(),
     updated_at timestamp without time zone
 );
 
 CREATE TABLE spree_calculators (
     id BIGSERIAL PRIMARY KEY,
-    type character varying,
-    calculable_type character varying,
+    type varchar,
+    calculable_type varchar,
     calculable_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     preferences text,
     deleted_at timestamp without time zone
@@ -73,10 +73,10 @@ CREATE TABLE spree_calculators (
 
 CREATE TABLE spree_countries (
     id BIGSERIAL PRIMARY KEY,
-    iso_name character varying,
-    iso character varying,
-    iso3 character varying,
-    name character varying,
+    iso_name varchar,
+    iso varchar,
+    iso3 varchar,
+    name varchar,
     numcode integer,
     states_required boolean DEFAULT false,
     updated_at timestamp without time zone,
@@ -85,16 +85,16 @@ CREATE TABLE spree_countries (
 
 CREATE TABLE spree_credit_cards (
     id BIGSERIAL PRIMARY KEY,
-    month character varying,
-    year character varying,
-    cc_type character varying,
-    last_digits character varying,
+    month varchar,
+    year varchar,
+    cc_type varchar,
+    last_digits varchar,
     address_id BIGINT,
-    gateway_customer_profile_id character varying,
-    gateway_payment_profile_id character varying,
-    created_at timestamp without time zone NOT NULL,
+    gateway_customer_profile_id varchar,
+    gateway_payment_profile_id varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    name character varying,
+    name varchar,
     user_id BIGINT,
     payment_method_id BIGINT,
     "default" boolean DEFAULT false NOT NULL
@@ -102,33 +102,33 @@ CREATE TABLE spree_credit_cards (
 
 CREATE TABLE spree_customer_returns (
     id BIGSERIAL PRIMARY KEY,
-    number character varying,
+    number varchar,
     stock_location_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_gateways (
     id BIGSERIAL PRIMARY KEY,
-    type character varying,
-    name character varying,
+    type varchar,
+    name varchar,
     description text,
     active boolean DEFAULT true,
-    environment character varying DEFAULT 'development',
-    server character varying DEFAULT 'test',
+    environment varchar DEFAULT 'development',
+    server varchar DEFAULT 'test',
     test_mode boolean DEFAULT true,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     preferences text
 );
 
 CREATE TABLE spree_inventory_units (
     id BIGSERIAL PRIMARY KEY,
-    state character varying,
+    state varchar,
     variant_id BIGINT,
     order_id BIGINT,
     shipment_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     pending boolean DEFAULT true,
     line_item_id BIGINT,
@@ -142,9 +142,9 @@ CREATE TABLE spree_line_items (
     order_id BIGINT,
     quantity integer NOT NULL,
     price numeric(10,2) NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    currency character varying,
+    currency varchar,
     cost_price numeric(10,2),
     tax_category_id BIGINT,
     adjustment_total numeric(10,2) DEFAULT 0.0,
@@ -158,10 +158,10 @@ CREATE TABLE spree_line_items (
 
 CREATE TABLE spree_log_entries (
     id BIGSERIAL PRIMARY KEY,
-    source_type character varying,
+    source_type varchar,
     source_id BIGINT,
     details text,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -173,10 +173,10 @@ CREATE TABLE spree_option_type_prototypes (
 
 CREATE TABLE spree_option_types (
     id BIGSERIAL PRIMARY KEY,
-    name character varying(100),
-    presentation character varying(100),
+    name varchar(100),
+    presentation varchar(100),
     "position" integer DEFAULT 0 NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -189,10 +189,10 @@ CREATE TABLE spree_option_value_variants (
 CREATE TABLE spree_option_values (
     id BIGSERIAL PRIMARY KEY,
     "position" integer,
-    name character varying,
-    presentation character varying,
+    name varchar,
+    presentation varchar,
     option_type_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -204,36 +204,36 @@ CREATE TABLE spree_order_promotions (
 
 CREATE TABLE spree_orders (
     id BIGSERIAL PRIMARY KEY,
-    number character varying(32),
+    number varchar(32),
     item_total numeric(10,2) DEFAULT 0.0 NOT NULL,
     total numeric(10,2) DEFAULT 0.0 NOT NULL,
-    state character varying,
+    state varchar,
     adjustment_total numeric(10,2) DEFAULT 0.0 NOT NULL,
     user_id BIGINT,
     completed_at timestamp without time zone,
     bill_address_id BIGINT,
     ship_address_id BIGINT,
     payment_total numeric(10,2) DEFAULT 0.0,
-    shipment_state character varying,
-    payment_state character varying,
-    email character varying,
+    shipment_state varchar,
+    payment_state varchar,
+    email varchar,
     special_instructions text,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    currency character varying,
-    last_ip_address character varying,
+    currency varchar,
+    last_ip_address varchar,
     created_by_id BIGINT,
     shipment_total numeric(10,2) DEFAULT 0.0 NOT NULL,
     additional_tax_total numeric(10,2) DEFAULT 0.0,
     promo_total numeric(10,2) DEFAULT 0.0,
-    channel character varying DEFAULT 'spree',
+    channel varchar DEFAULT 'spree',
     included_tax_total numeric(10,2) DEFAULT 0.0 NOT NULL,
     item_count integer DEFAULT 0,
     approver_id BIGINT,
     approved_at timestamp without time zone,
     confirmation_delivered boolean DEFAULT false,
     considered_risky boolean DEFAULT false,
-    guest_token character varying,
+    guest_token varchar,
     canceled_at timestamp without time zone,
     canceler_id BIGINT,
     store_id BIGINT,
@@ -246,20 +246,20 @@ CREATE TABLE spree_payment_capture_events (
     id BIGSERIAL PRIMARY KEY,
     amount numeric(10,2) DEFAULT 0.0,
     payment_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_payment_methods (
     id BIGSERIAL PRIMARY KEY,
-    type character varying,
-    name character varying,
+    type varchar,
+    name varchar,
     description text,
     active boolean DEFAULT true,
     deleted_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    display_on character varying DEFAULT 'both',
+    display_on varchar DEFAULT 'both',
     auto_capture boolean,
     preferences text,
     "position" integer DEFAULT 0
@@ -269,24 +269,24 @@ CREATE TABLE spree_payments (
     id BIGSERIAL PRIMARY KEY,
     amount numeric(10,2) DEFAULT 0.0 NOT NULL,
     order_id BIGINT,
-    source_type character varying,
+    source_type varchar,
     source_id BIGINT,
     payment_method_id BIGINT,
-    state character varying,
-    response_code character varying,
-    avs_response character varying,
-    created_at timestamp without time zone NOT NULL,
+    state varchar,
+    response_code varchar,
+    avs_response varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    number character varying,
-    cvv_response_code character varying,
-    cvv_response_message character varying
+    number varchar,
+    cvv_response_code varchar,
+    cvv_response_message varchar
 );
 
 CREATE TABLE spree_preferences (
     id BIGSERIAL PRIMARY KEY,
     value text,
-    key character varying,
-    created_at timestamp without time zone NOT NULL,
+    key varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -294,7 +294,7 @@ CREATE TABLE spree_prices (
     id BIGSERIAL PRIMARY KEY,
     variant_id BIGINT NOT NULL,
     amount numeric(10,2),
-    currency character varying,
+    currency varchar,
     deleted_at timestamp without time zone
 );
 
@@ -303,7 +303,7 @@ CREATE TABLE spree_product_option_types (
     "position" integer,
     product_id BIGINT,
     option_type_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -315,29 +315,29 @@ CREATE TABLE spree_product_promotion_rules (
 
 CREATE TABLE spree_product_properties (
     id BIGSERIAL PRIMARY KEY,
-    value character varying,
+    value varchar,
     product_id BIGINT,
     property_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     "position" integer DEFAULT 0
 );
 
 CREATE TABLE spree_products (
     id BIGSERIAL PRIMARY KEY,
-    name character varying DEFAULT '' NOT NULL,
+    name varchar DEFAULT '' NOT NULL,
     description text,
     available_on timestamp without time zone,
     deleted_at timestamp without time zone,
-    slug character varying,
+    slug varchar,
     meta_description text,
-    meta_keywords character varying,
+    meta_keywords varchar,
     tax_category_id BIGINT,
     shipping_category_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     promotionable boolean DEFAULT true,
-    meta_title character varying,
+    meta_title varchar,
     discontinue_on timestamp without time zone
 );
 
@@ -359,16 +359,16 @@ CREATE TABLE spree_promotion_actions (
     id BIGSERIAL PRIMARY KEY,
     promotion_id BIGINT,
     "position" integer,
-    type character varying,
+    type varchar,
     deleted_at timestamp without time zone
 );
 
 CREATE TABLE spree_promotion_categories (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    created_at timestamp without time zone NOT NULL,
+    name varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    code character varying
+    code varchar
 );
 
 CREATE TABLE spree_promotion_rule_taxons (
@@ -388,35 +388,35 @@ CREATE TABLE spree_promotion_rules (
     promotion_id BIGINT,
     user_id BIGINT,
     product_group_id BIGINT,
-    type character varying,
-    created_at timestamp without time zone NOT NULL,
+    type varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    code character varying,
+    code varchar,
     preferences text
 );
 
 CREATE TABLE spree_promotions (
     id BIGSERIAL PRIMARY KEY,
-    description character varying,
+    description varchar,
     expires_at timestamp without time zone,
     starts_at timestamp without time zone,
-    name character varying,
-    type character varying,
+    name varchar,
+    type varchar,
     usage_limit integer,
-    match_policy character varying DEFAULT 'all',
-    code character varying,
+    match_policy varchar DEFAULT 'all',
+    code varchar,
     advertise boolean DEFAULT false,
-    path character varying,
-    created_at timestamp without time zone NOT NULL,
+    path varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     promotion_category_id BIGINT
 );
 
 CREATE TABLE spree_properties (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    presentation character varying NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    name varchar,
+    presentation varchar NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -434,17 +434,17 @@ CREATE TABLE spree_prototype_taxons (
 
 CREATE TABLE spree_prototypes (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    created_at timestamp without time zone NOT NULL,
+    name varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_refund_reasons (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
+    name varchar,
     active boolean DEFAULT true,
     mutable boolean DEFAULT true,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -452,8 +452,8 @@ CREATE TABLE spree_refunds (
     id BIGSERIAL PRIMARY KEY,
     payment_id BIGINT,
     amount numeric(10,2) DEFAULT 0.0 NOT NULL,
-    transaction_id character varying,
-    created_at timestamp without time zone NOT NULL,
+    transaction_id varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     refund_reason_id BIGINT,
     reimbursement_id BIGINT
@@ -464,46 +464,46 @@ CREATE TABLE spree_reimbursement_credits (
     amount numeric(10,2) DEFAULT 0.0 NOT NULL,
     reimbursement_id BIGINT,
     creditable_id BIGINT,
-    creditable_type character varying
+    creditable_type varchar
 );
 
 CREATE TABLE spree_reimbursement_types (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
+    name varchar,
     active boolean DEFAULT true,
     mutable boolean DEFAULT true,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    type character varying
+    type varchar
 );
 
 CREATE TABLE spree_reimbursements (
     id BIGSERIAL PRIMARY KEY,
-    number character varying,
-    reimbursement_status character varying,
+    number varchar,
+    reimbursement_status varchar,
     customer_return_id BIGINT,
     order_id BIGINT,
     total numeric(10,2),
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_return_authorization_reasons (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
+    name varchar,
     active boolean DEFAULT true,
     mutable boolean DEFAULT true,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_return_authorizations (
     id BIGSERIAL PRIMARY KEY,
-    number character varying,
-    state character varying,
+    number varchar,
+    state varchar,
     order_id BIGINT,
     memo text,
-    created_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT NOW(),
     updated_at timestamp without time zone,
     stock_location_id BIGINT,
     return_authorization_reason_id BIGINT
@@ -514,13 +514,13 @@ CREATE TABLE spree_return_items (
     return_authorization_id BIGINT,
     inventory_unit_id BIGINT,
     exchange_variant_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     pre_tax_amount numeric(12,4) DEFAULT 0.0 NOT NULL,
     included_tax_total numeric(12,4) DEFAULT 0.0 NOT NULL,
     additional_tax_total numeric(12,4) DEFAULT 0.0 NOT NULL,
-    reception_status character varying,
-    acceptance_status character varying,
+    reception_status varchar,
+    acceptance_status varchar,
     customer_return_id BIGINT,
     reimbursement_id BIGINT,
     acceptance_status_errors text,
@@ -531,25 +531,29 @@ CREATE TABLE spree_return_items (
 
 CREATE TABLE spree_role_users (
     id BIGSERIAL PRIMARY KEY,
-    role_id BIGINT,
-    user_id BIGINT
+    role_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    nbf DATE NOT NULL DEFAULT current_date,
+    "exp" DATE NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW(),
+    updated_at timestamp without time zone
 );
 
 CREATE TABLE spree_roles (
     id BIGSERIAL PRIMARY KEY,
-    name character varying
+    name varchar NOT NULL
 );
 
 CREATE TABLE spree_shipments (
     id BIGSERIAL PRIMARY KEY,
-    tracking character varying,
-    number character varying,
+    tracking varchar,
+    number varchar,
     cost numeric(10,2) DEFAULT 0.0,
     shipped_at timestamp without time zone,
     order_id BIGINT,
     address_id BIGINT,
-    state character varying,
-    created_at timestamp without time zone NOT NULL,
+    state varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     stock_location_id BIGINT,
     adjustment_total numeric(10,2) DEFAULT 0.0,
@@ -563,8 +567,8 @@ CREATE TABLE spree_shipments (
 
 CREATE TABLE spree_shipping_categories (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    created_at timestamp without time zone NOT NULL,
+    name varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -572,7 +576,7 @@ CREATE TABLE spree_shipping_method_categories (
     id BIGSERIAL PRIMARY KEY,
     shipping_method_id BIGINT NOT NULL,
     shipping_category_id BIGINT NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -584,15 +588,15 @@ CREATE TABLE spree_shipping_method_zones (
 
 CREATE TABLE spree_shipping_methods (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    display_on character varying,
+    name varchar,
+    display_on varchar,
     deleted_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    tracking_url character varying,
-    admin_name character varying,
+    tracking_url varchar,
+    admin_name varchar,
     tax_category_id BIGINT,
-    code character varying
+    code varchar
 );
 
 CREATE TABLE spree_shipping_rates (
@@ -601,27 +605,27 @@ CREATE TABLE spree_shipping_rates (
     shipping_method_id BIGINT,
     selected boolean DEFAULT false,
     cost numeric(8,2) DEFAULT 0,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     tax_rate_id BIGINT
 );
 
 CREATE TABLE spree_state_changes (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    previous_state character varying,
+    name varchar,
+    previous_state varchar,
     stateful_id BIGINT,
     user_id BIGINT,
-    stateful_type character varying,
-    next_state character varying,
-    created_at timestamp without time zone NOT NULL,
+    stateful_type varchar,
+    next_state varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_states (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    abbr character varying,
+    name varchar,
+    abbr varchar,
     country_id BIGINT,
     updated_at timestamp without time zone
 );
@@ -631,7 +635,7 @@ CREATE TABLE spree_stock_items (
     stock_location_id BIGINT,
     variant_id BIGINT,
     count_on_hand integer DEFAULT 0 NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     backorderable boolean DEFAULT false,
     deleted_at timestamp without time zone
@@ -639,72 +643,72 @@ CREATE TABLE spree_stock_items (
 
 CREATE TABLE spree_stock_locations (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    created_at timestamp without time zone NOT NULL,
+    name varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     "default" boolean DEFAULT false NOT NULL,
-    address1 character varying,
-    address2 character varying,
-    city character varying,
+    address1 varchar,
+    address2 varchar,
+    city varchar,
     state_id BIGINT,
-    state_name character varying,
+    state_name varchar,
     country_id BIGINT,
-    zipcode character varying,
-    phone character varying,
+    zipcode varchar,
+    phone varchar,
     active boolean DEFAULT true,
     backorderable_default boolean DEFAULT false,
     propagate_all_variants boolean DEFAULT true,
-    admin_name character varying
+    admin_name varchar
 );
 
 CREATE TABLE spree_stock_movements (
     id BIGSERIAL PRIMARY KEY,
     stock_item_id BIGINT,
     quantity integer DEFAULT 0,
-    action character varying,
-    created_at timestamp without time zone NOT NULL,
+    action varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    originator_type character varying,
+    originator_type varchar,
     originator_id BIGINT
 );
 
 CREATE TABLE spree_stock_transfers (
     id BIGSERIAL PRIMARY KEY,
-    type character varying,
-    reference character varying,
+    type varchar,
+    reference varchar,
     source_location_id BIGINT,
     destination_location_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    number character varying
+    number varchar
 );
 
 CREATE TABLE spree_store_credit_categories (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    created_at timestamp without time zone NOT NULL,
+    name varchar,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_store_credit_events (
     id BIGSERIAL PRIMARY KEY,
     store_credit_id BIGINT NOT NULL,
-    action character varying NOT NULL,
+    action varchar NOT NULL,
     amount numeric(8,2),
-    authorization_code character varying NOT NULL,
+    authorization_code varchar NOT NULL,
     user_total_amount numeric(8,2) DEFAULT 0.0 NOT NULL,
     originator_id BIGINT,
-    originator_type character varying,
+    originator_type varchar,
     deleted_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_store_credit_types (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
+    name varchar,
     priority integer,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
@@ -717,56 +721,56 @@ CREATE TABLE spree_store_credits (
     amount_used numeric(8,2) DEFAULT 0.0 NOT NULL,
     memo text,
     deleted_at timestamp without time zone,
-    currency character varying,
+    currency varchar,
     amount_authorized numeric(8,2) DEFAULT 0.0 NOT NULL,
     originator_id BIGINT,
-    originator_type character varying,
+    originator_type varchar,
     type_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_stores (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    url character varying,
+    name varchar,
+    url varchar,
     meta_description text,
     meta_keywords text,
-    seo_title character varying,
-    mail_from_address character varying,
-    default_currency character varying,
-    code character varying,
+    seo_title varchar,
+    mail_from_address varchar,
+    default_currency varchar,
+    code varchar,
     "default" boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_taggings (
     id BIGSERIAL PRIMARY KEY,
     tag_id BIGINT,
-    taggable_type character varying,
+    taggable_type varchar,
     taggable_id BIGINT,
-    tagger_type character varying,
+    tagger_type varchar,
     tagger_id BIGINT,
-    context character varying(128),
+    context varchar(128),
     created_at timestamp without time zone
 );
 
 CREATE TABLE spree_tags (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
+    name varchar,
     taggings_count integer DEFAULT 0
 );
 
 CREATE TABLE spree_tax_categories (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    description character varying,
+    name varchar,
+    description varchar,
     is_default boolean DEFAULT false,
     deleted_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    tax_code character varying
+    tax_code varchar
 );
 
 CREATE TABLE spree_tax_rates (
@@ -775,17 +779,17 @@ CREATE TABLE spree_tax_rates (
     zone_id BIGINT,
     tax_category_id BIGINT,
     included_in_price boolean DEFAULT false,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    name character varying,
+    name varchar,
     show_rate_in_label boolean DEFAULT true,
     deleted_at timestamp without time zone
 );
 
 CREATE TABLE spree_taxonomies (
     id BIGSERIAL PRIMARY KEY,
-    name character varying NOT NULL,
-    created_at timestamp without time zone NOT NULL,
+    name varchar NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     "position" integer DEFAULT 0
 );
@@ -794,69 +798,69 @@ CREATE TABLE spree_taxons (
     id BIGSERIAL PRIMARY KEY,
     parent_id BIGINT,
     "position" integer DEFAULT 0,
-    name character varying NOT NULL,
-    permalink character varying,
+    name varchar NOT NULL,
+    permalink varchar,
     taxonomy_id BIGINT,
     lft integer,
     rgt integer,
-    icon_file_name character varying,
-    icon_content_type character varying,
+    icon_file_name varchar,
+    icon_content_type varchar,
     icon_file_size integer,
     icon_updated_at timestamp without time zone,
     description text,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    meta_title character varying,
-    meta_description character varying,
-    meta_keywords character varying,
+    meta_title varchar,
+    meta_description varchar,
+    meta_keywords varchar,
     depth integer
 );
 
 CREATE TABLE spree_trackers (
     id BIGSERIAL PRIMARY KEY,
-    analytics_id character varying,
+    analytics_id varchar,
     active boolean DEFAULT true,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     engine integer DEFAULT 0 NOT NULL
 );
 
 CREATE TABLE spree_users (
     id BIGSERIAL PRIMARY KEY,
-    encrypted_password character varying(128),
-    password_salt character varying(128),
-    email character varying,
-    remember_token character varying,
-    persistence_token character varying,
-    reset_password_token character varying,
-    perishable_token character varying,
+    encrypted_password varchar NOT NULL,
+    password_salt varchar(128),
+    email varchar(255) NOT NULL,
+    remember_token varchar,
+    persistence_token varchar,
+    reset_password_token varchar,
+    perishable_token varchar,
     sign_in_count integer DEFAULT 0 NOT NULL,
     failed_attempts integer DEFAULT 0 NOT NULL,
     last_request_at timestamp without time zone,
     current_sign_in_at timestamp without time zone,
     last_sign_in_at timestamp without time zone,
-    current_sign_in_ip character varying,
-    last_sign_in_ip character varying,
-    login character varying,
+    current_sign_in_ip varchar(46),
+    last_sign_in_ip varchar(46),
+    login varchar,
     ship_address_id BIGINT,
     bill_address_id BIGINT,
-    authentication_token character varying,
-    unlock_token character varying,
+    authentication_token varchar,
+    unlock_token varchar,
     locked_at timestamp without time zone,
     reset_password_sent_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    spree_api_key character varying(48),
-    remember_created_at timestamp without time zone,
+    spree_api_key varchar(48),
+    remember_created_at timestamp without time zone DEFAULT NOW(),
     deleted_at timestamp without time zone,
-    confirmation_token character varying,
+    confirmation_token varchar,
     confirmed_at timestamp without time zone,
     confirmation_sent_at timestamp without time zone
 );
 
 CREATE TABLE spree_variants (
     id BIGSERIAL PRIMARY KEY,
-    sku character varying DEFAULT '' NOT NULL,
+    sku varchar DEFAULT '' NOT NULL,
     weight numeric(8,2) DEFAULT 0.0,
     height numeric(8,2),
     width numeric(8,2),
@@ -866,7 +870,7 @@ CREATE TABLE spree_variants (
     product_id BIGINT,
     cost_price numeric(10,2),
     "position" integer,
-    cost_currency character varying,
+    cost_currency varchar,
     track_inventory boolean DEFAULT true,
     tax_category_id BIGINT,
     updated_at timestamp without time zone NOT NULL,
@@ -876,22 +880,22 @@ CREATE TABLE spree_variants (
 
 CREATE TABLE spree_zone_members (
     id BIGSERIAL PRIMARY KEY,
-    zoneable_type character varying,
+    zoneable_type varchar,
     zoneable_id BIGINT,
     zone_id BIGINT,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_zones (
     id BIGSERIAL PRIMARY KEY,
-    name character varying,
-    description character varying,
+    name varchar,
+    description varchar,
     default_tax boolean DEFAULT false,
     zone_members_count integer DEFAULT 0,
-    created_at timestamp without time zone NOT NULL,
+    created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    kind character varying
+    kind varchar
 );
 
 
@@ -1038,6 +1042,7 @@ CREATE INDEX idx_spree_return_items_on_reimbursement_id ON spree_return_items(re
 CREATE INDEX idx_spree_return_items_on_return_authorization_id ON spree_return_items(return_authorization_id);
 CREATE INDEX idx_spree_role_users_on_role_id ON spree_role_users(role_id);
 CREATE INDEX idx_spree_role_users_on_user_id ON spree_role_users(user_id);
+CREATE UNIQUE INDEX idx_spree_role_users_pky ON spree_role_users(user_id, role_id);
 CREATE UNIQUE INDEX idx_spree_roles_on_lower_name ON spree_roles(lower((name)::text));
 CREATE INDEX idx_spree_shipments_on_address_id ON spree_shipments(address_id);
 CREATE UNIQUE INDEX idx_spree_shipments_on_number ON spree_shipments(number);
