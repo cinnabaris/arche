@@ -1,0 +1,37 @@
+require 'carmen'
+require 'json'
+
+desc 'generate carmen.json'
+task :carmen do
+  puts 'generate countries.json'
+  countries = Carmen::Country.all.map do |c|
+    states = c.subregions.map do |s|
+      { name: s.name, abbr: s.code }
+    end
+    { name: c.name,
+      iso3: c.alpha_3_code,
+      iso: c.alpha_2_code,
+      iso_name: c.name.upcase,
+      numcode: c.numeric_code,
+      states_required: c.subregions?,
+      states: states }
+  end
+  File.open('../db/seed/carmen/countries.json', 'w') do |f|
+    f.write countries.to_json
+  end
+
+  %i[en cn tw].each do |l|
+    puts "generate #{l}.json"
+    Carmen.i18n_backend.locale = l
+    items = []
+    Carmen::Country.all.each do |c|
+      items << { code: "countries.#{c.alpha_3_code}.name", message: c.name }
+      c.subregions.each do |s|
+        items << { code: "countries.#{c.alpha_3_code}.states.#{s.code}", message: s.name }
+      end
+    end
+    File.open("../db/seed/carmen/#{l}.json", 'w') do |f|
+      f.write items.to_json
+    end
+  end
+end
