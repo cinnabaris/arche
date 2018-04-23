@@ -2,6 +2,8 @@
 
 A complete open source e-commerce solution built with Rust and React(STILL IN DEVELOPMENT).
 
+Inspired by [Spree](https://github.com/spree/spree)
+
 ## Install
 
 -   add to your .zshrc
