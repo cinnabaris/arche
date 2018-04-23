@@ -103,7 +103,29 @@ impl User {
             .get_result(db.deref())?;
         Ok(it.id)
     }
-
+    pub fn sign_in(
+        db: &Db,
+        user: &i64,
+        remote: &SocketAddr,
+        sign_in_count: i64,
+        current_sign_in_ip: Option<String>,
+        current_sign_in_at: Option<NaiveDateTime>,
+    ) -> Result<()> {
+        let ip = format!("{}", remote.ip());
+        let it = users::dsl::users.filter(users::dsl::id.eq(user));
+        let now = Utc::now().naive_utc();
+        update(it)
+            .set((
+                users::dsl::sign_in_count.eq(sign_in_count + 1),
+                users::dsl::last_sign_in_ip.eq(current_sign_in_ip),
+                users::dsl::last_sign_in_at.eq(current_sign_in_at),
+                users::dsl::current_sign_in_ip.eq(ip),
+                users::dsl::current_sign_in_at.eq(&now),
+                users::dsl::updated_at.eq(&now),
+            ))
+            .execute(db.deref())?;
+        Ok(())
+    }
     pub fn confirm(db: &Db, user: &i64) -> Result<()> {
         let it = users::dsl::users.filter(users::dsl::id.eq(user));
         let now = Utc::now().naive_utc();

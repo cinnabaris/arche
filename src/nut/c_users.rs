@@ -18,8 +18,92 @@ use super::super::jwt::{Home, Jwt};
 use super::super::orm::Connection as Db;
 use super::super::queue::{self, Queue};
 use super::super::result::{Error, Result};
-use super::models::{Log, User};
+use super::super::security::hash;
+use super::models::{Log, Policy, Role, User, ROLE_ADMIN};
 use super::workers::{Email, SEND_EMAIL};
+
+#[derive(Serialize, Deserialize, Debug, Validate)]
+struct FmSignIn {
+    #[validate(email)]
+    pub email: String,
+    #[validate(length(min = "6"))]
+    pub password: String,
+}
+
+#[post("/sign-in", data = "<form>")]
+fn post_sign_in(
+    db: Db,
+    remote: SocketAddr,
+    jwt: State<Jwt>,
+    lang: Lang,
+    form: Json<FmSignIn>,
+) -> Result<Json<Value>> {
+    let Lang(lang) = lang;
+
+    form.validate()?;
+
+    let it = User::get_by_email(&db, &form.email)?;
+    if let Some(password) = it.password.clone() {
+        if hash::verify(password.as_slice(), form.password.as_bytes()) {
+            if let None = it.confirmed_at {
+                return Err(Locale::e(
+                    &db,
+                    &lang,
+                    &s!("nut.errors.user-not-confirm"),
+                    None::<Value>,
+                ));
+            }
+            if let Some(_) = it.locked_at {
+                return Err(Locale::e(
+                    &db,
+                    &lang,
+                    &s!("nut.errors.user-is-lock"),
+                    None::<Value>,
+                ));
+            }
+            let rst = db.transaction::<_, Error, _>(|| {
+                User::sign_in(
+                    &db,
+                    &it.id,
+                    &remote,
+                    it.sign_in_count,
+                    it.current_sign_in_ip,
+                    it.current_sign_in_at,
+                )?;
+                Log::add(
+                    &db,
+                    &it.id,
+                    &lang,
+                    &remote,
+                    &s!("nut.logs.user.sign-in.success"),
+                    None::<Value>,
+                )?;
+                let admin = Role::get(&db, &s!(ROLE_ADMIN), &None, &None)?;
+                let token = jwt.sum(
+                    &mut json!({"uid":it.uid, "admin":Policy::can(&db, &it.id, &admin)}),
+                    Duration::from_secs(60 * 60 * 24),
+                )?;
+                Ok(json!({ "token": token, "name":it.name }))
+            })?;
+
+            return Ok(Json(rst));
+        }
+        Log::add(
+            &db,
+            &it.id,
+            &lang,
+            &remote,
+            &s!("nut.logs.user.sign-in.failed"),
+            None::<Value>,
+        )?;
+    }
+    Err(Locale::e(
+        &db,
+        &lang,
+        &s!("nut.errors.user-bad-password"),
+        None::<Value>,
+    ))
+}
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
 struct FmResetPassword {
