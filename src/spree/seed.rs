@@ -52,20 +52,20 @@ fn administrator(db: &Db) -> Result<()> {
 
 fn countries(_db: &Db, root: &PathBuf) -> Result<()> {
     // https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
-    // https://github.com/carmen-ruby/carmen
+    // TODO https://github.com/carmen-ruby/carmen
+    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/countries.rb
     log::info!("load countries from {:?}...", &root);
 
     Ok(())
 }
 
 fn states(_db: &Db, root: &PathBuf) -> Result<()> {
-    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/countries.rb
+    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
     log::info!("load states from {:?}...", &root);
     Ok(())
 }
 
 fn zones(_db: &Db, _root: &PathBuf) -> Result<()> {
-    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
     log::info!("add 'EU_VAT' zone");
     // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
     log::info!("add 'North America' zone");
