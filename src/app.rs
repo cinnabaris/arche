@@ -178,16 +178,30 @@ pub fn generate_nginx() -> Result<()> {
 pub fn db_seed() -> Result<()> {
     let root = Path::new("db").join("seed");
     load_locales(&root)?;
-    load_countries(&root)?;
+    load_regions(&root)?;
+    init_administrator()?;
     Ok(())
 }
 
 //-----------------------------------------------------------------------------
 
-fn load_countries(root: &PathBuf) -> Result<()> {
+fn init_administrator() -> Result<()> {
+    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/roles.rb
+    // https://github.com/spree/spree_auth_devise/blob/master/db/default/users.rb
+    Ok(())
+}
+
+fn load_regions(root: &PathBuf) -> Result<()> {
     // https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
-    let file = root.join("countries.json");
-    log::info!("load countries from {:?}...", &file);
+    // https://github.com/carmen-ruby/carmen
+    let dir = root.join("carmen");
+    log::info!("load countries from {:?}...", &dir);
+    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/countries.rb
+    log::info!("load states from {:?}...", &dir);
+    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
+    log::info!("add 'EU_VAT' zone");
+    // TODO https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
+    log::info!("add 'North America' zone");
     Ok(())
 }
 

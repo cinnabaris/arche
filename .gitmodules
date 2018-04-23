@@ -1,0 +1,3 @@
+[submodule "db/seed/carmen"]
+	path = db/seed/carmen
+	url = https://github.com/carmen-ruby/carmen.git
