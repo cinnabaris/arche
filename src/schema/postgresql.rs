@@ -165,14 +165,14 @@ table! {
 table! {
     spree_countries (id) {
         id -> Int8,
-        iso_name -> Nullable<Varchar>,
-        iso -> Nullable<Varchar>,
-        iso3 -> Nullable<Varchar>,
-        name -> Nullable<Varchar>,
-        numcode -> Nullable<Int4>,
-        states_required -> Nullable<Bool>,
-        updated_at -> Nullable<Timestamp>,
-        zipcode_required -> Nullable<Bool>,
+        name -> Varchar,
+        iso_name -> Varchar,
+        numcode -> Int4,
+        iso -> Varchar,
+        iso3 -> Varchar,
+        states_required -> Bool,
+        zipcode_required -> Bool,
+        updated_at -> Timestamp,
     }
 }
 
@@ -551,7 +551,7 @@ table! {
 table! {
     spree_promotions (id) {
         id -> Int8,
-        description -> Nullable<Varchar>,
+        description -> Text,
         expires_at -> Nullable<Timestamp>,
         starts_at -> Nullable<Timestamp>,
         name -> Nullable<Varchar>,
@@ -824,10 +824,10 @@ table! {
 table! {
     spree_states (id) {
         id -> Int8,
-        name -> Nullable<Varchar>,
-        abbr -> Nullable<Varchar>,
-        country_id -> Nullable<Int8>,
-        updated_at -> Nullable<Timestamp>,
+        name -> Varchar,
+        abbr -> Varchar,
+        country_id -> Int8,
+        updated_at -> Timestamp,
     }
 }
 
@@ -990,7 +990,7 @@ table! {
     spree_tax_categories (id) {
         id -> Int8,
         name -> Nullable<Varchar>,
-        description -> Nullable<Varchar>,
+        description -> Text,
         is_default -> Nullable<Bool>,
         deleted_at -> Nullable<Timestamp>,
         created_at -> Timestamp,
@@ -1027,7 +1027,7 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         meta_title -> Nullable<Varchar>,
-        meta_description -> Nullable<Varchar>,
+        meta_description -> Text,
         meta_keywords -> Nullable<Varchar>,
         depth -> Nullable<Int4>,
     }
@@ -1119,9 +1119,9 @@ table! {
 table! {
     spree_zone_members (id) {
         id -> Int8,
-        zoneable_type -> Nullable<Varchar>,
-        zoneable_id -> Nullable<Int8>,
-        zone_id -> Nullable<Int8>,
+        zone_id -> Int8,
+        zoneable_type -> Varchar,
+        zoneable_id -> Int8,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -1130,13 +1130,13 @@ table! {
 table! {
     spree_zones (id) {
         id -> Int8,
-        name -> Nullable<Varchar>,
-        description -> Nullable<Varchar>,
-        default_tax -> Nullable<Bool>,
-        zone_members_count -> Nullable<Int4>,
+        name -> Varchar,
+        description -> Text,
+        kind -> Varchar,
+        default_tax -> Bool,
+        zone_members_count -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        kind -> Nullable<Varchar>,
     }
 }
 

@@ -8,8 +8,160 @@ use diesel::{delete, insert_into, update};
 
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
-use super::super::schema::{spree_role_users, spree_roles, spree_users};
+use super::super::schema::{spree_countries, spree_role_users, spree_roles, spree_states,
+                           spree_users, spree_zone_members, spree_zones};
 use super::super::security::hash;
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct ZoneMember {
+    pub id: i64,
+    pub zone_id: i64,
+    pub zoneable_type: String,
+    pub zoneable_id: i64,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
+
+impl ZoneMember {
+    pub fn add(
+        db: &Db,
+        zone_id: &i64,
+        zoneable_type: &String,
+        zoneable_id: &i64,
+    ) -> Result<ZoneMember> {
+        let db = db.deref();
+        let now = Utc::now().naive_utc();
+        let it: ZoneMember = insert_into(spree_zone_members::dsl::spree_zone_members)
+            .values((
+                spree_zone_members::dsl::zone_id.eq(zone_id),
+                spree_zone_members::dsl::zoneable_type.eq(zoneable_type),
+                spree_zone_members::dsl::zoneable_id.eq(zoneable_id),
+                spree_zone_members::dsl::updated_at.eq(&now),
+            ))
+            .get_result(db)?;
+        Ok(it)
+    }
+}
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct Zone {
+    pub id: i64,
+    pub name: String,
+    pub description: String,
+    pub kind: String,
+    pub default_tax: bool,
+    pub zone_members_count: i32,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
+
+impl Zone {
+    pub const COUNTRY: &'static str = "country";
+
+    pub fn count(db: &Db) -> Result<i64> {
+        let cnt: i64 = spree_zones::dsl::spree_zones
+            .count()
+            .get_result(db.deref())?;
+        Ok(cnt)
+    }
+    pub fn add(db: &Db, name: &String, description: &String, kind: &String) -> Result<Zone> {
+        let db = db.deref();
+        let now = Utc::now().naive_utc();
+        let it: Zone = insert_into(spree_zones::dsl::spree_zones)
+            .values((
+                spree_zones::dsl::name.eq(name),
+                spree_zones::dsl::description.eq(description),
+                spree_zones::dsl::kind.eq(kind),
+                spree_zones::dsl::updated_at.eq(&now),
+            ))
+            .get_result(db)?;
+        Ok(it)
+    }
+}
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct State {
+    pub id: i64,
+    pub name: String,
+    pub abbr: String,
+    pub country_id: i64,
+    pub updated_at: NaiveDateTime,
+}
+
+impl State {
+    pub fn add(db: &Db, country: &i64, name: &String, abbr: &String) -> Result<State> {
+        let now = Utc::now().naive_utc();
+        let it: State = insert_into(spree_states::dsl::spree_states)
+            .values((
+                spree_states::dsl::name.eq(name),
+                spree_states::dsl::abbr.eq(abbr),
+                spree_states::dsl::country_id.eq(country),
+                spree_states::dsl::updated_at.eq(&now),
+            ))
+            .get_result(db.deref())?;
+        Ok(it)
+    }
+}
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct Country {
+    pub id: i64,
+    pub name: String,
+    pub iso_name: String,
+    pub numcode: i32,
+    pub iso: String,
+    pub iso3: String,
+    pub states_required: bool,
+    pub zipcode_required: bool,
+    pub updated_at: NaiveDateTime,
+}
+
+impl Country {
+    pub fn get_id_by_iso(db: &Db, iso: &String) -> Result<i64> {
+        let id: i64 = spree_countries::dsl::spree_countries
+            .select(spree_countries::dsl::id)
+            .filter(spree_countries::dsl::iso.eq(iso))
+            .first(db.deref())?;
+        Ok(id)
+    }
+    pub fn count(db: &Db) -> Result<i64> {
+        let cnt: i64 = spree_countries::dsl::spree_countries
+            .count()
+            .get_result(db.deref())?;
+        Ok(cnt)
+    }
+    pub fn add(
+        db: &Db,
+        name: &String,
+        iso_name: &String,
+        numcode: &i32,
+        iso: &String,
+        iso3: &String,
+        states_required: &bool,
+    ) -> Result<Country> {
+        let now = Utc::now().naive_utc();
+        let no_zipcode_iso_codes = vec![
+            "AO", "AG", "AW", "BS", "BZ", "BJ", "BM", "BO", "BW", "BF", "BI", "CM", "CF", "KM",
+            "CG", "CD", "CK", "CUW", "CI", "DJ", "DM", "GQ", "ER", "FJ", "TF", "GAB", "GM", "GH",
+            "GD", "GN", "GY", "HK", "IE", "KI", "KP", "LY", "MO", "MW", "ML", "MR", "NR", "AN",
+            "NU", "KP", "PA", "QA", "RW", "KN", "LC", "ST", "SC", "SL", "SB", "SO", "SR", "SY",
+            "TZ", "TL", "TK", "TG", "TO", "TV", "UG", "AE", "VU", "YE", "ZW",
+        ];
+        let it: Country = insert_into(spree_countries::dsl::spree_countries)
+            .values((
+                spree_countries::dsl::name.eq(name),
+                spree_countries::dsl::iso_name.eq(iso_name),
+                spree_countries::dsl::numcode.eq(numcode),
+                spree_countries::dsl::iso.eq(iso),
+                spree_countries::dsl::iso3.eq(iso3),
+                spree_countries::dsl::states_required.eq(states_required),
+                spree_countries::dsl::zipcode_required.eq(no_zipcode_iso_codes.contains(&&iso[..])),
+                spree_countries::dsl::updated_at.eq(&now),
+            ))
+            .get_result(db.deref())?;
+        Ok(it)
+    }
+}
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Role {

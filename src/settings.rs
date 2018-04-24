@@ -18,10 +18,10 @@ pub struct Setting {
     pub key: String,
     pub salt: Option<Vec<u8>>,
     pub value: Vec<u8>,
-    #[serde(rename = "updatedAt")]
-    pub updated_at: NaiveDateTime,
     #[serde(rename = "createdAt")]
     pub created_at: NaiveDateTime,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: NaiveDateTime,
 }
 
 impl Setting {

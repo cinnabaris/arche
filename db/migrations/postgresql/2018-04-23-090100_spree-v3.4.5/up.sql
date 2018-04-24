@@ -73,14 +73,14 @@ CREATE TABLE spree_calculators (
 
 CREATE TABLE spree_countries (
     id BIGSERIAL PRIMARY KEY,
-    iso_name varchar,
-    iso varchar,
-    iso3 varchar,
-    name varchar,
-    numcode integer,
-    states_required boolean DEFAULT false,
-    updated_at timestamp without time zone,
-    zipcode_required boolean DEFAULT true
+    name varchar(255) NOT NULL,
+    iso_name varchar(255) NOT NULL,
+    numcode integer NOT NULL,
+    iso varchar(2) NOT NULL,
+    iso3 varchar(3) NOT NULL,
+    states_required boolean NOT NULL DEFAULT false,
+    zipcode_required boolean NOT NULL DEFAULT true,
+    updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_credit_cards (
@@ -397,7 +397,7 @@ CREATE TABLE spree_promotion_rules (
 
 CREATE TABLE spree_promotions (
     id BIGSERIAL PRIMARY KEY,
-    description varchar,
+    description TEXT NOT NULL,
     expires_at timestamp without time zone,
     starts_at timestamp without time zone,
     name varchar,
@@ -624,10 +624,10 @@ CREATE TABLE spree_state_changes (
 
 CREATE TABLE spree_states (
     id BIGSERIAL PRIMARY KEY,
-    name varchar,
-    abbr varchar,
-    country_id BIGINT,
-    updated_at timestamp without time zone
+    name varchar(255) NOT NULL,
+    abbr varchar(32) NOT NULL,
+    country_id BIGINT NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_stock_items (
@@ -765,7 +765,7 @@ CREATE TABLE spree_tags (
 CREATE TABLE spree_tax_categories (
     id BIGSERIAL PRIMARY KEY,
     name varchar,
-    description varchar,
+    description TEXT NOT NULL,
     is_default boolean DEFAULT false,
     deleted_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT NOW() NOT NULL,
@@ -811,7 +811,7 @@ CREATE TABLE spree_taxons (
     created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     meta_title varchar,
-    meta_description varchar,
+    meta_description TEXT NOT NULL,
     meta_keywords varchar,
     depth integer
 );
@@ -880,22 +880,22 @@ CREATE TABLE spree_variants (
 
 CREATE TABLE spree_zone_members (
     id BIGSERIAL PRIMARY KEY,
-    zoneable_type varchar,
-    zoneable_id BIGINT,
-    zone_id BIGINT,
+    zone_id BIGINT NOT NULL,
+    zoneable_type varchar(16) NOT NULL,
+    zoneable_id BIGINT NOT NULL,
     created_at timestamp without time zone DEFAULT NOW() NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE spree_zones (
     id BIGSERIAL PRIMARY KEY,
-    name varchar,
-    description varchar,
-    default_tax boolean DEFAULT false,
-    zone_members_count integer DEFAULT 0,
+    name varchar(255) NOT NULL,
+    description TEXT NOT NULL,
+    kind varchar(16) NOT NULL,
+    default_tax boolean DEFAULT false NOT NULL,
+    zone_members_count integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone DEFAULT NOW() NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    kind varchar
+    updated_at timestamp without time zone NOT NULL
 );
 
 

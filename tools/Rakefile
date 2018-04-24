@@ -12,12 +12,12 @@ task :carmen do
       iso3: c.alpha_3_code,
       iso: c.alpha_2_code,
       iso_name: c.name.upcase,
-      numcode: c.numeric_code,
+      numcode: c.numeric_code.to_i,
       states_required: c.subregions?,
       states: states }
   end
   File.open('../db/seed/carmen/countries.json', 'w') do |f|
-    f.write countries.to_json
+    f.write JSON.pretty_generate(countries)
   end
 
   %i[en cn tw].each do |l|
@@ -31,7 +31,7 @@ task :carmen do
       end
     end
     File.open("../db/seed/carmen/#{l}.json", 'w') do |f|
-      f.write items.to_json
+      f.write JSON.pretty_generate(items)
     end
   end
 end
