@@ -5,6 +5,8 @@ use base64;
 use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
+use hex;
+use md5::{self, Digest};
 use serde_json;
 
 use super::super::orm::Connection as Db;
@@ -331,6 +333,15 @@ pub struct User {
 }
 
 impl User {
+    // https://en.gravatar.com/site/implement/hash/
+    pub fn gravatar_logo(email: &String) -> String {
+        let mut h = md5::Md5::new();
+        h.input(email.to_lowercase().trim().as_bytes());
+        format!(
+            "https://www.gravatar.com/avatar/{}.png",
+            hex::encode(h.result().as_slice())
+        )
+    }
     pub fn get_by_email(db: &Db, email: &String) -> Result<User> {
         let it = spree_users::dsl::spree_users
             .filter(spree_users::dsl::email.eq(email))

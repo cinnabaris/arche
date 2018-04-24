@@ -17,7 +17,7 @@ use toml;
 use super::orm::{self, Connection as Db};
 use super::queue::{self, Provider as QueueProvider};
 use super::result::{Error, Result};
-use super::{cache, env, i18n, jwt, router, security, spree};
+use super::{cache, env, i18n, jwt, nut, router, security, spree};
 
 pub fn server() -> Result<()> {
     // worker
@@ -186,6 +186,7 @@ pub fn db_seed() -> Result<()> {
     db.transaction::<_, Error, _>(|| {
         load_locales(&db, &root)?;
         spree::seed::load(&db, &root)?;
+        nut::seed::administrator(&db)?;
         Ok(())
     })
 }

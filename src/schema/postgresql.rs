@@ -99,6 +99,16 @@ table! {
 }
 
 table! {
+    logs (id) {
+        id -> Int8,
+        user_id -> Int8,
+        ip -> Varchar,
+        message -> Varchar,
+        created_at -> Timestamptz,
+    }
+}
+
+table! {
     settings (id) {
         id -> Int8,
         key -> Varchar,
@@ -1180,6 +1190,7 @@ allow_tables_to_appear_in_same_query!(
     forum_topics_tags,
     friendly_id_slugs,
     locales,
+    logs,
     settings,
     spree_addresses,
     spree_adjustments,
