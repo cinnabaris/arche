@@ -9,13 +9,12 @@ use validator::Validate;
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
 use super::forms::UserSignUp;
-use super::models::{Country, Role, State, User, Zone, ZoneMember};
+use super::models::{Country, Currency, Role, State, User, Zone, ZoneMember};
 
 pub fn load(db: &Db, root: &PathBuf) -> Result<()> {
-    let root = root.join("carmen");
-    regions(db, &root)?;
+    regions(db, root)?;
     zones(db)?;
-    currencies(db, &root)?;
+    currencies(db, root)?;
     administrator(db)?;
     Ok(())
 }
@@ -27,7 +26,7 @@ fn administrator(db: &Db) -> Result<()> {
     }
     // https://github.com/spree/spree/blob/master/core/db/default/spree/roles.rb
     // https://github.com/spree/spree_auth_devise/blob/master/db/default/users.rb
-
+    log::info!("to add an administrator");
     let stdin = io::stdin();
     println!("email:");
     let mut email = String::new();
@@ -41,7 +40,6 @@ fn administrator(db: &Db) -> Result<()> {
     };
     form.validate()?;
 
-    log::info!("add administrator {}", &form.email);
     let user = User::sign_up(db, &form.email, &form.password)?;
     User::confirm(db, &user.id)?;
     for it in vec![Role::ROOT, Role::ADMIN, Role::MEMBER] {
@@ -52,8 +50,59 @@ fn administrator(db: &Db) -> Result<()> {
     Ok(())
 }
 
-fn currencies(_db: &Db, _root: &PathBuf) -> Result<()> {
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct CurrencyItem {
+    pub key: String,
+    pub iso_code: String,
+    pub name: String,
+    pub symbol: Option<String>,
+    pub alternate_symbols: Option<Vec<String>>,
+    pub subunit: Option<String>,
+    pub subunit_to_unit: i32,
+    pub symbol_first: bool,
+    pub html_entity: Option<String>,
+    pub decimal_mark: String,
+    pub thousands_separator: String,
+    pub iso_numeric: Option<i32>,
+    pub smallest_denomination: Option<i32>,
+}
+
+fn currencies(db: &Db, root: &PathBuf) -> Result<()> {
+    if Currency::count(db)? > 0 {
+        log::warn!("ingnore import currencies");
+        return Ok(());
+    }
+
+    let root = root.join("money");
     // https://www.iso.org/iso-4217-currency-codes.html
+    let file = root.join("currencies.json");
+    log::info!("load currencies data from {:?}...", &file);
+    let currencies: Vec<CurrencyItem> = serde_json::from_reader(File::open(file)?)?;
+
+    let mut total: isize = 0;
+
+    for it in currencies {
+        Currency::add(
+            db,
+            &it.key,
+            &it.iso_code,
+            &it.name,
+            &it.symbol,
+            &it.alternate_symbols,
+            &it.subunit,
+            &it.subunit_to_unit,
+            &it.symbol_first,
+            &it.html_entity,
+            &it.decimal_mark,
+            &it.thousands_separator,
+            &it.iso_numeric,
+            &it.smallest_denomination,
+        )?;
+
+        total = total + 1;
+    }
+    log::info!("find {} currencies", total);
+
     Ok(())
 }
 
@@ -79,6 +128,8 @@ fn regions(db: &Db, root: &PathBuf) -> Result<()> {
         log::warn!("ingnore import countries,states,zones");
         return Ok(());
     }
+
+    let root = root.join("carmen");
     // https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
     // https://github.com/carmen-ruby/carmen
     // https://github.com/spree/spree/blob/master/core/db/default/spree/countries.rb

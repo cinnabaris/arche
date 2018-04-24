@@ -1,7 +1,34 @@
 require 'carmen'
 require 'json'
+require 'money'
 
-desc 'generate carmen.json'
+desc 'generate money seeds'
+task :money do
+  puts 'generate currencies.json'
+  items = Money::Currency.table.map do |key, val|
+    # it.except!(:priority)
+    {
+      key: key,
+      iso_code: val[:iso_code],
+      name: val[:name],
+      symbol:  val[:symbol].empty? ? nil : val[:symbol],
+      alternate_symbols: val[:alternate_symbols],
+      subunit:  val[:subunit].nil? || val[:subunit].empty? ? nil : val[:subunit],
+      subunit_to_unit: val[:subunit_to_unit],
+      symbol_first: val[:symbol_first],
+      html_entity: val[:html_entity].empty? ? nil : val[:html_entity],
+      decimal_mark: val[:decimal_mark],
+      thousands_separator: val[:thousands_separator],
+      iso_numeric: val[:iso_numeric].empty? ? nil : val[:iso_numeric].to_i,
+      smallest_denomination: val[:smallest_denomination].to_i || nil
+    }
+  end
+  File.open('../db/seed/money/currencies.json', 'w') do |f|
+    f.write JSON.pretty_generate(items)
+  end
+end
+
+desc 'generate carmen seeds'
 task :carmen do
   puts 'generate countries.json'
   countries = Carmen::Country.all.map do |c|

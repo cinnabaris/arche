@@ -1,4 +1,24 @@
 table! {
+    currencies (id) {
+        id -> Int8,
+        key -> Varchar,
+        iso_code -> Varchar,
+        name -> Varchar,
+        symbol -> Nullable<Varchar>,
+        alternate_symbols -> Varchar,
+        subunit -> Nullable<Varchar>,
+        subunit_to_unit -> Int4,
+        symbol_first -> Bool,
+        html_entity -> Nullable<Varchar>,
+        decimal_mark -> Bpchar,
+        thousands_separator -> Bpchar,
+        iso_numeric -> Nullable<Int4>,
+        smallest_denomination -> Nullable<Int4>,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     forum_categories (id) {
         id -> Int8,
         name -> Varchar,
@@ -1152,6 +1172,7 @@ table! {
 }
 
 allow_tables_to_appear_in_same_query!(
+    currencies,
     forum_categories,
     forum_posts,
     forum_tags,

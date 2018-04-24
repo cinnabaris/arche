@@ -5,12 +5,91 @@ use base64;
 use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
+use serde_json;
 
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
-use super::super::schema::{spree_countries, spree_role_users, spree_roles, spree_states,
-                           spree_users, spree_zone_members, spree_zones};
+use super::super::schema::{currencies, spree_countries, spree_role_users, spree_roles,
+                           spree_states, spree_users, spree_zone_members, spree_zones};
 use super::super::security::hash;
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct Currency {
+    pub id: i64,
+    pub key: String,
+    pub iso_code: String,
+    pub name: String,
+    pub symbol: Option<String>,
+    pub alternate_symbols: String,
+    pub subunit: Option<String>,
+    pub subunit_to_unit: i32,
+    pub symbol_first: bool,
+    pub html_entity: Option<String>,
+    pub decimal_mark: String,
+    pub thousands_separator: String,
+    pub iso_numeric: Option<i32>,
+    pub smallest_denomination: Option<i32>,
+    pub updated_at: NaiveDateTime,
+}
+
+impl Currency {
+    pub fn alternate_symbols(&self) -> Result<Vec<String>> {
+        let items: Vec<String> = serde_json::from_slice(self.alternate_symbols.as_bytes())?;
+        Ok(items)
+    }
+    pub fn get_by_iso_code(db: &Db, iso_code: &String) -> Result<Currency> {
+        let it: Currency = currencies::dsl::currencies
+            .filter(currencies::dsl::iso_code.eq(iso_code))
+            .first(db.deref())?;
+        Ok(it)
+    }
+    pub fn count(db: &Db) -> Result<i64> {
+        let cnt: i64 = currencies::dsl::currencies.count().get_result(db.deref())?;
+        Ok(cnt)
+    }
+    pub fn add(
+        db: &Db,
+        key: &String,
+        iso_code: &String,
+        name: &String,
+        symbol: &Option<String>,
+        alternate_symbols: &Option<Vec<String>>,
+        subunit: &Option<String>,
+        subunit_to_unit: &i32,
+        symbol_first: &bool,
+        html_entity: &Option<String>,
+        decimal_mark: &String,
+        thousands_separator: &String,
+        iso_numeric: &Option<i32>,
+        smallest_denomination: &Option<i32>,
+    ) -> Result<Currency> {
+        let db = db.deref();
+        let now = Utc::now().naive_utc();
+        let alternate_symbols = match alternate_symbols {
+            Some(v) => json!(v),
+            None => json!({}),
+        };
+        let it: Currency = insert_into(currencies::dsl::currencies)
+            .values((
+                currencies::dsl::key.eq(key),
+                currencies::dsl::iso_code.eq(iso_code),
+                currencies::dsl::name.eq(name),
+                currencies::dsl::symbol.eq(symbol),
+                currencies::dsl::alternate_symbols.eq(&serde_json::to_string(&alternate_symbols)?),
+                currencies::dsl::subunit.eq(subunit),
+                currencies::dsl::subunit_to_unit.eq(subunit_to_unit),
+                currencies::dsl::symbol_first.eq(symbol_first),
+                currencies::dsl::html_entity.eq(html_entity),
+                currencies::dsl::decimal_mark.eq(decimal_mark),
+                currencies::dsl::thousands_separator.eq(thousands_separator),
+                currencies::dsl::iso_numeric.eq(iso_numeric),
+                currencies::dsl::smallest_denomination.eq(smallest_denomination),
+                currencies::dsl::updated_at.eq(&now),
+            ))
+            .get_result(db)?;
+        Ok(it)
+    }
+}
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct ZoneMember {

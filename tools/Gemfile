@@ -4,3 +4,4 @@ source "https://rubygems.org"
 
 gem "carmen"
 gem "rake"
+gem "money"
