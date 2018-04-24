@@ -1106,7 +1106,7 @@ table! {
         last_sign_in_at -> Nullable<Timestamp>,
         current_sign_in_ip -> Nullable<Varchar>,
         last_sign_in_ip -> Nullable<Varchar>,
-        login -> Nullable<Varchar>,
+        login -> Varchar,
         ship_address_id -> Nullable<Int8>,
         bill_address_id -> Nullable<Int8>,
         authentication_token -> Nullable<Varchar>,

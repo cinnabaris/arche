@@ -1,3 +1,4 @@
+use std::net::SocketAddr;
 use std::ops::Add;
 use std::ops::Deref;
 
@@ -8,6 +9,7 @@ use diesel::{delete, insert_into, update};
 use hex;
 use md5::{self, Digest};
 use serde_json;
+use uuid::Uuid;
 
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
@@ -315,7 +317,7 @@ pub struct User {
     pub last_sign_in_at: Option<NaiveDateTime>,
     pub current_sign_in_ip: Option<String>,
     pub last_sign_in_ip: Option<String>,
-    pub login: Option<String>,
+    pub login: String,
     pub ship_address_id: Option<i64>,
     pub bill_address_id: Option<i64>,
     pub authentication_token: Option<String>,
@@ -333,6 +335,16 @@ pub struct User {
 }
 
 impl User {
+    pub fn sum_password(s: &String) -> Result<String> {
+        Ok(base64::encode(&hash::sum(s.as_bytes())?))
+    }
+    pub fn chk_password(p: &String, s: &String) -> bool {
+        if let Ok(p) = base64::decode(p) {
+            return hash::verify(&p, s.as_bytes());
+        }
+        false
+    }
+
     // https://en.gravatar.com/site/implement/hash/
     pub fn gravatar_logo(email: &String) -> String {
         let mut h = md5::Md5::new();
@@ -342,6 +354,7 @@ impl User {
             hex::encode(h.result().as_slice())
         )
     }
+
     pub fn get_by_email(db: &Db, email: &String) -> Result<User> {
         let it = spree_users::dsl::spree_users
             .filter(spree_users::dsl::email.eq(email))
@@ -354,14 +367,37 @@ impl User {
             .get_result(db.deref())?;
         Ok(cnt)
     }
+    pub fn sign_in(
+        db: &Db,
+        user: &i64,
+        remote: &SocketAddr,
+        sign_in_count: i32,
+        current_sign_in_ip: Option<String>,
+        current_sign_in_at: Option<NaiveDateTime>,
+    ) -> Result<()> {
+        let ip = format!("{}", remote.ip());
+        let it = spree_users::dsl::spree_users.filter(spree_users::dsl::id.eq(user));
+        let now = Utc::now().naive_utc();
+        update(it)
+            .set((
+                spree_users::dsl::sign_in_count.eq(sign_in_count + 1),
+                spree_users::dsl::last_sign_in_ip.eq(current_sign_in_ip),
+                spree_users::dsl::last_sign_in_at.eq(current_sign_in_at),
+                spree_users::dsl::current_sign_in_ip.eq(ip),
+                spree_users::dsl::current_sign_in_at.eq(&now),
+                spree_users::dsl::updated_at.eq(&now),
+            ))
+            .execute(db.deref())?;
+        Ok(())
+    }
     pub fn sign_up(db: &Db, email: &String, password: &String) -> Result<User> {
         let now = Utc::now().naive_utc();
         let it: User = insert_into(spree_users::dsl::spree_users)
             .values((
                 spree_users::dsl::email.eq(email),
-                spree_users::dsl::encrypted_password
-                    .eq(&base64::encode(&hash::sum(password.as_bytes())?)),
+                spree_users::dsl::encrypted_password.eq(&User::sum_password(password)?),
                 spree_users::dsl::updated_at.eq(&now),
+                spree_users::dsl::login.eq(&Uuid::new_v4().to_string()),
             ))
             .get_result(db.deref())?;
         Ok(it)
@@ -377,6 +413,18 @@ impl User {
             .execute(db.deref())?;
         Ok(())
     }
+
+    pub fn password(db: &Db, user: &i64, password: &String) -> Result<()> {
+        let it = spree_users::dsl::spree_users.filter(spree_users::dsl::id.eq(user));
+        update(it)
+            .set((
+                spree_users::dsl::encrypted_password.eq(&User::sum_password(password)?),
+                spree_users::dsl::updated_at.eq(Utc::now().naive_utc()),
+            ))
+            .execute(db.deref())?;
+        Ok(())
+    }
+
     pub fn lock(db: &Db, user: &i64, ok: bool) -> Result<()> {
         let it = spree_users::dsl::spree_users.filter(spree_users::dsl::id.eq(user));
         let now = Utc::now().naive_utc();

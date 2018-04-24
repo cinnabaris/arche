@@ -54,18 +54,6 @@ class Widget extends Component {
             offset: 2
           }}>
           <Form onSubmit={this.handleSubmit}>
-            <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.username" />} hasFeedback={true}>
-              {
-                getFieldDecorator('name', {
-                  rules: [
-                    {
-                      required: true,
-                      message: formatMessage({id: "validator.required"})
-                    }
-                  ]
-                })(<Input/>)
-              }
-            </FormItem>
             <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.email" />} hasFeedback={true}>
               {
                 getFieldDecorator('email', {

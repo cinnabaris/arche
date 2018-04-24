@@ -8,26 +8,19 @@ use rocket::Route;
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![
-        // ("/", routes!(c_home::index)),
-        // (
-        //     "/api",
-        //     routes!(
-        //         c_home::get_locales,
-        //         c_home::get_layout,
-        //         c_home::post_install
-        //     ),
-        // ),
-        // (
-        //     "/api/users",
-        //     routes!(
-        //         c_users::post_sign_up,
-        //         c_users::get_confirm_token,
-        //         c_users::post_confirm,
-        //         c_users::get_unlock_token,
-        //         c_users::post_unlock,
-        //         c_users::post_forgot_password,
-        //         c_users::post_reset_password
-        //     ),
-        // ),
+        ("/", routes!(c_home::index)),
+        ("/api", routes!(c_home::get_locales, c_home::get_layout)),
+        (
+            "/api/users",
+            routes!(
+                c_users::post_sign_up,
+                c_users::get_confirm_token,
+                c_users::post_confirm,
+                c_users::get_unlock_token,
+                c_users::post_unlock,
+                c_users::post_forgot_password,
+                c_users::post_reset_password
+            ),
+        ),
     ]
 }

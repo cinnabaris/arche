@@ -6,7 +6,7 @@ use validator::Validate;
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
 use super::super::spree::models::{Role, User};
-use super::c_users::UserSignUp;
+use super::c_users::FmSignUp;
 
 pub fn administrator(db: &Db) -> Result<()> {
     if User::count(db)? > 0 {
@@ -23,7 +23,7 @@ pub fn administrator(db: &Db) -> Result<()> {
     println!("password:");
     let mut password = String::new();
     stdin.lock().read_line(&mut password)?;
-    let form = UserSignUp {
+    let form = FmSignUp {
         email: s!(email.trim()),
         password: s!(password.trim()),
     };

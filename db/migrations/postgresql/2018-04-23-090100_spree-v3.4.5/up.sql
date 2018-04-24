@@ -841,7 +841,7 @@ CREATE TABLE spree_users (
     last_sign_in_at timestamp without time zone,
     current_sign_in_ip varchar(46),
     last_sign_in_ip varchar(46),
-    login varchar,
+    login varchar(36) NOT NULL,
     ship_address_id BIGINT,
     bill_address_id BIGINT,
     authentication_token varchar,
@@ -1130,3 +1130,5 @@ CREATE UNIQUE INDEX idx_spree_taggings_idx ON spree_taggings(tag_id, taggable_id
 CREATE INDEX idx_spree_taggings_idy ON spree_taggings(taggable_id, taggable_type, tagger_id, context);
 CREATE INDEX idx_spree_stock_item_by_loc_and_var_id ON spree_stock_items(stock_location_id, variant_id);
 CREATE UNIQUE INDEX idx_spree_shipping_method_and_categories ON spree_shipping_method_categories(shipping_category_id, shipping_method_id);
+
+CREATE UNIQUE INDEX idx_spree_users_on_login ON spree_users(login);
