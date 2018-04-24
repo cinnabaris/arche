@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::PathBuf;
@@ -6,6 +7,7 @@ use log;
 use serde_json;
 use validator::Validate;
 
+use super::super::i18n::Locale;
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
 use super::forms::UserSignUp;
@@ -26,7 +28,7 @@ fn administrator(db: &Db) -> Result<()> {
     }
     // https://github.com/spree/spree/blob/master/core/db/default/spree/roles.rb
     // https://github.com/spree/spree_auth_devise/blob/master/db/default/users.rb
-    log::info!("to add an administrator");
+    log::info!("create an administrator");
     let stdin = io::stdin();
     println!("email:");
     let mut email = String::new();
@@ -123,6 +125,12 @@ struct StateItem {
     abbr: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct LocaleItem {
+    code: String,
+    message: String,
+}
+
 fn regions(db: &Db, root: &PathBuf) -> Result<()> {
     if Country::count(db)? > 0 {
         log::warn!("ingnore import countries,states,zones");
@@ -157,7 +165,25 @@ fn regions(db: &Db, root: &PathBuf) -> Result<()> {
         }
         ct = ct + 1;
     }
+
     log::info!("find {} countries, {} states", ct, st);
+
+    let mut langs = HashMap::new();
+    langs.insert("en-US", "en");
+    langs.insert("zh-Hans", "cn");
+    langs.insert("zh-Hant", "tw");
+    for (l, n) in langs {
+        let mut file = root.join(n);
+        file.set_extension("json");
+        log::info!("load locales from {:?}", file);
+        let items: Vec<LocaleItem> = serde_json::from_reader(File::open(file)?)?;
+        let mut total = 0;
+        for it in items {
+            Locale::set(db, &s!(l), &it.code, &it.message)?;
+            total = total + 1;
+        }
+        log::info!("insert {}", total);
+    }
 
     Ok(())
 }

@@ -5,8 +5,8 @@ use std::str::FromStr;
 use std::{ffi, fs};
 
 use chrono::{NaiveDateTime, Utc};
-use diesel::insert_into;
 use diesel::prelude::*;
+use diesel::{insert_into, update};
 use handlebars::Handlebars;
 use hyper::header::{AcceptLanguage, Header, LanguageTag, Raw};
 use ini::Ini;
@@ -109,7 +109,7 @@ impl Locale {
         Error::WithDescription(Locale::t(db, lang, code, args))
     }
     pub fn t<T: Serialize>(db: &Db, lang: &String, code: &String, args: Option<T>) -> String {
-        if let Ok(msg) = Locale::get_message(db, lang, code) {
+        if let Ok(msg) = Locale::get(db, lang, code) {
             if let Some(args) = args {
                 if let Ok(msg) = Handlebars::new().render_template(&msg, &args) {
                     return msg;
@@ -120,13 +120,45 @@ impl Locale {
         }
         return format!("{}.{}", lang, code);
     }
-    pub fn get_message(con: &Db, lang: &String, code: &String) -> Result<String> {
+    pub fn get(con: &Db, lang: &String, code: &String) -> Result<String> {
         let msg = locales::dsl::locales
             .select(locales::dsl::message)
             .filter(locales::dsl::lang.eq(lang))
             .filter(locales::dsl::code.eq(code))
             .first::<String>(con.deref())?;
         Ok(msg)
+    }
+    pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<i64> {
+        let now = Utc::now().naive_utc();
+        let db = db.deref();
+        match locales::dsl::locales
+            .select(locales::dsl::id)
+            .filter(locales::dsl::lang.eq(lang))
+            .filter(locales::dsl::code.eq(code))
+            .first::<i64>(db)
+        {
+            Ok(id) => {
+                let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
+                update(it)
+                    .set((
+                        locales::dsl::message.eq(message),
+                        locales::dsl::updated_at.eq(&now),
+                    ))
+                    .execute(db)?;
+                Ok(id)
+            }
+            Err(_) => {
+                let it: Locale = insert_into(locales::dsl::locales)
+                    .values((
+                        locales::dsl::lang.eq(&lang),
+                        locales::dsl::code.eq(&code),
+                        locales::dsl::message.eq(&message),
+                        locales::dsl::updated_at.eq(Utc::now().naive_utc()),
+                    ))
+                    .get_result(db)?;
+                Ok(it.id)
+            }
+        }
     }
     pub fn map_by_lang(con: &Db, lang: &String) -> Result<BTreeMap<String, String>> {
         let mut items = BTreeMap::new();

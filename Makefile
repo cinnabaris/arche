@@ -7,7 +7,7 @@ api:
 	cargo build --release
 	strip -s target/release/arche
 	mkdir -p $(dist)
-	-cp -r target/release/arche migrations locales templates themes log4rs.yml LICENSE README.md $(dist)/
+	-cp -r target/release/arche db templates themes log4rs.yml LICENSE README.md $(dist)/
 
 www:
 	cd dashboard && npm run build
