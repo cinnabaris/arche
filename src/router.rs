@@ -1,12 +1,13 @@
 use std::path::{Path, PathBuf};
 
+use rocket::http::Status;
 use rocket::response::NamedFile;
 use rocket::{self, Catcher, Route, State};
 
 use super::{env, nut};
 
 pub fn catchers() -> Vec<Catcher> {
-    errors![not_found, bad_request]
+    errors![not_found, bad_request, forbidden]
 }
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
@@ -29,10 +30,15 @@ pub fn get_assets(cfg: State<env::Config>, file: PathBuf) -> Option<NamedFile> {
 
 #[error(404)]
 fn not_found() -> &'static str {
-    "Not found"
+    Status::NotFound.reason
 }
 
 #[error(400)]
 fn bad_request() -> &'static str {
-    "Bad request"
+    Status::BadRequest.reason
+}
+
+#[error(403)]
+fn forbidden() -> &'static str {
+    Status::Forbidden.reason
 }

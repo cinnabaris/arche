@@ -19,7 +19,7 @@ export const options = (method) => {
     mode: 'cors',
     credentials: 'include',
     headers: {
-      'Authorization': `BEARER ${getToken()}`
+      'Authorization': `Bearer ${getToken()}`
     }
   }
 }

@@ -1,6 +1,8 @@
 use base64;
+use hyper::header::{Authorization, Bearer, ContentType, Header};
 use rocket::config::{Environment, Limits};
 use rocket::http::Method;
+
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 
 use super::result::{Error, Result};
@@ -88,8 +90,8 @@ impl Http {
                 .map(From::from)
                 .collect(),
             allowed_headers: AllowedHeaders::some(&[
-                "Authorization",
-                "Content-Type",
+                Authorization::<Bearer>::header_name(),
+                ContentType::header_name(),
                 "X-Requested-With",
             ]),
             allow_credentials: true,

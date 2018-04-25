@@ -1,6 +1,6 @@
 import RenderAuthorized from 'ant-design-pro/lib/Authorized';
 
-export const USER = 'user'
+export const MEMBER = 'member'
 export const ADMIN = 'admin'
 
 const TOKEN = "token"

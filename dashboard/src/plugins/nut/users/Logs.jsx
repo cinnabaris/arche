@@ -7,7 +7,7 @@ import {connect} from 'react-redux'
 import Layout from '../../../layouts/dashboard'
 import {get} from '../../../ajax'
 import TimeAgo from '../../../components/TimeAgo'
-import {USER, ADMIN} from '../../../auth'
+import {MEMBER} from '../../../auth'
 
 class Widget extends Component {
   state = {
@@ -23,10 +23,10 @@ class Widget extends Component {
       id: "nut.users.logs.title"
     }
     return (<Layout breads={[{
-          href: "/users/logs",
-          label: title
-        }
-      ]} roles={[USER, ADMIN]} title={title}>
+      href: "/users/logs",
+      label: title
+    }
+    ]} roles={[MEMBER]} title={title}>
       <Row>
         <Col md={{
             span: 12,

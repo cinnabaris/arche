@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom'
 
 import {signOut, toggleSideBar, selectSideBar} from '../../actions'
 import {_delete} from '../../ajax'
-import {Authorized, USER, ADMIN} from '../../auth'
+import {Authorized, MEMBER} from '../../auth'
 
 import plugins from '../../plugins'
 
@@ -62,9 +62,7 @@ class Widget extends Component {
         </SubMenu>)))
       }
       {
-        Authorized.check([
-          ADMIN, USER
-        ], (<MenuItem key='users.sign-out'>
+        Authorized.check([MEMBER], (<MenuItem key='users.sign-out'>
           <Icon type='logout'/>
           <FormattedMessage id='nut.users.sign-out.title'/>
         </MenuItem>))

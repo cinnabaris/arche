@@ -1,4 +1,4 @@
-import {USER, ADMIN} from '../../auth'
+import {MEMBER} from '../../auth'
 
 const ProjectsForm = import ('./projects/Form')
 
@@ -20,9 +20,7 @@ export default {
       icon: "pay-circle-o",
       label: "donate.dashboard.title",
       href: "donate",
-      roles: [
-        USER, ADMIN
-      ],
+      roles: [MEMBER],
       items: [
         {
           label: "donate.projects.index.title",

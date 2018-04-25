@@ -1,4 +1,4 @@
-import {USER, ADMIN} from '../../auth'
+import {MEMBER, ADMIN} from '../../auth'
 
 const AdminCardsForm = import ('./admin/cards/Form')
 const AdminLinksForm = import ('./admin/links/Form')
@@ -110,9 +110,7 @@ export default {
       icon: "user",
       label: "nut.self.title",
       href: "personal",
-      roles: [
-        USER, ADMIN
-      ],
+      roles: [MEMBER],
       items: [
         {
           label: "nut.users.logs.title",

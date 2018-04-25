@@ -5,7 +5,7 @@ import {connect} from 'react-redux'
 
 import Layout from '../../../layouts/dashboard'
 import {post} from '../../../ajax'
-import {USER, ADMIN} from '../../../auth'
+import {MEMBER} from '../../../auth'
 import {Submit, formItemLayout} from '../../../components/form'
 
 const FormItem = Form.Item
@@ -43,7 +43,7 @@ class Widget extends Component {
           href: "/users/change-password",
           label: title
         }
-      ]} title={title} roles={[USER, ADMIN]}>
+      ]} title={title} roles={[MEMBER]}>
       <Row>
         <Col md={{
             span: 12,

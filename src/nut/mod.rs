@@ -13,13 +13,18 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
         (
             "/api/users",
             routes!(
+                // non sign in
                 c_users::post_sign_up,
                 c_users::get_confirm_token,
                 c_users::post_confirm,
                 c_users::get_unlock_token,
                 c_users::post_unlock,
                 c_users::post_forgot_password,
-                c_users::post_reset_password
+                c_users::post_reset_password,
+                c_users::post_sign_in,
+                // must sign in
+                c_users::get_logs,
+                c_users::delete_sign_out,
             ),
         ),
     ]

@@ -2,7 +2,7 @@ import jwtDecode from 'jwt-decode'
 import moment from 'moment'
 
 import {USERS_SIGN_IN, USERS_SIGN_OUT, SITE_REFRESH, SIDE_BAR_TOGGLE, SIDE_BAR_SELECT} from './actions'
-import {setToken, reloadAuthorized, ADMIN, USER} from './auth'
+import {setToken, reloadAuthorized} from './auth'
 
 const sideBar = (state = {
   selected: [],
@@ -26,12 +26,10 @@ const currentUser = (state = {}, action) => {
       try {
         var it = jwtDecode(action.token);
         if (moment().isBetween(moment.unix(it.nbf), moment.unix(it.exp))) {
-          reloadAuthorized(
-            it.admin
-            ? ADMIN
-            : USER)
+          console.log(it.roles)
+          reloadAuthorized(it.roles)
           setToken(action.token)
-          return {uid: it.uid, admin: it.admin} // FIXME
+          return {uid: it.uid}
         }
       } catch (e) {
         console.error(e)

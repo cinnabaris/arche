@@ -10,7 +10,7 @@ use rocket::http::RawStr;
 use rocket::response::{Flash, Redirect};
 use rocket::State;
 use rocket_contrib::Json;
-use serde_json::Value;
+use serde_json::{self, Value};
 use validator::Validate;
 
 use super::super::i18n::{Lang, Locale};
@@ -18,9 +18,32 @@ use super::super::jwt::{Home, Jwt};
 use super::super::orm::Connection as Db;
 use super::super::queue::{self, Queue};
 use super::super::result::{Error, Result};
-use super::super::spree::models::User;
+use super::super::spree::guards::{CurrentUser, Session};
+use super::super::spree::models::{Role, User};
 use super::models::Log;
 use super::workers::{Email, SEND_EMAIL};
+
+#[delete("/sign-out")]
+fn delete_sign_out(db: Db, lang: Lang, remote: SocketAddr, user: CurrentUser) -> Result<Json<()>> {
+    let Lang(lang) = lang;
+    Log::add(
+        &db,
+        &user.id,
+        &s!(lang),
+        &remote,
+        &s!("nut.logs.user.sign-out"),
+        None::<Value>,
+    )?;
+    Ok(Json(()))
+}
+
+#[get("/logs")]
+fn get_logs(db: Db, user: CurrentUser) -> Result<Json<Vec<Log>>> {
+    let items = Log::list(&db, &user.id)?;
+    Ok(Json(items))
+}
+
+//-----------------------------------------------------------------------------
 
 #[derive(Serialize, Deserialize, Debug, Validate)]
 struct FmSignIn {
@@ -45,21 +68,8 @@ fn post_sign_in(
     let it = User::get_by_email(&db, &form.email)?;
 
     if User::chk_password(&it.encrypted_password, &form.password) {
-        if let None = it.confirmed_at {
-            return Err(Locale::e(
-                &db,
-                &lang,
-                &s!("nut.errors.user-not-confirm"),
-                None::<Value>,
-            ));
-        }
-        if let Some(_) = it.locked_at {
-            return Err(Locale::e(
-                &db,
-                &lang,
-                &s!("nut.errors.user-is-lock"),
-                None::<Value>,
-            ));
+        if let Some(code) = it.status() {
+            return Err(Locale::e(&db, &lang, &code, None::<Value>));
         }
         let token = db.transaction::<_, Error, _>(|| {
             User::sign_in(
@@ -79,9 +89,11 @@ fn post_sign_in(
                 None::<Value>,
             )?;
 
-            let roles = User::roles(&db, &it.id)?;
             let token = jwt.sum(
-                &mut json!({"uid":it.login, "roles":roles }),
+                &mut serde_json::to_value(&Session {
+                    uid: it.login,
+                    roles: User::roles(&db, &it.id)?,
+                })?,
                 Duration::from_secs(60 * 60 * 24),
             )?;
             Ok(token)
@@ -405,6 +417,8 @@ fn post_sign_up(
         }
         // add email user
         let user = User::sign_up(&db, &form.email, &form.password)?;
+        let member = Role::find_or_create(&db, &s!(Role::MEMBER))?;
+        User::apply(&db, &user.id, &member, 365 * 120)?;
         Log::add(
             &db,
             &user.id,

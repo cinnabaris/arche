@@ -335,6 +335,18 @@ pub struct User {
 }
 
 impl User {
+    pub fn status(&self) -> Option<String> {
+        if let Some(_) = self.deleted_at {
+            return Some(s!("nut.errors.user-delete"));
+        }
+        if let None = self.confirmed_at {
+            return Some(s!("nut.errors.user-not-confirm"));
+        }
+        if let Some(_) = self.locked_at {
+            return Some(s!("nut.errors.user-is-lock"));
+        }
+        None
+    }
     pub fn sum_password(s: &String) -> Result<String> {
         Ok(base64::encode(&hash::sum(s.as_bytes())?))
     }
@@ -354,7 +366,12 @@ impl User {
             hex::encode(h.result().as_slice())
         )
     }
-
+    pub fn get_by_uid(db: &Db, uid: &String) -> Result<User> {
+        let it = spree_users::dsl::spree_users
+            .filter(spree_users::dsl::login.eq(uid))
+            .first::<User>(db.deref())?;
+        Ok(it)
+    }
     pub fn get_by_email(db: &Db, email: &String) -> Result<User> {
         let it = spree_users::dsl::spree_users
             .filter(spree_users::dsl::email.eq(email))
