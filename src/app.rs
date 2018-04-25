@@ -2,6 +2,7 @@ use std::env::current_dir;
 use std::io::{Read, Write};
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 use std::{fs, thread};
 
 use base64;
@@ -40,6 +41,7 @@ pub fn server() -> Result<()> {
             Ok(_) => log::info!("exiting worker"),
             Err(e) => log::error!("{:?}", e),
         }
+        thread::sleep(Duration::from_secs(10));
     });
     // http
     let etc = parse_config()?;
