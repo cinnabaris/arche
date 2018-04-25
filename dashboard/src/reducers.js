@@ -26,7 +26,6 @@ const currentUser = (state = {}, action) => {
       try {
         var it = jwtDecode(action.token);
         if (moment().isBetween(moment.unix(it.nbf), moment.unix(it.exp))) {
-          console.log(it.roles)
           reloadAuthorized(it.roles)
           setToken(action.token)
           return {uid: it.uid}
