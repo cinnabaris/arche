@@ -104,7 +104,7 @@ table! {
         user_id -> Int8,
         ip -> Varchar,
         message -> Varchar,
-        created_at -> Timestamptz,
+        created_at -> Timestamp,
     }
 }
 

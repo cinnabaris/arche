@@ -6,8 +6,8 @@ import {connect} from 'react-redux'
 
 import Layout from '../../../layouts/dashboard'
 import {get} from '../../../ajax'
-import TimeAgo from '../../../components/TimeAgo'
-import {MEMBER} from '../../../auth'
+import {timeago} from '../../../components/moment'
+import {MEMBER, ADMIN} from '../../../auth'
 
 class Widget extends Component {
   state = {
@@ -26,19 +26,19 @@ class Widget extends Component {
       href: "/users/logs",
       label: title
     }
-    ]} roles={[MEMBER]} title={title}>
+    ]} roles={[MEMBER, ADMIN]} title={title}>
       <Row>
         <Col md={{
             span: 12,
             offset: 2
-          }}>
+        }}>
           <Table bordered={true} rowKey="id" dataSource={this.state.items} columns={[
-              {
-                title: <FormattedMessage id="attributes.created-at"/>,
+            {
+              title: <FormattedMessage id="attributes.created-at"/>,
                 key: 'createdAt',
-                render: (text, record) => (<TimeAgo value={record.createdAt}/>)
-              }, {
-                title: <FormattedMessage id="attributes.ip"/>,
+              render: (text, record) => timeago(record.createdAt)
+            }, {
+              title: <FormattedMessage id="attributes.ip"/>,
                 dataIndex: 'ip',
                 key: 'ip'
               }, {

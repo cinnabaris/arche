@@ -7,7 +7,7 @@ import {push} from 'react-router-redux'
 
 import Layout from '../../../layouts/dashboard'
 import {post, get} from '../../../ajax'
-import {MEMBER} from '../../../auth'
+import {MEMBER, ADMIN} from '../../../auth'
 import {Submit, formItemLayout} from '../../../components/form'
 
 const FormItem = Form.Item
@@ -39,7 +39,7 @@ class Widget extends Component {
       href: "/users/profile",
       label: title
     }
-    ]} title={title} roles={[MEMBER]}>
+    ]} title={title} roles={[MEMBER, ADMIN]}>
       <Row>
         <Col md={{
             span: 12,

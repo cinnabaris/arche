@@ -9,11 +9,11 @@ import {
 } from 'antd'
 import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
 import {connect} from 'react-redux'
-import Moment from 'react-moment'
 
 import Layout from '../../../../layouts/dashboard'
 import {get, _delete} from '../../../../ajax'
 import {ADMIN} from '../../../../auth'
+import {timestamp} from '../../../../components/moment'
 
 class Widget extends Component {
   state = {
@@ -37,21 +37,21 @@ class Widget extends Component {
       id: "nut.admin.leave-words.index.title"
     }
     return (<Layout breads={[{
-          href: "/admin/leave-words",
-          label: title
-        }
-      ]} title={title} roles={[ADMIN]}>
+      href: "/admin/leave-words",
+      label: title
+    }
+    ]} title={title} roles={[ADMIN]}>
       <Row>
         <Col md={{
             span: 12,
             offset: 2
-          }}>
+        }}>
           <Table bordered={true} rowKey="id" dataSource={this.state.items} columns={[
-              {
-                title: <FormattedMessage id="attributes.created-at"/>,
+            {
+              title: <FormattedMessage id="attributes.created-at"/>,
                 key: 'createdAt',
-                render: (text, record) => (<Moment fromNow={true}>{record.createdAt}</Moment>)
-              }, {
+              render: (text, record) => timestamp(record.createdAt)
+            }, {
                 title: <FormattedMessage id="attributes.content"/>,
                 key: 'body',
                 render: (text, record) => (<div>

@@ -110,7 +110,9 @@ export default {
       icon: "user",
       label: "nut.self.title",
       href: "personal",
-      roles: [MEMBER],
+      roles: [
+        MEMBER, ADMIN
+      ],
       items: [
         {
           label: "nut.users.logs.title",

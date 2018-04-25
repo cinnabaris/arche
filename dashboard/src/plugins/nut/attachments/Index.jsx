@@ -16,7 +16,7 @@ import {CopyToClipboard} from 'react-copy-to-clipboard'
 
 import Layout from '../../../layouts/dashboard'
 import {get, _delete, backend} from '../../../ajax'
-import {getToken, MEMBER} from '../../../auth'
+import {getToken, MEMBER, ADMIN} from '../../../auth'
 
 class Widget extends Component {
   state = {
@@ -43,7 +43,7 @@ class Widget extends Component {
       href: "/attachments",
       label: title
     }
-    ]} title={title} roles={[MEMBER]}>
+    ]} title={title} roles={[MEMBER, ADMIN]}>
       <Row>
         <Col>
           <Upload multiple={true} withCredentials={true} name="file" action={backend("/attachments/")} headers={{

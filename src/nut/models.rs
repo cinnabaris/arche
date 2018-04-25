@@ -27,6 +27,7 @@ impl Log {
     pub fn list(db: &Db, user: &i64) -> Result<Vec<Log>> {
         let it = logs::dsl::logs
             .filter(logs::dsl::user_id.eq(user))
+            .order(logs::dsl::created_at.desc())
             .get_results::<Log>(db.deref())?;
         Ok(it)
     }

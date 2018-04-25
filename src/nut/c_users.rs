@@ -19,7 +19,7 @@ use super::super::orm::Connection as Db;
 use super::super::queue::{self, Queue};
 use super::super::result::{Error, Result};
 use super::super::spree::guards::{CurrentUser, Session};
-use super::super::spree::models::{Role, User};
+use super::super::spree::models::User;
 use super::models::Log;
 use super::workers::{Email, SEND_EMAIL};
 
@@ -417,8 +417,6 @@ fn post_sign_up(
         }
         // add email user
         let user = User::sign_up(&db, &form.email, &form.password)?;
-        let member = Role::find_or_create(&db, &s!(Role::MEMBER))?;
-        User::apply(&db, &user.id, &member, 365 * 120)?;
         Log::add(
             &db,
             &user.id,
