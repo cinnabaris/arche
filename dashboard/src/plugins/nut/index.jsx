@@ -32,9 +32,6 @@ export default {
       path: "/users/logs",
       component: import ("./users/Logs")
     }, {
-      path: "/users/profile",
-      component: import ("./users/Profile")
-    }, {
       path: "/users/change-password",
       component: import ("./users/ChangePassword")
     }, {
@@ -117,9 +114,6 @@ export default {
         {
           label: "nut.users.logs.title",
           href: "/users/logs"
-        }, {
-          label: "nut.users.profile.title",
-          href: "/users/profile"
         }, {
           label: "nut.users.change-password.title",
           href: "/users/change-password"
