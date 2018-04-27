@@ -6,6 +6,9 @@ CREATE TABLE locales (
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
+
 CREATE UNIQUE INDEX idx_locales_code_lang ON locales (code, lang);
+
 CREATE INDEX idx_locales_code ON locales (code);
+
 CREATE INDEX idx_locales_lang ON locales (lang);

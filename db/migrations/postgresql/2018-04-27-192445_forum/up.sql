@@ -36,7 +36,8 @@ CREATE TABLE forum_tags (
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
-CREATE UNIQUE INDEX idx_forum_tags_name ON forum_tags(name);
+
+CREATE UNIQUE INDEX idx_forum_tags_name ON forum_tags (name);
 
 CREATE TABLE forum_topics_tags (
   id BIGSERIAL PRIMARY KEY,
@@ -45,4 +46,5 @@ CREATE TABLE forum_topics_tags (
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
-CREATE UNIQUE INDEX idx_forum_topics_tags ON forum_topics_tags(topic_id, tag_id);
+
+CREATE UNIQUE INDEX idx_forum_topics_tags ON forum_topics_tags (topic_id, tag_id);

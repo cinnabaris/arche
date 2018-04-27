@@ -9,9 +9,9 @@ CREATE TABLE members (
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
-CREATE UNIQUE INDEX idx_members_email
-  ON members (email);
-CREATE INDEX idx_members_name
-    ON members (name);
-CREATE INDEX idx_members_phone
-    ON members (phone);
+
+CREATE UNIQUE INDEX idx_members_email ON members (email);
+
+CREATE INDEX idx_members_name ON members (name);
+
+CREATE INDEX idx_members_phone ON members (phone);
