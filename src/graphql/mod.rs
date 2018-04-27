@@ -9,7 +9,7 @@ use juniper_rocket::{graphiql_source, GraphQLRequest, GraphQLResponse};
 use rocket::response::content::Html;
 use rocket::{Route, State};
 
-use super::i18n::Lang;
+use super::i18n::Locale;
 use super::orm::Connection;
 use super::spree::guards::CurrentUser;
 
@@ -25,41 +25,40 @@ fn doc() -> Html<String> {
 #[get("/graphql?<request>")]
 fn get(
     db: Connection,
-    lang: Lang,
+    locale: Locale,
     remote: SocketAddr,
     user: Option<CurrentUser>,
     request: GraphQLRequest,
     schema: State<schema::Schema>,
 ) -> GraphQLResponse {
-    execute(db, lang, remote, user, request, schema)
+    execute(db, locale, remote, user, request, schema)
 }
 
 #[post("/graphql", data = "<request>")]
 fn post(
     db: Connection,
-    lang: Lang,
+    locale: Locale,
     remote: SocketAddr,
     user: Option<CurrentUser>,
     request: GraphQLRequest,
     schema: State<schema::Schema>,
 ) -> GraphQLResponse {
-    execute(db, lang, remote, user, request, schema)
+    execute(db, locale, remote, user, request, schema)
 }
 
 fn execute(
     db: Connection,
-    lang: Lang,
+    locale: Locale,
     remote: SocketAddr,
     user: Option<CurrentUser>,
     request: GraphQLRequest,
     schema: State<schema::Schema>,
 ) -> GraphQLResponse {
-    let Lang(lang) = lang;
     request.execute(
         &schema,
         &context::Context {
             db: db,
-            locale: lang,
+            locale: locale.name,
             user: user,
             remote: remote,
         },

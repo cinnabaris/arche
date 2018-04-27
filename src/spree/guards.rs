@@ -4,7 +4,7 @@ use rocket::request::{self, FromRequest};
 use rocket::{Outcome, Request, State};
 use serde_json::{self, Value};
 
-use super::super::i18n::{Lang, Locale};
+use super::super::i18n::Locale;
 use super::super::jwt::Jwt;
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
@@ -54,9 +54,8 @@ impl<'a, 'r> FromRequest<'a, 'r> for CurrentUser {
                 let Authorization::<Bearer>(bearer) = auth;
                 let jwt = req.guard::<State<Jwt>>()?;
                 let db = req.guard::<Db>()?;
-                let lang = req.guard::<Lang>()?;
-                let Lang(lang) = lang;
-                if let Ok(it) = CurrentUser::get(&jwt, &db, &lang, &bearer.token) {
+                let locale = req.guard::<Locale>()?;
+                if let Ok(it) = CurrentUser::get(&jwt, &db, &locale.name, &bearer.token) {
                     return Outcome::Success(it);
                 }
             }

@@ -38,9 +38,12 @@ impl<'a, 'r> FromRequest<'a, 'r> for Params {
 //-----------------------------------------------------------------------------
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Lang(pub String);
+pub struct Locale {
+    // https://tools.ietf.org/html/bcp47
+    pub name: String,
+}
 
-impl Lang {
+impl Locale {
     fn parse<'a, 'r>(req: &'a Request<'r>) -> Result<Option<LanguageTag>> {
         let key = String::from("locale");
         // 1. Check URL arguments.
@@ -67,7 +70,7 @@ impl Lang {
     }
 }
 
-impl<'a, 'r> FromRequest<'a, 'r> for Lang {
+impl<'a, 'r> FromRequest<'a, 'r> for Locale {
     type Error = ();
 
     fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, ()> {
@@ -77,23 +80,25 @@ impl<'a, 'r> FromRequest<'a, 'r> for Lang {
                     for it in &cfg.languages {
                         if let Ok(ref t) = LanguageTag::from_str(&it[..]) {
                             if l.matches(t) {
-                                return Outcome::Success(Lang(it.to_string()));
+                                return Outcome::Success(Self {
+                                    name: it.to_string(),
+                                });
                             }
                         }
                     }
                 }
             }
         }
-        return Outcome::Success(Lang("en-US".into()));
+        return Outcome::Success(Self {
+            name: "en-US".into(),
+        });
     }
 }
 
 //-----------------------------------------------------------------------------
 
-// https://tools.ietf.org/html/bcp47
-
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
-pub struct Locale {
+struct Model {
     pub id: i64,
     pub lang: String,
     pub code: String,
@@ -148,7 +153,7 @@ impl Locale {
                 Ok(id)
             }
             Err(_) => {
-                let it: Locale = insert_into(locales::dsl::locales)
+                let it: Model = insert_into(locales::dsl::locales)
                     .values((
                         locales::dsl::lang.eq(&lang),
                         locales::dsl::code.eq(&code),
