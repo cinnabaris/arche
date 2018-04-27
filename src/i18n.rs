@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use std::{ffi, fs};
 
-use chrono::{NaiveDateTime, Utc};
+use chrono::Utc;
 use diesel::prelude::*;
 use diesel::{insert_into, update};
 use handlebars::Handlebars;
@@ -97,18 +97,6 @@ impl<'a, 'r> FromRequest<'a, 'r> for Locale {
 
 //-----------------------------------------------------------------------------
 
-#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
-struct Model {
-    pub id: i64,
-    pub lang: String,
-    pub code: String,
-    pub message: String,
-    #[serde(rename = "createdAt")]
-    pub created_at: NaiveDateTime,
-    #[serde(rename = "updatedAt")]
-    pub updated_at: NaiveDateTime,
-}
-
 impl Locale {
     pub fn e<T: Serialize>(db: &Db, lang: &String, code: &String, args: Option<T>) -> Error {
         Error::WithDescription(Locale::t(db, lang, code, args))
@@ -153,15 +141,16 @@ impl Locale {
                 Ok(id)
             }
             Err(_) => {
-                let it: Model = insert_into(locales::dsl::locales)
+                let id = insert_into(locales::dsl::locales)
                     .values((
                         locales::dsl::lang.eq(&lang),
                         locales::dsl::code.eq(&code),
                         locales::dsl::message.eq(&message),
                         locales::dsl::updated_at.eq(Utc::now().naive_utc()),
                     ))
-                    .get_result(db)?;
-                Ok(it.id)
+                    .returning(locales::dsl::id)
+                    .get_result::<i64>(db)?;
+                Ok(id)
             }
         }
     }
