@@ -14,6 +14,7 @@ CREATE TABLE users (
   last_sign_in_ip    VARCHAR(39),
   confirmed_at       TIMESTAMP WITH TIME ZONE,
   locked_at          TIMESTAMP WITH TIME ZONE,
+  deleted_at         TIMESTAMP WITHOUT TIME ZONE,
   created_at         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at         TIMESTAMP WITH TIME ZONE NOT NULL
 );
