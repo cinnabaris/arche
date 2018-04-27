@@ -31,7 +31,7 @@ pub fn server() -> Result<()> {
                 queue::Consumer::new(
                     name,
                     etc.env()?,
-                    orm::pool(&etc.database)?,
+                    orm::new(etc.database.clone())?,
                     security::Encryptor::new(etc.secret_key()?.as_slice())?,
                 ),
             )?;
@@ -63,10 +63,9 @@ pub fn server() -> Result<()> {
             },
         )
         .finalize()?;
-    let dbp = orm::pool(&etc.database)?;
+    let dbp = orm::new(etc.database.clone())?;
     let mut app = rocket::custom(cfg, false)
         .manage(dbp.clone())
-        .manage(graphql::context::Context::new(dbp.clone()))
         .manage(graphql::schema::Schema::new(
             graphql::query::Query {},
             graphql::mutation::Mutation {},
@@ -187,7 +186,7 @@ pub fn generate_nginx() -> Result<()> {
 
 pub fn db_seed() -> Result<()> {
     let etc = parse_config()?;
-    let pool = orm::pool(&etc.database)?;
+    let pool = orm::new(etc.database)?;
     let db = orm::Connection(pool.get()?);
     let root = Path::new("db").join("seed");
 

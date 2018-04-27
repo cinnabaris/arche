@@ -23,9 +23,10 @@ type DiselConnection = diesel::mysql::MysqlConnection;
 
 pub type Pool = r2d2::Pool<ConnectionManager<DiselConnection>>;
 
-pub fn pool(url: &String) -> Result<Pool> {
-    let p = r2d2::Pool::new(ConnectionManager::<DiselConnection>::new(&url[..]))?;
-    Ok(p)
+pub fn new<S: Into<String>>(url: S) -> Result<Pool> {
+    Ok(r2d2::Pool::new(ConnectionManager::<DiselConnection>::new(
+        url,
+    ))?)
 }
 
 pub struct Connection(pub PooledConnection<ConnectionManager<DiselConnection>>);

@@ -12,7 +12,8 @@ graphql_object!(Query: Context |&self| {
     }
 
     field human(&executor, name: String) -> FieldResult<Human> {
-        // let context = executor.context();
+
+        let context = executor.context();
         // let connection = context.pool.get_connection()?;
         // let human = connection.find_human(&id)?;
         Ok(Human{name:name,id:432})
