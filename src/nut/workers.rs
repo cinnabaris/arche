@@ -1,5 +1,4 @@
 use std::collections::BTreeMap;
-// use std::default::Default;
 use std::path::PathBuf;
 
 use lettre::smtp::authentication::{Credentials, Mechanism};
@@ -15,7 +14,7 @@ use super::super::orm::Connection as Db;
 use super::super::queue::Consumer;
 use super::super::result::Result;
 use super::super::security::Encryptor;
-use super::super::settings::Setting;
+use super::super::settings;
 
 pub const SEND_EMAIL: &'static str = "send-email";
 
@@ -47,8 +46,7 @@ impl SendEmail for Consumer {
             return Ok(());
         }
 
-        let smtp: Smtp = Setting::get(db, enc, &s!("site.smtp"))?;
-        // let smtp: Smtp = Default::default();
+        let smtp: Smtp = settings::get(db, enc, &s!("site.smtp"))?;
 
         let mut email = EmailBuilder::new()
             .to(it.to)
