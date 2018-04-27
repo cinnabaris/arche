@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use chrono::{NaiveDateTime, Utc};
+use chrono::Utc;
 use diesel::prelude::*;
 use diesel::{insert_into, update};
 use serde::de::DeserializeOwned;
@@ -11,18 +11,6 @@ use super::orm::Connection as Db;
 use super::result::Result;
 use super::schema::settings;
 use super::security::Encryptor;
-
-#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
-struct Model {
-    pub id: i64,
-    pub key: String,
-    pub salt: Option<Vec<u8>>,
-    pub value: Vec<u8>,
-    #[serde(rename = "createdAt")]
-    pub created_at: NaiveDateTime,
-    #[serde(rename = "updatedAt")]
-    pub updated_at: NaiveDateTime,
-}
 
 pub fn get<K: Serialize, V: DeserializeOwned>(db: &Db, enc: &Encryptor, k: &K) -> Result<V> {
     let k = serde_json::to_string(k)?;
