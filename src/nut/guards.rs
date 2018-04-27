@@ -8,7 +8,7 @@ use super::super::i18n::Locale;
 use super::super::jwt::Jwt;
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
-use super::models::{Role, User};
+use super::models::{Policy, Role, User};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Session {
@@ -32,7 +32,12 @@ impl CurrentUser {
         let token = jwt.parse(token)?;
         let ss = serde_json::from_value::<Session>(token)?;
         let it = User::get_by_uid(db, &ss.uid)?;
-        let roles = User::roles(db, &it.id)?;
+        let mut roles = Vec::new();
+        for id in Policy::roles(db, &it.id)? {
+            let it = Role::by_id(db, &id)?;
+            roles.push(it.name.clone());
+        }
+
         match it.status() {
             Some(code) => Err(Locale::e(db, &lang, &code, None::<Value>)),
             None => Ok(CurrentUser {

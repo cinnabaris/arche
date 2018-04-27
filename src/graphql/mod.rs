@@ -10,8 +10,8 @@ use rocket::response::content::Html;
 use rocket::{Route, State};
 
 use super::i18n::Locale;
+use super::nut::guards::CurrentUser;
 use super::orm::Connection;
-use super::spree::guards::CurrentUser;
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![("/", routes!(doc, get, post))]

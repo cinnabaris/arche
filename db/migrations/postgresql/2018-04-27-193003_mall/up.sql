@@ -52,7 +52,15 @@ CREATE TABLE mall_zones (
   description TEXT NOT NULL,
   kind varchar(16) NOT NULL,
   default_tax boolean DEFAULT false NOT NULL,
-  zone_members_count integer DEFAULT 0 NOT NULL,
+  created_at timestamp without time zone DEFAULT NOW() NOT NULL,
+  updated_at timestamp without time zone NOT NULL
+);
+
+CREATE TABLE mall_zone_members (
+  id BIGSERIAL PRIMARY KEY,
+  zone_id BIGINT NOT NULL,
+  zoneable_type varchar(16) NOT NULL,
+  zoneable_id BIGINT NOT NULL,
   created_at timestamp without time zone DEFAULT NOW() NOT NULL,
   updated_at timestamp without time zone NOT NULL
 );

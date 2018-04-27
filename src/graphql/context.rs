@@ -2,8 +2,8 @@ use std::net::SocketAddr;
 
 use juniper;
 
+use super::super::nut::guards::CurrentUser;
 use super::super::orm::Connection;
-use super::super::spree::guards::CurrentUser;
 
 pub struct Context {
     pub db: Connection,

@@ -80,5 +80,4 @@ pub mod mall;
 pub mod nut;
 pub mod ops;
 pub mod pos;
-pub mod spree;
 pub mod survey;

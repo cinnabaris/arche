@@ -5,8 +5,8 @@ use validator::Validate;
 
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
-use super::super::spree::models::{Role, User};
 use super::c_users::FmSignUp;
+use super::models::{Policy, Role, User};
 
 pub fn administrator(db: &Db) -> Result<()> {
     if User::count(db)? > 0 {
@@ -24,16 +24,17 @@ pub fn administrator(db: &Db) -> Result<()> {
     let mut password = String::new();
     stdin.lock().read_line(&mut password)?;
     let form = FmSignUp {
+        name: s!("Administrator"),
         email: s!(email.trim()),
         password: s!(password.trim()),
     };
     form.validate()?;
 
-    let user = User::sign_up(db, &form.email, &form.password)?;
-    User::confirm(db, &user.id)?;
+    let user = User::sign_up(db, &form.name, &form.email, &form.password)?;
+    User::set_confirmed(db, &user.id)?;
     for it in vec![Role::ROOT, Role::ADMIN, Role::MEMBER] {
-        let role = Role::find_or_create(db, &s!(it))?;
-        User::apply(db, &user.id, &role, 365 * 120)?;
+        let role = Role::get(db, &s!(it), &None, &None)?;
+        Policy::apply(db, &user.id, &role, 365 * 120)?;
     }
 
     Ok(())

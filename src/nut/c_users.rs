@@ -384,6 +384,8 @@ use validator::Validate;
 //
 #[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct FmSignUp {
+    #[validate(length(min = "2", max = "64"))]
+    pub name: String,
     #[validate(email)]
     pub email: String,
     #[validate(length(min = "6", max = "32"))]
