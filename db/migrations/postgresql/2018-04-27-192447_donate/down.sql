@@ -1,1 +1,2 @@
--- This file should undo anything in `up.sql`
+DROP TABLE donate_payments;
+DROP TABLE donate_projects;
