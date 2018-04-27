@@ -18,7 +18,7 @@ use toml;
 use super::orm::{self, Connection as Db};
 use super::queue::{self, Provider as QueueProvider};
 use super::result::{Error, Result};
-use super::{cache, env, i18n, jwt, nut, router, security, spree};
+use super::{cache, env, graphql, i18n, jwt, nut, router, security, spree};
 
 pub fn server() -> Result<()> {
     // worker
@@ -63,8 +63,14 @@ pub fn server() -> Result<()> {
             },
         )
         .finalize()?;
+    let dbp = orm::pool(&etc.database)?;
     let mut app = rocket::custom(cfg, false)
-        .manage(orm::pool(&etc.database)?)
+        .manage(dbp.clone())
+        .manage(graphql::context::Context::new(dbp.clone()))
+        .manage(graphql::schema::Schema::new(
+            graphql::query::Query {},
+            graphql::mutation::Mutation {},
+        ))
         .manage(cache::new(&etc.cache.url, etc.cache.namespace.clone())?)
         .manage(security::Encryptor::new(etc.secret_key()?.as_slice())?)
         .manage(queue::new(etc.queue.url.clone(), etc.queue.name.clone()))

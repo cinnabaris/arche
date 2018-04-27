@@ -4,15 +4,16 @@ use rocket::http::Status;
 use rocket::response::NamedFile;
 use rocket::{self, Catcher, Route, State};
 
-use super::{env, nut};
+use super::{env, graphql, nut};
 
 pub fn catchers() -> Vec<Catcher> {
-    errors![not_found, bad_request, forbidden]
+    errors![not_found, bad_request, forbidden, internal_server]
 }
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();
     items.extend_from_slice(nut::routes().as_slice());
+    items.extend_from_slice(graphql::routes().as_slice());
     return items;
 }
 
@@ -41,4 +42,9 @@ fn bad_request() -> &'static str {
 #[error(403)]
 fn forbidden() -> &'static str {
     Status::Forbidden.reason
+}
+
+#[error(500)]
+fn internal_server() -> &'static str {
+    Status::InternalServerError.reason
 }

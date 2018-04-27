@@ -1,4 +1,4 @@
-#![feature(plugin, use_extern_macros, custom_attribute)]
+#![feature(plugin, use_extern_macros, custom_attribute, proc_macro_path_invoc)]
 #![recursion_limit = "128"] // https://github.com/diesel-rs/diesel/issues/1127
 #![plugin(rocket_codegen)]
 extern crate rocket;
@@ -13,6 +13,8 @@ extern crate serde_json;
 extern crate diesel;
 #[macro_use]
 extern crate validator_derive;
+#[macro_use]
+extern crate juniper;
 
 extern crate amqp;
 extern crate base64;
@@ -27,6 +29,7 @@ extern crate handlebars;
 extern crate hex;
 extern crate hyper;
 extern crate ini;
+extern crate juniper_rocket;
 extern crate language_tags;
 extern crate lettre;
 extern crate lettre_email;
@@ -58,6 +61,7 @@ pub mod app;
 pub mod cache;
 pub mod console;
 pub mod env;
+pub mod graphql;
 pub mod i18n;
 pub mod jwt;
 pub mod orm;
