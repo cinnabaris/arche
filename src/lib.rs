@@ -72,6 +72,7 @@ pub mod schema;
 pub mod security;
 pub mod settings;
 
+pub mod cbeta;
 pub mod donate;
 pub mod erp;
 pub mod forum;
@@ -79,6 +80,5 @@ pub mod mall;
 pub mod nut;
 pub mod ops;
 pub mod pos;
-pub mod reading;
 pub mod spree;
 pub mod survey;
