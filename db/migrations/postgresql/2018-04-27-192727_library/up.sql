@@ -22,5 +22,6 @@ CREATE TABLE library_logs (
   book_id INT NOT NULL,
   action VARCHAR(8) NOT NULL,
   days SMALLINT,
+  description TEXT NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()
 );

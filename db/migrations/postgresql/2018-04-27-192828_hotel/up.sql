@@ -21,5 +21,6 @@ CREATE TABLE hotel_logs (
   room_id INT NOT NULL,
   action VARCHAR(8) NOT NULL,
   days SMALLINT,
+  description TEXT NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()
 );
