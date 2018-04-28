@@ -1,13 +1,13 @@
 table! {
     attachments (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         url -> Varchar,
         length -> Int4,
         media_type -> Varchar,
         resource_type -> Varchar,
-        resource_id -> Int8,
-        user_id -> Int8,
+        resource_id -> Int4,
+        user_id -> Int4,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
     }
@@ -15,7 +15,7 @@ table! {
 
 table! {
     cards (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         summary -> Text,
         #[sql_name = "type"]
@@ -33,13 +33,13 @@ table! {
 
 table! {
     donate_payments (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         summary -> Varchar,
         #[sql_name = "type"]
         type_ -> Varchar,
         profile -> Text,
-        project_id -> Int8,
+        project_id -> Int4,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
     }
@@ -47,12 +47,12 @@ table! {
 
 table! {
     donate_projects (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         body -> Text,
         #[sql_name = "type"]
         type_ -> Varchar,
-        user_id -> Int8,
+        user_id -> Int4,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
     }
@@ -60,12 +60,12 @@ table! {
 
 table! {
     forum_categories (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
         color -> Varchar,
         icon -> Varchar,
         description -> Nullable<Varchar>,
-        parent_id -> Nullable<Int8>,
+        parent_id -> Nullable<Int4>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -73,10 +73,10 @@ table! {
 
 table! {
     forum_posts (id) {
-        id -> Int8,
+        id -> Int4,
         body -> Text,
-        user_id -> Int8,
-        post_id -> Int8,
+        user_id -> Int4,
+        post_id -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -84,7 +84,7 @@ table! {
 
 table! {
     forum_tags (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
         background_color -> Varchar,
         text_color -> Varchar,
@@ -95,11 +95,11 @@ table! {
 
 table! {
     forum_topics (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         body -> Text,
-        user_id -> Int8,
-        category_id -> Int8,
+        user_id -> Int4,
+        category_id -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -107,9 +107,9 @@ table! {
 
 table! {
     forum_topics_tags (id) {
-        id -> Int8,
-        topic_id -> Int8,
-        tag_id -> Int8,
+        id -> Int4,
+        topic_id -> Int4,
+        tag_id -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -117,7 +117,7 @@ table! {
 
 table! {
     friend_links (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         home -> Varchar,
         logo -> Varchar,
@@ -129,9 +129,9 @@ table! {
 
 table! {
     hotel_logs (id) {
-        id -> Int8,
-        member_id -> Int8,
-        room_id -> Int8,
+        id -> Int4,
+        member_id -> Int4,
+        room_id -> Int4,
         action -> Varchar,
         days -> Nullable<Int2>,
         created_at -> Timestamp,
@@ -140,13 +140,13 @@ table! {
 
 table! {
     hotel_rooms (id) {
-        id -> Int8,
+        id -> Int4,
         uid -> Varchar,
         loc -> Varchar,
         floor -> Varchar,
         door -> Varchar,
         bed -> Varchar,
-        status -> Varchar,
+        status -> Int2,
         description -> Nullable<Text>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -155,7 +155,7 @@ table! {
 
 table! {
     leave_words (id) {
-        id -> Int8,
+        id -> Int4,
         body -> Text,
         #[sql_name = "type"]
         type_ -> Varchar,
@@ -165,12 +165,12 @@ table! {
 
 table! {
     library_books (id) {
-        id -> Int8,
+        id -> Int4,
         uid -> Varchar,
         title -> Varchar,
         author -> Varchar,
         publisher -> Varchar,
-        status -> Varchar,
+        status -> Int2,
         description -> Nullable<Text>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -179,9 +179,9 @@ table! {
 
 table! {
     library_logs (id) {
-        id -> Int8,
-        member_id -> Int8,
-        book_id -> Int8,
+        id -> Int4,
+        member_id -> Int4,
+        book_id -> Int4,
         action -> Varchar,
         days -> Nullable<Int2>,
         created_at -> Timestamp,
@@ -190,7 +190,7 @@ table! {
 
 table! {
     links (id) {
-        id -> Int8,
+        id -> Int4,
         href -> Varchar,
         label -> Varchar,
         loc -> Varchar,
@@ -204,7 +204,7 @@ table! {
 
 table! {
     locales (id) {
-        id -> Int8,
+        id -> Int4,
         lang -> Varchar,
         code -> Varchar,
         message -> Text,
@@ -215,8 +215,8 @@ table! {
 
 table! {
     logs (id) {
-        id -> Int8,
-        user_id -> Int8,
+        id -> Int4,
+        user_id -> Int4,
         ip -> Varchar,
         message -> Varchar,
         created_at -> Timestamptz,
@@ -225,8 +225,8 @@ table! {
 
 table! {
     mail_aliases (id) {
-        id -> Int8,
-        domain_id -> Int8,
+        id -> Int4,
+        domain_id -> Int4,
         source -> Varchar,
         destination -> Varchar,
         created_at -> Timestamp,
@@ -236,7 +236,7 @@ table! {
 
 table! {
     mail_domains (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -245,8 +245,8 @@ table! {
 
 table! {
     mail_users (id) {
-        id -> Int8,
-        domain_id -> Int8,
+        id -> Int4,
+        domain_id -> Int4,
         email -> Varchar,
         full_name -> Varchar,
         password -> Varchar,
@@ -259,7 +259,7 @@ table! {
 
 table! {
     mall_countries (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
         iso_name -> Varchar,
         numcode -> Int4,
@@ -273,7 +273,7 @@ table! {
 
 table! {
     mall_currencies (id) {
-        id -> Int8,
+        id -> Int4,
         key -> Varchar,
         iso_code -> Varchar,
         name -> Varchar,
@@ -293,20 +293,20 @@ table! {
 
 table! {
     mall_states (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
         abbr -> Varchar,
-        country_id -> Int8,
+        country_id -> Int4,
         updated_at -> Timestamp,
     }
 }
 
 table! {
     mall_zone_members (id) {
-        id -> Int8,
-        zone_id -> Int8,
+        id -> Int4,
+        zone_id -> Int4,
         zoneable_type -> Varchar,
-        zoneable_id -> Int8,
+        zoneable_id -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -314,7 +314,7 @@ table! {
 
 table! {
     mall_zones (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
         description -> Text,
         kind -> Varchar,
@@ -326,7 +326,7 @@ table! {
 
 table! {
     members (id) {
-        id -> Int8,
+        id -> Int4,
         email -> Varchar,
         name -> Varchar,
         address -> Varchar,
@@ -340,9 +340,9 @@ table! {
 
 table! {
     policies (id) {
-        id -> Int8,
-        user_id -> Int8,
-        role_id -> Int8,
+        id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
         nbf -> Date,
         exp -> Date,
         created_at -> Timestamptz,
@@ -352,7 +352,7 @@ table! {
 
 table! {
     reading_books (id) {
-        id -> Int8,
+        id -> Int4,
         author -> Varchar,
         publisher -> Varchar,
         title -> Varchar,
@@ -371,9 +371,9 @@ table! {
 
 table! {
     reading_notes (id) {
-        id -> Int8,
-        user_id -> Int8,
-        book_id -> Int8,
+        id -> Int4,
+        user_id -> Int4,
+        book_id -> Int4,
         body -> Text,
         #[sql_name = "type"]
         type_ -> Varchar,
@@ -384,9 +384,9 @@ table! {
 
 table! {
     roles (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
-        resource_id -> Nullable<Int8>,
+        resource_id -> Nullable<Int4>,
         resource_type -> Nullable<Varchar>,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
@@ -395,7 +395,7 @@ table! {
 
 table! {
     settings (id) {
-        id -> Int8,
+        id -> Int4,
         key -> Varchar,
         salt -> Nullable<Bytea>,
         value -> Bytea,
@@ -406,7 +406,7 @@ table! {
 
 table! {
     survey_fields (id) {
-        id -> Int8,
+        id -> Int4,
         label -> Varchar,
         name -> Varchar,
         value -> Varchar,
@@ -414,7 +414,7 @@ table! {
         #[sql_name = "type"]
         type_ -> Varchar,
         required -> Bool,
-        form_id -> Int8,
+        form_id -> Int4,
         sort_order -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -423,14 +423,14 @@ table! {
 
 table! {
     survey_forms (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         body -> Text,
         #[sql_name = "type"]
         type_ -> Varchar,
         uid -> Varchar,
         mode -> Varchar,
-        user_id -> Int8,
+        user_id -> Int4,
         nbf -> Date,
         exp -> Date,
         created_at -> Timestamp,
@@ -440,9 +440,9 @@ table! {
 
 table! {
     survey_records (id) {
-        id -> Int8,
+        id -> Int4,
         value -> Text,
-        form_id -> Int8,
+        form_id -> Int4,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -450,19 +450,19 @@ table! {
 
 table! {
     todo_logs (id) {
-        id -> Int8,
+        id -> Int4,
         message -> Varchar,
         begin -> Timestamp,
         end -> Timestamp,
-        task_id -> Int8,
-        member_id -> Int8,
+        task_id -> Int4,
+        member_id -> Int4,
         created_at -> Timestamp,
     }
 }
 
 table! {
     todo_projects (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         description -> Nullable<Text>,
         created_at -> Timestamp,
@@ -472,10 +472,10 @@ table! {
 
 table! {
     todo_tasks (id) {
-        id -> Int8,
+        id -> Int4,
         title -> Varchar,
         description -> Nullable<Text>,
-        status -> Varchar,
+        status -> Int2,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -483,7 +483,7 @@ table! {
 
 table! {
     users (id) {
-        id -> Int8,
+        id -> Int4,
         name -> Varchar,
         email -> Varchar,
         uid -> Varchar,
@@ -506,9 +506,9 @@ table! {
 
 table! {
     votes (id) {
-        id -> Int8,
+        id -> Int4,
         resource_type -> Varchar,
-        resource_id -> Int8,
+        resource_id -> Int4,
         point -> Int4,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
@@ -517,8 +517,8 @@ table! {
 
 table! {
     vpn_logs (id) {
-        id -> Int8,
-        user_id -> Int8,
+        id -> Int4,
+        user_id -> Int4,
         trusted_ip -> Nullable<Varchar>,
         trusted_port -> Nullable<Int2>,
         remote_ip -> Nullable<Varchar>,
@@ -532,7 +532,7 @@ table! {
 
 table! {
     vpn_users (id) {
-        id -> Int8,
+        id -> Int4,
         full_name -> Varchar,
         email -> Varchar,
         password -> Varchar,

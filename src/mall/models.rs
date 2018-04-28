@@ -12,7 +12,7 @@ use super::super::schema::{mall_countries, mall_currencies, mall_states, mall_zo
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Currency {
-    pub id: i64,
+    pub id: i32,
     pub key: String,
     pub iso_code: String,
     pub name: String,
@@ -93,10 +93,10 @@ impl Currency {
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct ZoneMember {
-    pub id: i64,
-    pub zone_id: i64,
+    pub id: i32,
+    pub zone_id: i32,
     pub zoneable_type: String,
-    pub zoneable_id: i64,
+    pub zoneable_id: i32,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -104,9 +104,9 @@ pub struct ZoneMember {
 impl ZoneMember {
     pub fn add(
         db: &Db,
-        zone_id: &i64,
+        zone_id: &i32,
         zoneable_type: &String,
-        zoneable_id: &i64,
+        zoneable_id: &i32,
     ) -> Result<ZoneMember> {
         let db = db.deref();
         let now = Utc::now().naive_utc();
@@ -124,7 +124,7 @@ impl ZoneMember {
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Zone {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub description: String,
     pub kind: String,
@@ -157,15 +157,15 @@ impl Zone {
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct State {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub abbr: String,
-    pub country_id: i64,
+    pub country_id: i32,
     pub updated_at: NaiveDateTime,
 }
 
 impl State {
-    pub fn add(db: &Db, country: &i64, name: &String, abbr: &String) -> Result<State> {
+    pub fn add(db: &Db, country: &i32, name: &String, abbr: &String) -> Result<State> {
         let now = Utc::now().naive_utc();
         let it: State = insert_into(mall_states::dsl::mall_states)
             .values((
@@ -181,7 +181,7 @@ impl State {
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Country {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub iso_name: String,
     pub numcode: i32,
@@ -193,8 +193,8 @@ pub struct Country {
 }
 
 impl Country {
-    pub fn get_id_by_iso(db: &Db, iso: &String) -> Result<i64> {
-        let id: i64 = mall_countries::dsl::mall_countries
+    pub fn get_id_by_iso(db: &Db, iso: &String) -> Result<i32> {
+        let id: i32 = mall_countries::dsl::mall_countries
             .select(mall_countries::dsl::id)
             .filter(mall_countries::dsl::iso.eq(iso))
             .first(db.deref())?;

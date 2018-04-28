@@ -1,5 +1,6 @@
 use std::io::{self, BufRead};
 
+use chrono::Duration;
 use log;
 use validator::Validate;
 
@@ -34,7 +35,7 @@ pub fn administrator(db: &Db) -> Result<()> {
     User::set_confirmed(db, &user.id)?;
     for it in vec![Role::ROOT, Role::ADMIN, Role::MEMBER] {
         let role = Role::get(db, &s!(it), &None, &None)?;
-        Policy::apply(db, &user.id, &role, 365 * 120)?;
+        Policy::apply(db, &user.id, &role, Duration::weeks(5 * 1024))?;
     }
 
     Ok(())

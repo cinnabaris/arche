@@ -18,9 +18,9 @@ use super::super::security::hash;
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Policy {
-    pub id: i64,
-    pub user_id: i64,
-    pub role_id: i64,
+    pub id: i32,
+    pub user_id: i32,
+    pub role_id: i32,
     pub nbf: NaiveDate,
     pub exp: NaiveDate,
     pub created_at: NaiveDateTime,
@@ -28,7 +28,7 @@ pub struct Policy {
 }
 
 impl Policy {
-    pub fn users(db: &Db, role: &i64) -> Result<Vec<i64>> {
+    pub fn users(db: &Db, role: &i32) -> Result<Vec<i32>> {
         let db = db.deref();
         let ids = policies::dsl::policies
             .select((
@@ -37,7 +37,7 @@ impl Policy {
                 policies::dsl::exp,
             ))
             .filter(policies::dsl::role_id.eq(role))
-            .get_results::<(i64, NaiveDate, NaiveDate)>(db)?;
+            .get_results::<(i32, NaiveDate, NaiveDate)>(db)?;
 
         let today = Utc::now().date().naive_utc();
         let mut items = Vec::new();
@@ -49,7 +49,7 @@ impl Policy {
         Ok(items)
     }
 
-    pub fn roles(db: &Db, user: &i64) -> Result<Vec<i64>> {
+    pub fn roles(db: &Db, user: &i32) -> Result<Vec<i32>> {
         let db = db.deref();
         let ids = policies::dsl::policies
             .select((
@@ -58,7 +58,7 @@ impl Policy {
                 policies::dsl::exp,
             ))
             .filter(policies::dsl::user_id.eq(user))
-            .get_results::<(i64, NaiveDate, NaiveDate)>(db)?;
+            .get_results::<(i32, NaiveDate, NaiveDate)>(db)?;
 
         let today = Utc::now().date().naive_utc();
         let mut items = Vec::new();
@@ -70,7 +70,7 @@ impl Policy {
         Ok(items)
     }
 
-    pub fn can(db: &Db, user: &i64, role: &i64) -> bool {
+    pub fn can(db: &Db, user: &i32, role: &i32) -> bool {
         if let Ok((nbf, exp)) = policies::dsl::policies
             .select((policies::dsl::nbf, policies::dsl::exp))
             .filter(policies::dsl::user_id.eq(user))
@@ -83,10 +83,10 @@ impl Policy {
         false
     }
 
-    pub fn apply(db: &Db, user: &i64, role: &i64, days: i64) -> Result<()> {
+    pub fn apply(db: &Db, user: &i32, role: &i32, ttl: Duration) -> Result<()> {
         let db = db.deref();
         let nbf = Utc::now();
-        let exp = nbf.add(Duration::days(days));
+        let exp = nbf.add(ttl);
         let nbf = nbf.date().naive_utc();
         let exp = exp.date().naive_utc();
 
@@ -95,7 +95,7 @@ impl Policy {
             .select(policies::dsl::id)
             .filter(policies::dsl::user_id.eq(user))
             .filter(policies::dsl::role_id.eq(role))
-            .first::<i64>(db)
+            .first::<i32>(db)
         {
             Ok(id) => {
                 let it = policies::dsl::policies.filter(policies::dsl::id.eq(&id));
@@ -123,7 +123,7 @@ impl Policy {
         }
     }
 
-    pub fn deny(db: &Db, user: &i64, role: &i64) -> Result<usize> {
+    pub fn deny(db: &Db, user: &i32, role: &i32) -> Result<usize> {
         let it = policies::dsl::policies
             .filter(policies::dsl::user_id.eq(user))
             .filter(policies::dsl::role_id.eq(role));
@@ -135,9 +135,9 @@ impl Policy {
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Role {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
-    pub resource_id: Option<i64>,
+    pub resource_id: Option<i32>,
     pub resource_type: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -148,7 +148,7 @@ impl Role {
     pub const ROOT: &'static str = "root";
     pub const MEMBER: &'static str = "member";
 
-    pub fn by_id(db: &Db, id: &i64) -> Result<Role> {
+    pub fn by_id(db: &Db, id: &i32) -> Result<Role> {
         Ok(roles::dsl::roles
             .filter(roles::dsl::id.eq(id))
             .first::<Role>(db.deref())?)
@@ -158,8 +158,8 @@ impl Role {
         db: &Db,
         name: &String,
         resource_type: &Option<String>,
-        resource_id: &Option<i64>,
-    ) -> Result<i64> {
+        resource_id: &Option<i32>,
+    ) -> Result<i32> {
         let db = db.deref();
         let now = Utc::now().naive_utc();
         match roles::dsl::roles
@@ -167,7 +167,7 @@ impl Role {
             .filter(roles::dsl::name.eq(name))
             .filter(roles::dsl::resource_type.eq(resource_type))
             .filter(roles::dsl::resource_id.eq(resource_id))
-            .first::<i64>(db)
+            .first::<i32>(db)
         {
             Ok(id) => Ok(id),
             Err(_) => {
@@ -179,7 +179,7 @@ impl Role {
                         roles::dsl::updated_at.eq(&now),
                     ))
                     .returning(roles::dsl::id)
-                    .get_result::<i64>(db)?;
+                    .get_result::<i32>(db)?;
                 Ok(id)
             }
         }
@@ -188,7 +188,7 @@ impl Role {
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct User {
-    pub id: i64,
+    pub id: i32,
     pub name: String,
     pub email: String,
     pub uid: String,
@@ -255,7 +255,7 @@ impl User {
     }
     pub fn sign_in(
         db: &Db,
-        user: &i64,
+        user: &i32,
         remote: &SocketAddr,
         sign_in_count: i32,
         current_sign_in_ip: Option<String>,
@@ -292,7 +292,7 @@ impl User {
             .get_result(db.deref())?;
         Ok(it)
     }
-    pub fn set_confirmed(db: &Db, user: &i64) -> Result<()> {
+    pub fn set_confirmed(db: &Db, user: &i32) -> Result<()> {
         let it = users::dsl::users.filter(users::dsl::id.eq(user));
         let now = Utc::now().naive_utc();
         update(it)
@@ -304,7 +304,7 @@ impl User {
         Ok(())
     }
 
-    pub fn set_password(db: &Db, user: &i64, password: &String) -> Result<()> {
+    pub fn set_password(db: &Db, user: &i32, password: &String) -> Result<()> {
         let it = users::dsl::users.filter(users::dsl::id.eq(user));
         update(it)
             .set((
@@ -315,7 +315,7 @@ impl User {
         Ok(())
     }
 
-    pub fn set_locked(db: &Db, user: &i64, ok: bool) -> Result<()> {
+    pub fn set_locked(db: &Db, user: &i32, ok: bool) -> Result<()> {
         let it = users::dsl::users.filter(users::dsl::id.eq(user));
         let now = Utc::now().naive_utc();
         update(it)
@@ -330,9 +330,9 @@ impl User {
 
 #[derive(Serialize, Queryable, Deserialize, Debug, Clone)]
 pub struct Log {
-    pub id: i64,
+    pub id: i32,
     #[serde(rename = "userId")]
-    pub user_id: i64,
+    pub user_id: i32,
     pub message: String,
     pub ip: String,
     #[serde(rename = "createdAt")]
@@ -340,7 +340,7 @@ pub struct Log {
 }
 
 impl Log {
-    pub fn list(db: &Db, user: &i64) -> Result<Vec<Log>> {
+    pub fn list(db: &Db, user: &i32) -> Result<Vec<Log>> {
         let it = logs::dsl::logs
             .filter(logs::dsl::user_id.eq(user))
             .order(logs::dsl::created_at.desc())
@@ -349,7 +349,7 @@ impl Log {
     }
     pub fn add<S: Serialize>(
         db: &Db,
-        user: &i64,
+        user: &i32,
         lang: &String,
         remote: &SocketAddr,
         code: &String,

@@ -195,7 +195,10 @@ pub fn db_seed() -> Result<()> {
         super::mall::seed::load(&db, &root)?;
         super::nut::seed::administrator(&db)?;
         Ok(())
-    })
+    })?;
+
+    log::info!("Done!!!");
+    Ok(())
 }
 
 pub fn db_dump() -> Result<()> {

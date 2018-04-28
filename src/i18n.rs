@@ -121,14 +121,14 @@ impl Locale {
             .first::<String>(con.deref())?;
         Ok(msg)
     }
-    pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<i64> {
+    pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<i32> {
         let now = Utc::now().naive_utc();
         let db = db.deref();
         match locales::dsl::locales
             .select(locales::dsl::id)
             .filter(locales::dsl::lang.eq(lang))
             .filter(locales::dsl::code.eq(code))
-            .first::<i64>(db)
+            .first::<i32>(db)
         {
             Ok(id) => {
                 let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
@@ -149,7 +149,7 @@ impl Locale {
                         locales::dsl::updated_at.eq(Utc::now().naive_utc()),
                     ))
                     .returning(locales::dsl::id)
-                    .get_result::<i64>(db)?;
+                    .get_result::<i32>(db)?;
                 Ok(id)
             }
         }

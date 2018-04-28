@@ -17,7 +17,7 @@ pub struct Session {
 }
 
 pub struct CurrentUser {
-    pub id: i64,
+    pub id: i32,
     pub roles: Vec<String>,
 }
 
@@ -70,7 +70,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for CurrentUser {
 }
 
 pub struct AdminUser {
-    pub id: i64,
+    pub id: i32,
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for AdminUser {
