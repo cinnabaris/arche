@@ -1,35 +1,35 @@
 CREATE TABLE forum_categories (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(32) NOT NULL,
   color VARCHAR(16) NOT NULL,
   icon VARCHAR(16) NOT NULL,
   description VARCHAR(500),
-  parent_id BIGINT,
+  parent_id INT,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 CREATE TABLE forum_topics (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   body TEXT NOT NULL,
-  user_id BIGINT NOT NULL,
-  category_id BIGINT NOT NULL,
+  user_id INT NOT NULL,
+  category_id INT NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 CREATE TABLE forum_posts (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   body TEXT NOT NULL,
-  user_id BIGINT NOT NULL,
-  post_id BIGINT NOT NULL,
+  user_id INT NOT NULL,
+  post_id INT NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
 CREATE TABLE forum_tags (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(32) NOT NULL,
   background_color VARCHAR(16) NOT NULL,
   text_color VARCHAR(16) NOT NULL,
@@ -40,9 +40,9 @@ CREATE TABLE forum_tags (
 CREATE UNIQUE INDEX idx_forum_tags_name ON forum_tags (name);
 
 CREATE TABLE forum_topics_tags (
-  id BIGSERIAL PRIMARY KEY,
-  topic_id BIGINT NOT NULL,
-  tag_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  topic_id INT NOT NULL,
+  tag_id INT NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );

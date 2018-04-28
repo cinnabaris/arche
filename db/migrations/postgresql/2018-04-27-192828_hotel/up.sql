@@ -1,5 +1,5 @@
 CREATE TABLE hotel_rooms (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   uid VARCHAR(8) NOT NULL,
   loc VARCHAR(32) NOT NULL,
   floor VARCHAR(4) NOT NULL,
@@ -18,9 +18,9 @@ CREATE INDEX idx_hotel_rooms_loc ON hotel_rooms (loc);
 CREATE INDEX idx_hotel_rooms_status ON hotel_rooms (status);
 
 CREATE TABLE hotel_logs (
-  id BIGSERIAL PRIMARY KEY,
-  member_id BIGINT NOT NULL,
-  room_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  member_id INT NOT NULL,
+  room_id INT NOT NULL,
   action VARCHAR(8) NOT NULL,
   days SMALLINT,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()

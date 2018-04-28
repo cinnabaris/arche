@@ -1,5 +1,5 @@
 CREATE TABLE reading_books (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   author VARCHAR(255) NOT NULL,
   publisher VARCHAR(255) NOT NULL,
   title VARCHAR(255) NOT NULL,
@@ -25,9 +25,9 @@ CREATE INDEX idx_reading_books_type ON reading_books (type);
 CREATE INDEX idx_reading_books_lang ON reading_books (lang);
 
 CREATE TABLE reading_notes (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL,
-  book_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  book_id INT NOT NULL,
   body TEXT NOT NULL,
   type VARCHAR(8) NOT NULL DEFAULT 'markdown',
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),

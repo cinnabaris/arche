@@ -1,5 +1,5 @@
 CREATE TABLE library_books (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   uid VARCHAR(8) NOT NULL,
   title VARCHAR(255) NOT NULL,
   author VARCHAR(255) NOT NULL,
@@ -19,9 +19,9 @@ CREATE INDEX idx_library_books_author ON library_books (author);
 CREATE INDEX idx_library_books_status ON library_books (status);
 
 CREATE TABLE library_logs (
-  id BIGSERIAL PRIMARY KEY,
-  member_id BIGINT NOT NULL,
-  book_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  member_id INT NOT NULL,
+  book_id INT NOT NULL,
   action VARCHAR(8) NOT NULL,
   days SMALLINT,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()

@@ -1,5 +1,5 @@
 CREATE TABLE users (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(32) NOT NULL,
   email VARCHAR(255) NOT NULL,
   uid VARCHAR(36) NOT NULL,
@@ -23,8 +23,8 @@ CREATE INDEX idx_users_provider_id ON users (provider_id);
 CREATE INDEX idx_users_provider_type ON users (provider_type);
 
 CREATE TABLE logs (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
   ip VARCHAR(39) NOT NULL,
   message VARCHAR(255) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW());
@@ -32,9 +32,9 @@ CREATE TABLE logs (
 CREATE INDEX idx_logs_ip ON logs (ip);
 
 CREATE TABLE roles (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(32) NOT NULL,
-  resource_id BIGINT,
+  resource_id INT,
   resource_type VARCHAR(255),
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE NOT NULL);
 
@@ -55,9 +55,9 @@ CREATE INDEX idx_roles_name ON roles (name);
 CREATE INDEX idx_roles_resource_type ON roles (resource_type);
 
 CREATE TABLE policies (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL,
-  role_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  role_id INT NOT NULL,
   nbf DATE NOT NULL DEFAULT current_date,
   exp DATE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE NOT NULL);

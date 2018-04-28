@@ -1,5 +1,5 @@
 CREATE TABLE vpn_users (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   full_name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
@@ -17,8 +17,8 @@ CREATE UNIQUE INDEX idx_vpn_users_email ON vpn_users (email);
 CREATE INDEX idx_vpn_users_full_name ON vpn_users (full_name);
 
 CREATE TABLE vpn_logs (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
   trusted_ip VARCHAR(39),
   trusted_port SMALLINT,
   remote_ip VARCHAR(39),

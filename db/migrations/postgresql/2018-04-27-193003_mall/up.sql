@@ -1,5 +1,5 @@
 CREATE TABLE mall_currencies (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   key VARCHAR(3) NOT NULL,
   iso_code varchar(3) NOT NULL,
   name varchar(255) NOT NULL,
@@ -23,7 +23,7 @@ CREATE INDEX idx_mall_currencies_iso_code ON mall_currencies (iso_code);
 CREATE INDEX idx_mall_currencies_name ON mall_currencies (name);
 
 CREATE TABLE mall_countries (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
   iso_name varchar(255) NOT NULL,
   numcode integer NOT NULL,
@@ -39,15 +39,15 @@ CREATE UNIQUE INDEX idx_mall_countries_on_lower_iso_name ON mall_countries (lowe
 CREATE UNIQUE INDEX idx_mall_countries_on_lower_name ON mall_countries (lower((name)::text));
 
 CREATE TABLE mall_states (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
   abbr varchar(32) NOT NULL,
-  country_id BIGINT NOT NULL,
+  country_id INT NOT NULL,
   updated_at timestamp without time zone NOT NULL
 );
 
 CREATE TABLE mall_zones (
-  id BIGSERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
   description TEXT NOT NULL,
   kind varchar(16) NOT NULL,
@@ -57,10 +57,10 @@ CREATE TABLE mall_zones (
 );
 
 CREATE TABLE mall_zone_members (
-  id BIGSERIAL PRIMARY KEY,
-  zone_id BIGINT NOT NULL,
+  id SERIAL PRIMARY KEY,
+  zone_id INT NOT NULL,
   zoneable_type varchar(16) NOT NULL,
-  zoneable_id BIGINT NOT NULL,
+  zoneable_id INT NOT NULL,
   created_at timestamp without time zone DEFAULT NOW() NOT NULL,
   updated_at timestamp without time zone NOT NULL
 );
