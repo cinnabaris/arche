@@ -5,7 +5,7 @@ CREATE TABLE hotel_rooms (
   floor VARCHAR(4) NOT NULL,
   door VARCHAR(8) NOT NULL,
   bed VARCHAR(4) NOT NULL,
-  status VARCHAR(8) NOT NULL,
+  status SMALLINT NOT NULL,
   description TEXT,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
@@ -14,8 +14,6 @@ CREATE TABLE hotel_rooms (
 CREATE UNIQUE INDEX idx_hotel_rooms_uid ON hotel_rooms (uid);
 
 CREATE INDEX idx_hotel_rooms_loc ON hotel_rooms (loc);
-
-CREATE INDEX idx_hotel_rooms_status ON hotel_rooms (status);
 
 CREATE TABLE hotel_logs (
   id SERIAL PRIMARY KEY,

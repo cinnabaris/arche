@@ -10,12 +10,10 @@ CREATE TABLE todo_tasks (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  status VARCHAR(8) NOT NULL,
+  status SMALLINT NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
-
-CREATE INDEX todo_tasks_status ON todo_tasks (status);
 
 CREATE TABLE todo_logs (
   id SERIAL PRIMARY KEY,
