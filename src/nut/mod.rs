@@ -1,7 +1,8 @@
 // pub mod c_home;
-pub mod c_users;
+pub mod forms;
 pub mod guards;
 pub mod models;
+pub mod schema;
 pub mod seed;
 pub mod workers;
 

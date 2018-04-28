@@ -5,7 +5,7 @@ use validator::Validate;
 
 use super::super::orm::Connection as Db;
 use super::super::result::Result;
-use super::c_users::FmSignUp;
+use super::forms::UsersSignUp;
 use super::models::{Policy, Role, User};
 
 pub fn administrator(db: &Db) -> Result<()> {
@@ -23,7 +23,7 @@ pub fn administrator(db: &Db) -> Result<()> {
     println!("password:");
     let mut password = String::new();
     stdin.lock().read_line(&mut password)?;
-    let form = FmSignUp {
+    let form = UsersSignUp {
         name: s!("Administrator"),
         email: s!(email.trim()),
         password: s!(password.trim()),

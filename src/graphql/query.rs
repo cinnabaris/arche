@@ -1,21 +1,22 @@
 use juniper::FieldResult;
 
+use super::super::env::VERSION;
+use super::super::nut;
 use super::context::Context;
-use super::mutation::Human;
 
 pub struct Query;
 
 graphql_object!(Query: Context |&self| {
 
     field apiVersion() -> &str {
-        "1.0"
+        VERSION
     }
 
-    field human(&executor, name: String) -> FieldResult<Human> {
+    field locales(&executor, lang: String) -> FieldResult<nut::schema::User> {
 
-        let context = executor.context();
+        // let context = executor.context();
         // let connection = context.pool.get_connection()?;
         // let human = connection.find_human(&id)?;
-        Ok(Human{name:name,id:432})
+        Ok(nut::schema::User{id:s!("aaa"), name:s!("bbb")})
     }
 });
