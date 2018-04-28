@@ -7,11 +7,11 @@ api:
 	cargo build --release
 	strip -s target/release/arche
 	mkdir -p $(dist)
-	-cp -r target/release/arche db templates themes log4rs.yml LICENSE README.md $(dist)/
+	-cp -r target/release/arche db templates log4rs.yml LICENSE README.md $(dist)/
 
 www:
-	cd dashboard && npm run build
-	-cp -r dashboard/build $(dist)/public
+	cd desktop && npm run build
+	-cp -r desktop/dist $(dist)/public
 
 schema:
 	DATABASE_URL="postgres://postgres:@localhost:5432/arche" diesel print-schema > src/schema/postgresql.rs
@@ -19,4 +19,4 @@ schema:
 
 clean:
 	cargo clean
-	-rm -r $(dist) $(dist).tar.xz dashboard/build
+	-rm -r $(dist) $(dist).tar.xz desktop/dist

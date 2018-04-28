@@ -131,5 +131,3 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [msmtp](https://wiki.archlinux.org/index.php/msmtp)
 -   [Are we (I)DE yet?](https://areweideyet.com/)
 -   [Awesome Rust](https://github.com/rust-unofficial/awesome-rust)
--   [A Vue.js 2.0 UI Toolkit for Web](https://github.com/ElemeFE/element)
--   [A vue2.0 minimal admin template](https://github.com/PanJiaChen/vueAdmin-template)
