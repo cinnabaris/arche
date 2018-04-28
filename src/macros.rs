@@ -8,7 +8,14 @@ macro_rules! s {
 #[macro_export]
 macro_rules! gq {
     ($x:expr, $y:expr) => {
-        match $y.call(&$x.context()) {
+        ge!($y.call(&$x.context()))
+    };
+}
+
+#[macro_export]
+macro_rules! ge {
+    ($x:expr) => {
+        match $x {
             Ok(v) => Ok(v),
             Err(e) => Err(juniper::FieldError::new(e, juniper::Value::Null)),
         }

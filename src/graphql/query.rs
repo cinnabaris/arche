@@ -1,7 +1,6 @@
-use juniper::FieldResult;
+use juniper::{self, FieldResult};
 
-use super::super::env::VERSION;
-use super::super::nut;
+use super::super::{env, i18n};
 use super::context::Context;
 
 pub struct Query;
@@ -9,11 +8,11 @@ pub struct Query;
 graphql_object!(Query: Context |&self| {
 
     field apiVersion() -> &str {
-        VERSION
+        env::VERSION
     }
 
-    field locales(&executor, lang: String) -> FieldResult<nut::schema::User> {
-        Ok(nut::schema::User{id:s!("aaa"), name:s!("bbb")})
+    field locales(&executor, lang: String) -> FieldResult<Vec<i18n::Model>> {
+        ge!(i18n::Model::by_lang(&executor.context().db, &lang))
     }
-    
+
 });

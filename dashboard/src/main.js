@@ -12,7 +12,7 @@ import './main.css';
 import reducers from './reducers'
 import plugins from './plugins'
 import {get as detectLocale} from './intl'
-import {get} from './ajax'
+import {client} from './request'
 
 const main = (id) => {
   const user = detectLocale()
@@ -25,9 +25,20 @@ const main = (id) => {
     router: routerReducer
   }), applyMiddleware(middleware))
 
-  get(`/locales/${user.locale}`).then((rst) => {
+  client().request(`
+    query getLocales($lang: String!){
+      locales(lang: $lang){
+        code,
+        message
+      }
+    }
+  `, {lang: user.locale}).then((rst) => {
+    var messages = rst.locales.reduce(function(acc, cur) {
+      acc[cur.code] = cur.message
+      return acc
+    }, {})
     user.messages = {
-      ...rst
+      ...messages
     }
     ReactDOM.render((<LocaleProvider locale={user.antd}>
       <IntlProvider locale={user.locale} messages={user.messages}>

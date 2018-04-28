@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use std::{ffi, fs};
 
-use chrono::Utc;
+use chrono::{NaiveDateTime, Utc};
 use diesel::prelude::*;
 use diesel::{insert_into, update};
 use handlebars::Handlebars;
@@ -35,6 +35,28 @@ impl<'a, 'r> FromRequest<'a, 'r> for Params {
         }
     }
 }
+
+//-----------------------------------------------------------------------------
+#[derive(Serialize, Queryable, GraphQLObject, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Model {
+    pub id: i32,
+    pub lang: String,
+    pub code: String,
+    pub message: String,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
+
+impl Model {
+    pub fn by_lang(db: &Db, lang: &String) -> Result<Vec<Model>> {
+        let items = locales::dsl::locales
+            .filter(locales::dsl::lang.eq(lang))
+            .get_results::<Model>(db.deref())?;
+        Ok(items)
+    }
+}
+
 //-----------------------------------------------------------------------------
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -187,6 +187,7 @@ impl Role {
 }
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct User {
     pub id: i32,
     pub name: String,
