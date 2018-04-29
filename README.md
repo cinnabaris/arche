@@ -71,6 +71,7 @@ enable autosave
 -   atom-beautify(enable newline, beautify on save; need python-sqlparse)
 -   language-babel
 -   language-ini
+-   language-vue
 -   git-plus
 
 ## Notes
