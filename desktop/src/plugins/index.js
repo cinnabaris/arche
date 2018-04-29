@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Vuex from 'vuex'
-import VueI18n from 'vue-i18n'
 import BootstrapVue from 'bootstrap-vue'
 import ElementUI from 'element-ui'
 
@@ -12,7 +11,6 @@ import forum from './forum'
 
 Vue.use(Router)
 Vue.use(Vuex)
-Vue.use(VueI18n)
 Vue.use(BootstrapVue)
 Vue.use(ElementUI)
 

@@ -1,6 +1,6 @@
 <template>
 <layout-application>
-  sign in
+  sign in <br/>{{ $t("nut.users.sign-in.title") }}
    <b-alert show>Default Alert</b-alert>
   <shared-links/>
 </layout-application>
