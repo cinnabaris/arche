@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 
-import App from './App'
 import plugins from './plugins'
 import {get as getLocale} from './intl'
 import {client} from './request'
@@ -20,7 +19,7 @@ client().request(`
   }
 `, {lang: lng.locale}).then((rst) => {
   var messages = {}
-  messages[lng.locale] = rst.locales.reduce(function (acc, cur) {
+  messages[lng.locale] = rst.locales.reduce(function(acc, cur) {
     acc[cur.code] = cur.message
     return acc
   }, {})
@@ -30,11 +29,5 @@ client().request(`
   })
 
   /* eslint-disable no-new */
-  new Vue({el: '#app',
-    i18n,
-    router: plugins.router,
-    components: {
-      App
-    },
-    template: '<App/>'})
+  new Vue({el: '#app', i18n, router: plugins.router, template: '<router-view/>'})
 })
