@@ -1,7 +1,7 @@
 <template>
-<div>
-  <router-link :to="{name:'users.sign-in'}">Sign in</router-link>
-  <router-link :to="{name:'users.sign-up'}">Sign up</router-link>
+  <div>
+    <router-link :to="{ name: 'users.sign-in'}">{{ $t("nut.users.sign-in.title") }}</router-link>
+    <router-link :to="{ name: 'users.sign-up'}">{{ $t("nut.users.sign-up.title") }}</router-link>
 </div>
 </template>
 

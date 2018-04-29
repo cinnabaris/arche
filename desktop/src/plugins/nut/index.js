@@ -1,4 +1,5 @@
 import Home from './Home'
+import NotFound from './NotFound'
 
 import UsersSignIn from './users/SignIn'
 import UsersSignUp from './users/SignUp'
@@ -22,6 +23,10 @@ export default {
       path: '/',
       name: 'home',
       component: Home
+    }, {
+      path: '*',
+      name: 'not-found',
+      component: NotFound
     }
   ]
 }

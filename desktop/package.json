@@ -9,7 +9,6 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "bootstrap-vue": "^2.0.0-rc.9",
     "element-ui": "^2.3.6",
     "graphql-request": "^1.5.2",
     "js-cookie": "^2.2.0",
