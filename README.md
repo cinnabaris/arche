@@ -1,6 +1,6 @@
 # arche
 
-A complete open source e-commerce solution built with Rust and Vue(STILL IN DEVELOPMENT).
+A complete open source e-commerce solution built with Rust and React(STILL IN DEVELOPMENT).
 
 Inspired by [Spree](https://github.com/spree/spree) and [NodeBB](https://github.com/NodeBB/NodeBB).
 
@@ -71,7 +71,6 @@ enable autosave
 -   atom-beautify(enable newline, beautify on save; need python-sqlparse)
 -   language-babel
 -   language-ini
--   language-vue
 -   git-plus
 
 ## Notes
