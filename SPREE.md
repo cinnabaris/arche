@@ -2,21 +2,21 @@
 
 ## Install
 
--   install rbenv
+- install rbenv
 
 ```bash
 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 cd ~/.rbenv && src/configure && make -C src
 ```
 
--   add to ~/.zshrc and re-login
+- add to ~/.zshrc and re-login
 
 ```bash
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
 ```
 
--   install ruby
+- install ruby
 
 ```bash
 git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
@@ -24,14 +24,14 @@ git clone https://github.com/rbenv/rbenv-vars.git $(rbenv root)/plugins/rbenv-va
 rbenv global 2.4.2
 ```
 
--   create app
+- create app
 
 ```bash
 gem install rails -v 5.1
 rails new demo
 ```
 
--   add Spree gems to your Gemfile
+- add Spree gems to your Gemfile
 
 ```ruby
 gem 'spree', '~> 3.4.4'
@@ -42,14 +42,14 @@ gem 'pg', '>= 0.18', '< 2.0'
 gem 'mysql2', '>= 0.3.18', '< 0.6.0'
 ```
 
--   install
+- install
 
 ```bash
 bundle update i18n
 bundle install
 ```
 
--   database.yml
+- database.yml
 
 ```yaml
 adapter:  postgresql
@@ -65,7 +65,7 @@ username:   root
 password:   test
 ```
 
--   generate tables
+- generate tables
 
 ```bash
 bundle exec rake railties:install:migrations
@@ -73,7 +73,7 @@ bundle exec rake db:migrate
 bundle exec rake db:seed
 ```
 
--   export tables
+- export tables
 
 ```bash
 pg_dump -O -x -s -U postgres spree > pg.sql

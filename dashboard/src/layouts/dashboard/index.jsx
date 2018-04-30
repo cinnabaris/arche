@@ -66,4 +66,4 @@ Widget.propTypes = {
 
 const WidgetI = injectIntl(Widget)
 
-export default connect(state => ({user: state.currentUser, site: state.siteInfo}), {push, signOut})(WidgetI)
+export default connect(state => ({user: state.currentUser}), {push, signOut})(WidgetI)

@@ -46,8 +46,7 @@ class Widget extends Component {
 Widget.propTypes = {
   refresh: PropTypes.func.isRequired,
   signIn: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired,
-  site: PropTypes.object.isRequired
+  user: PropTypes.object.isRequired
 }
 
-export default connect(state => ({user: state.currentUser, site: state.siteInfo}), {signIn, refresh})(Widget)
+export default connect(state => ({user: state.currentUser}), {signIn, refresh})(Widget)

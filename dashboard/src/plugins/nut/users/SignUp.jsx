@@ -1,45 +1,82 @@
-import React, {Component} from 'react'
+import React, {
+  Component
+} from 'react'
 import PropTypes from 'prop-types'
-import {Form, Row, Col, Input, message} from 'antd'
-import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
-import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import {
+  Form,
+  Row,
+  Col,
+  Input,
+  message
+} from 'antd'
+import {
+  injectIntl,
+  intlShape,
+  FormattedMessage
+} from 'react-intl'
+import {
+  connect
+} from 'react-redux'
+import {
+  push
+} from 'react-router-redux'
 
 import Layout from '../../../layouts/application'
-import {post} from '../../../ajax'
-import {Submit, formItemLayout} from '../../../components/form'
+import {
+  post
+} from '../../../ajax'
+import {
+  Submit,
+  formItemLayout
+} from '../../../components/form'
 import SharedLinks from './SharedLinks'
 
 const FormItem = Form.Item
 
 class Widget extends Component {
   handleSubmit = (e) => {
-    const {push} = this.props
-    const {formatMessage} = this.props.intl
+    const {
+      push
+    } = this.props
+    const {
+      formatMessage
+    } = this.props.intl
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         post('/users/sign-up', Object.assign({}, values, {
           next: window.location.href + '/../sign-in'
         })).then(() => {
-          message.info(formatMessage({id: "nut.users.confirm.success"}))
+          message.info(formatMessage({
+            id: "nut.users.confirm.success"
+          }))
           push('/users/sign-in')
         }).catch(message.error);
       }
     });
   }
   checkPassword = (rule, value, callback) => {
-    const {formatMessage} = this.props.intl
-    const {getFieldValue} = this.props.form
+    const {
+      formatMessage
+    } = this.props.intl
+    const {
+      getFieldValue
+    } = this.props.form
     if (value && value !== getFieldValue('password')) {
-      callback(formatMessage({id: "validator.password-confirmation"}));
+      callback(formatMessage({
+        id: "validator.password-confirmation"
+      }));
     } else {
       callback();
     }
   }
   render() {
-    const {formatMessage} = this.props.intl
-    const {getFieldDecorator} = this.props.form
+    const {
+      formatMessage
+    } = this.props.intl
+    const {
+      getFieldDecorator
+    } = this.props.form
     const title = {
       id: "nut.users.sign-up.title"
     }
@@ -113,4 +150,4 @@ const WidgetF = Form.create()(injectIntl(Widget))
 
 export default connect(state => ({}), {
   push
-},)(WidgetF)
+}, )(WidgetF)

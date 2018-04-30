@@ -1,8 +1,19 @@
 import jwtDecode from 'jwt-decode'
 import moment from 'moment'
 
-import {USERS_SIGN_IN, USERS_SIGN_OUT, SITE_REFRESH, SIDE_BAR_TOGGLE, SIDE_BAR_SELECT} from './actions'
-import {setToken, reloadAuthorized, MEMBER, ADMIN} from './auth'
+import {
+  USERS_SIGN_IN,
+  USERS_SIGN_OUT,
+  SIDE_BAR_TOGGLE,
+  SIDE_BAR_SELECT
+} from './actions'
+import {
+  setToken,
+  reloadAuthorized,
+  MEMBER,
+  ADMIN,
+  GUEST
+} from './auth'
 
 const sideBar = (state = {
   selected: [],
@@ -14,7 +25,9 @@ const sideBar = (state = {
         selected: [action.item]
       })
     case SIDE_BAR_TOGGLE:
-      return Object.assign({}, state, {open: action.items})
+      return Object.assign({}, state, {
+        open: action.items
+      })
     default:
       return state
   }
@@ -26,18 +39,16 @@ const currentUser = (state = {}, action) => {
       try {
         var it = jwtDecode(action.token);
         if (moment().isBetween(moment.unix(it.nbf), moment.unix(it.exp))) {
-          // TODO 多角色？
-          reloadAuthorized(
-            it.roles.includes(ADMIN)
-            ? ADMIN
-            : MEMBER)
+          reloadAuthorized(it.role)
           setToken(action.token)
-          return {uid: it.uid}
+          return {
+            uid: it.uid
+          }
         }
       } catch (e) {
         console.error(e)
       }
-      reloadAuthorized()
+      reloadAuthorized(GUEST)
       setToken()
       return {}
     case USERS_SIGN_OUT:
@@ -49,22 +60,25 @@ const currentUser = (state = {}, action) => {
   }
 }
 
-const siteInfo = (state = {
-  languages: []
-}, action) => {
-  switch (action.type) {
-    case SITE_REFRESH:
-      // set favicon
-      var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'shortcut icon';
-      link.href = action.info.favicon;
-      document.getElementsByTagName('head')[0].appendChild(link);
+// const siteInfo = (state = {
+//   languages: []
+// }, action) => {
+//   switch (action.type) {
+//     case SITE_REFRESH:
+//        set favicon
+//       var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+//       link.type = 'image/x-icon';
+//       link.rel = 'shortcut icon';
+//       link.href = action.info.favicon;
+//       document.getElementsByTagName('head')[0].appendChild(link);
+//
+//       return Object.assign({}, action.info)
+//     default:
+//       return state;
+//   }
+// }
 
-      return Object.assign({}, action.info)
-    default:
-      return state;
-  }
+export default {
+  currentUser,
+  sideBar
 }
-
-export default {currentUser, siteInfo, sideBar}
