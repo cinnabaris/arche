@@ -6,11 +6,11 @@ import {connect} from 'react-redux'
 import Exception from 'ant-design-pro/lib/Exception'
 import {push} from 'react-router-redux'
 
-import Footer from '../Footer'
+import Footer from './Footer'
 import Sidebar from './Sidebar'
-import Breadcrumb from '../Breadcrumb'
-import {signOut} from '../../actions'
-import {Authorized} from '../../auth'
+import Breadcrumb from './Breadcrumb'
+import {signOut} from '../actions'
+import {Authorized} from '../auth'
 
 const {Header, Content, Sider} = Layout
 
