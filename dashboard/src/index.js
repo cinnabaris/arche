@@ -1,5 +1,5 @@
-import '@babel/polyfill';
-import 'url-polyfill';
+import '@babel/polyfill'
+import 'url-polyfill'
 
 import registerServiceWorker from './registerServiceWorker'
 import main from './main'
