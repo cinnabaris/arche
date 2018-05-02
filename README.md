@@ -6,14 +6,14 @@ Inspired by [Spree](https://github.com/spree/spree) and [NodeBB](https://github.
 
 ## Install
 
-- add to your .zshrc
+-   add to your .zshrc
 
 ```bash
 export PATH="$HOME/.cargo/bin:$PATH"
 export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
 ```
 
-- install rust
+-   install rust
 
 ```bash
 curl https://sh.rustup.rs -sSf | sh
@@ -24,7 +24,7 @@ racer complete std::io::B
 rustup component add rust-src
 ```
 
-- upgrade
+-   upgrade
 
 ```bash
 rustup update
@@ -33,7 +33,7 @@ cargo update
 
 ## Usage
 
-- get source code
+-   get source code
 
 ```bash
 git clone https://github.com/cinnabaris/arche.git
@@ -41,20 +41,20 @@ cd arche
 cargo install diesel_cli --no-default-features --features postgres,mysql
 ```
 
-- using postgresql(default)
+-   using postgresql(default)
 
 ```bash
 make clean
 make
 ```
 
-- using mysql(test on Percona Server for MySQL)
+-   using mysql(test on Percona Server for MySQL)
 
 ```bash
 cargo build  --no-default-features  --features "mysql"
 ```
 
-- testing
+-   testing
 
 ```bash
 diesel database reset
@@ -62,32 +62,21 @@ cargo run
 python -m unittest -v
 ```
 
-## Editor Plugins(atom)
-
-enable autosave
-
-- ide-rust
-- file-icons
-- atom-beautify(enable newline, beautify on save; need python-sqlparse)
-- language-babel
-- language-ini
-- git-plus
-
 ## Notes
 
-- Generate a random key
+-   Generate a random key
 
 ```bash
 openssl rand -base64 32
 ```
 
-- ~/.npmrc
+-   ~/.npmrc
 
 ```bash
 npm config set prefix '~/.npm-global'
 ```
 
-- 'Peer authentication failed for user', open file "/etc/postgresql/9.5/main/pg_hba.conf" change line:
+-   'Peer authentication failed for user', open file "/etc/postgresql/9.5/main/pg_hba.conf" change line:
 
 ```bash
 local   all             all                                     peer
@@ -95,7 +84,7 @@ TO:
 local   all             all                                     md5
 ```
 
-- forgot mysql root password
+-   forgot mysql root password
 
 create file  /tmp/reset.mysqld
 
@@ -110,7 +99,7 @@ edit file /etc/mysql/my.cnf
 init-file=/tmp/reset.mysqld
 ```
 
-- RabbitMQ
+-   RabbitMQ
 
 ```bash
 rabbitmq-plugins enable rabbitmq_management
@@ -124,10 +113,10 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 
 ## Documents
 
-- [For gmail smtp](http://stackoverflow.com/questions/20337040/gmail-smtp-debug-error-please-log-in-via-your-web-browser)
-- [favicon.ico](http://icoconvert.com/)
-- [smver](http://semver.org/)
-- [banner.txt](http://patorjk.com/software/taag/)
-- [msmtp](https://wiki.archlinux.org/index.php/msmtp)
-- [Are we (I)DE yet?](https://areweideyet.com/)
-- [Awesome Rust](https://github.com/rust-unofficial/awesome-rust)
+-   [For gmail smtp](http://stackoverflow.com/questions/20337040/gmail-smtp-debug-error-please-log-in-via-your-web-browser)
+-   [favicon.ico](http://icoconvert.com/)
+-   [smver](http://semver.org/)
+-   [banner.txt](http://patorjk.com/software/taag/)
+-   [msmtp](https://wiki.archlinux.org/index.php/msmtp)
+-   [Are we (I)DE yet?](https://areweideyet.com/)
+-   [Awesome Rust](https://github.com/rust-unofficial/awesome-rust)
