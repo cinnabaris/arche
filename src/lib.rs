@@ -71,6 +71,7 @@ pub mod router;
 pub mod schema;
 pub mod security;
 pub mod settings;
+pub mod context;
 
 pub mod cbeta;
 pub mod donate;
