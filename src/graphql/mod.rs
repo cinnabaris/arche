@@ -10,8 +10,6 @@ use rocket::response::content::Html;
 use rocket::{Route, State};
 
 use super::i18n::Locale;
-use super::nut::guards::CurrentUser;
-use super::orm::Connection;
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![("/", routes!(doc, get, post))]
@@ -24,42 +22,31 @@ fn doc() -> Html<String> {
 
 #[get("/graphql?<request>")]
 fn get(
-    db: Connection,
     locale: Locale,
     remote: SocketAddr,
-    user: Option<CurrentUser>,
-    request: GraphQLRequest,
-    schema: State<schema::Schema>,
-) -> GraphQLResponse {
-    execute(db, locale, remote, user, request, schema)
-}
-
-#[post("/graphql", data = "<request>")]
-fn post(
-    db: Connection,
-    locale: Locale,
-    remote: SocketAddr,
-    user: Option<CurrentUser>,
-    request: GraphQLRequest,
-    schema: State<schema::Schema>,
-) -> GraphQLResponse {
-    execute(db, locale, remote, user, request, schema)
-}
-
-fn execute(
-    db: Connection,
-    locale: Locale,
-    remote: SocketAddr,
-    user: Option<CurrentUser>,
     request: GraphQLRequest,
     schema: State<schema::Schema>,
 ) -> GraphQLResponse {
     request.execute(
         &schema,
         &context::Context {
-            db: db,
             locale: locale.name,
-            user: user,
+            remote: remote,
+        },
+    )
+}
+
+#[post("/graphql", data = "<request>")]
+fn post(
+    locale: Locale,
+    remote: SocketAddr,
+    request: GraphQLRequest,
+    schema: State<schema::Schema>,
+) -> GraphQLResponse {
+    request.execute(
+        &schema,
+        &context::Context {
+            locale: locale.name,
             remote: remote,
         },
     )

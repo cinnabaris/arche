@@ -1,5 +1,4 @@
 use clap;
-use sodiumoxide;
 
 use super::context::Context;
 use super::env;
@@ -11,8 +10,6 @@ pub struct App {
 
 impl App {
     pub fn main() -> Result<()> {
-        sodiumoxide::init();
-
         let generate_nginx =
             clap::SubCommand::with_name("generate:nginx").about("Generate nginx.conf");
         let generate_config =
