@@ -7,15 +7,6 @@ use rocket::{Outcome, Request, State};
 use diesel;
 use diesel::r2d2::{self, ConnectionManager, PooledConnection};
 
-use super::result::Result;
-
-/*
-logging:
-edit "/var/lib/postgres/data/postgresql.conf", change "log_statement = 'all'"
-sudo gpasswd -a YOUR-NAME wheel
-journalctl -f -u postgresql
-*/
-
 #[cfg(feature = "postgresql")]
 type DiselConnection = diesel::pg::PgConnection;
 #[cfg(feature = "mysql")]

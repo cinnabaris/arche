@@ -1,8 +1,16 @@
+use std::default::Default;
+
+use amqp::Options as AmqpOptions;
 use base64;
+use diesel::mysql::MysqlConnection;
+use diesel::pg::PgConnection;
+use diesel::r2d2::ConnectionManager as DieselConnectionManager;
 use hyper::header::{Authorization, Bearer, ContentType, Header};
+use r2d2::Pool;
+use r2d2_redis::RedisConnectionManager;
+use redis::{ConnectionAddr as RedisConnectionAddr, ConnectionInfo as RedisConnectionInfo};
 use rocket::config::{Environment, Limits};
 use rocket::http::Method;
-
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 
 use super::result::{Error, Result};
@@ -30,7 +38,7 @@ pub struct Config {
     #[serde(rename = "secretkey")]
     pub secret_key: String, // 32-bits base64 encode string
     pub workers: u16,
-    pub database: String,
+    pub database: Option<Database>,
     pub http: Http,
     pub cache: Cache,
     pub queue: Queue,
@@ -99,17 +107,136 @@ impl Http {
         }
     }
 }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Database {
+    pub postgresql: Option<PostgreSql>,
+    pub mysql: Option<MySql>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PostgreSql {
+    pub host: String,
+    pub port: u16,
+    pub name: String,
+    pub user: String,
+    pub password: Option<String>,
+    pub ssl_mode: String,
+}
+
+impl PostgreSql {
+    /*
+    logging:
+    edit "/var/lib/postgres/data/postgresql.conf", change "log_statement = 'all'"
+    sudo gpasswd -a YOUR-NAME wheel
+    journalctl -f -u postgresql
+    */
+    pub fn new(&self) -> Result<Pool<DieselConnectionManager<PgConnection>>> {
+        Ok(Pool::new(DieselConnectionManager::<PgConnection>::new(
+            format!(
+                "postgres://{user}:{password}@{host}:{port}/{name}",
+                user = self.user,
+                password = match self.password {
+                    Some(ref p) => p.clone(),
+                    None => s!(""),
+                },
+                name = self.name,
+                host = self.host,
+                port = self.port,
+            ),
+        ))?)
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MySql {
+    pub host: String,
+    pub port: u16,
+    pub name: String,
+    pub user: String,
+    pub password: Option<String>,
+}
+
+impl MySql {
+    pub fn new(&self) -> Result<Pool<DieselConnectionManager<MysqlConnection>>> {
+        Ok(Pool::new(DieselConnectionManager::<MysqlConnection>::new(
+            format!(
+                "mysql://{user}:{password}@{host}:{port}/{name}",
+                user = self.user,
+                password = match self.password {
+                    Some(ref p) => p.clone(),
+                    None => s!(""),
+                },
+                name = self.name,
+                host = self.host,
+                port = self.port
+            ),
+        ))?)
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Cache {
     pub namespace: String,
-    pub url: String,
+    pub redis: Option<Redis>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Redis {
+    pub host: String,
+    pub port: u16,
+    pub db: i64,
+    pub password: Option<String>,
+}
+
+impl Redis {
+    pub fn new(&self) -> Result<Pool<RedisConnectionManager>> {
+        Ok(Pool::new(RedisConnectionManager::new(
+            RedisConnectionInfo {
+                addr: Box::new(RedisConnectionAddr::Tcp(self.host.clone(), self.port)),
+                db: self.db,
+                passwd: self.password.clone(),
+            },
+        )?)?)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Queue {
-    pub url: String,
+    pub rabbitmq: Option<RabbitMQ>,
     pub name: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct RabbitMQ {
+    pub host: String,
+    pub port: u16,
+    pub user: String,
+    pub password: String,
+    #[serde(rename = "virtual")]
+    pub _virtual: String,
+}
+
+impl RabbitMQ {
+    pub fn url(&self) -> String {
+        // amqp://username:password@host:port/virtual_host
+        format!(
+            "amqp://{user}:{password}@{host}:{port}/{virtual}",
+            user = self.user,
+            password = self.password,
+            virtual = self._virtual,
+            host = self.host,
+            port = self.port
+        )
+    }
+    pub fn options(&self) -> AmqpOptions {
+        AmqpOptions {
+            host: self.host.clone(),
+            port: self.port,
+            login: self.user.clone(),
+            password: self.password.clone(),
+            vhost: self._virtual.clone(),
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -1,13 +1,14 @@
 dist=dist
+target=x86_64-unknown-linux-gnu
 
 build: api www
 	cd $(dist) && tar cfJ ../$(dist).tar.xz *
 
 api:
-	cargo build --release --target=x86_64-unknown-linux-gnu
-	strip -s target/release/arche
+	cargo build --release --target=$(target)
+	strip -s target/$(target)/release/arche
 	mkdir -p $(dist)
-	-cp -r target/release/arche db templates themes log4rs.yml LICENSE README.md $(dist)/
+	-cp -r target/$(target)/release/arche db templates themes log4rs.yml LICENSE README.md $(dist)/
 
 www:
 	cd dashboard && npm run build

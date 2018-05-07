@@ -1,6 +1,5 @@
 use chrono::Duration;
-use r2d2::Pool;
-use r2d2_redis::RedisConnectionManager;
+
 use redis::cmd;
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
@@ -12,8 +11,7 @@ pub type Cache = Redis;
 
 pub fn new(url: &String, namespace: String) -> Result<Cache> {
     return Ok(Redis {
-        pool: Pool::new(RedisConnectionManager::new(&url[..])?)?,
-        namespace: namespace,
+        pool: namespace: namespace,
     });
 }
 

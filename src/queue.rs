@@ -95,7 +95,7 @@ impl Amqp {
     where
         F: Fn(&mut Channel) -> Result<()>,
     {
-        let mut ss = Session::open_url(&self.url)?;
+        let mut ss = Session::open_url(&self.url[..])?;
         let mut ch = ss.open_channel(1)?;
         ch.queue_declare(
             &self.queue[..],
