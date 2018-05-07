@@ -8,7 +8,7 @@ fn main() {
         log4rs::init_file("log4rs.yml", Default::default())?;
         arche::console::run()
     };
-    if let Err(e) = run() {
+    if let Err(e) = run() {        
         error!("{:?}", e);
     }
 }
