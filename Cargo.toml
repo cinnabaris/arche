@@ -9,11 +9,6 @@ license = "MIT"
 [profile.release]
 lto = true
 
-[features]
-default = ["postgresql"]
-postgresql = ["diesel/postgres", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2", "diesel/64-column-tables"]
-mysql = ["diesel/mysql", "diesel/chrono", "diesel/serde_json", "diesel/uuid", "diesel/network-address", "diesel/numeric", "diesel/r2d2", "diesel/64-column-tables"]
-
 [dependencies]
 toml = "0.4"
 hyper = "0.11"
@@ -49,7 +44,6 @@ rusoto_core = "0.32"
 rusoto_sqs = "0.32"
 rusoto_sns = "0.32"
 rusoto_s3 = "0.32"
-diesel = "1.2"
 validator = "0.6"
 validator_derive = "0.6"
 juniper = "0.9"
@@ -57,6 +51,10 @@ juniper_rocket = "0.1"
 sodiumoxide = "*"
 frank_jwt = "*"
 sys-info = "*"
+
+[dependencies.diesel]
+version = "1.2"
+features = ["mysql", "postgres", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "64-column-tables"]
 
 [dependencies.chrono]
 version = "0.4"

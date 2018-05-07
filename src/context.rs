@@ -1,6 +1,6 @@
 use super::cache::Cache;
 use super::queue::Queue;
-use super::repository::Repository;
+use super::repositories::Repository;
 
 pub struct Context {
     repository: Box<Repository>,

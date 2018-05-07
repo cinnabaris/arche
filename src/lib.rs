@@ -62,7 +62,7 @@ pub mod cache;
 pub mod context;
 pub mod env;
 pub mod queue;
-pub mod repository;
+pub mod repositories;
 pub mod result;
 // pub mod console;
 // pub mod graphql;

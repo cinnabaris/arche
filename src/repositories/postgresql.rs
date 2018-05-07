@@ -134,6 +134,7 @@ table! {
         room_id -> Int4,
         action -> Varchar,
         days -> Nullable<Int2>,
+        description -> Text,
         created_at -> Timestamp,
     }
 }
@@ -184,6 +185,7 @@ table! {
         book_id -> Int4,
         action -> Varchar,
         days -> Nullable<Int2>,
+        description -> Text,
         created_at -> Timestamp,
     }
 }
@@ -451,7 +453,7 @@ table! {
 table! {
     todo_logs (id) {
         id -> Int4,
-        message -> Varchar,
+        description -> Text,
         begin -> Timestamp,
         end -> Timestamp,
         task_id -> Int4,

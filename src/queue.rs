@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use amqp::{self, protocol, Basic, Channel, Session, Table};
@@ -35,35 +35,15 @@ pub trait Consumer: Send + Sync {
 
 #[derive(Clone)]
 pub struct Worker {
-    consumers: Arc<Mutex<HashMap<String, Box<Consumer>>>>,
+    consumers: Arc<HashMap<String, Box<Consumer>>>,
 }
 
 impl Worker {
-    pub fn new() -> Self {
+    pub fn new(consumers: HashMap<String, Box<Consumer>>) -> Self {
         Self {
-            consumers: Arc::new(Mutex::new(HashMap::new())),
+            consumers: Arc::new(consumers),
         }
     }
-
-    pub fn register(&self, n: String, c: Box<Consumer>) -> Result<()> {
-        let locker = Arc::clone(&self.consumers);
-        let guard = locker.lock();
-        match guard {
-            Ok(mut consumers) => {
-                if consumers.contains_key(&n) {
-                    Err(Error::WithDescription(format!(
-                        "consumer {:?} already exist!",
-                        n
-                    )))
-                } else {
-                    consumers.insert(n, c);
-                    Ok(())
-                }
-            }
-            Err(e) => Err(Error::WithDescription(format!("{:?}", e))),
-        }
-    }
-
     pub fn handle(
         &self,
         _type: &String,
@@ -71,17 +51,14 @@ impl Worker {
         content_type: &String,
         payload: &[u8],
     ) -> Result<()> {
-        let locker = Arc::clone(&self.consumers);
-        let guard = locker.lock();
-        match guard {
-            Ok(consumers) => match consumers.get(_type) {
-                Some(consumer) => consumer.run(id, content_type, payload),
-                None => Err(Error::WithDescription(format!(
-                    "can't fine consumer for {:?}",
-                    _type
-                ))),
-            },
-            Err(e) => Err(Error::WithDescription(format!("{:?}", e))),
+        let consumers = Arc::clone(&self.consumers);
+
+        match consumers.get(_type) {
+            Some(consumer) => consumer.run(id, content_type, payload),
+            None => Err(Error::WithDescription(format!(
+                "can't fine consumer for {:?}",
+                _type
+            ))),
         }
     }
 }
