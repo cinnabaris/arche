@@ -1,6 +1,6 @@
 use frank_jwt::Algorithm;
 
-use super::cache::{Cache, Redis};
+use super::cache::Cache;
 use super::env;
 use super::jwt::Jwt;
 use super::queue::{Queue, RabbitMq};
@@ -10,7 +10,7 @@ use super::security::{Security, Sodium};
 
 pub struct Context {
     pub repository: Box<Repository>,
-    pub cache: Box<Cache>,
+    pub cache: Cache,
     pub queue: Box<Queue>,
     pub security: Box<Security>,
     pub jwt: Jwt,
@@ -36,9 +36,9 @@ impl Context {
         )))
     }
 
-    fn open_cache(cfg: &env::Cache) -> Result<Box<Cache>> {
+    fn open_cache(cfg: &env::Cache) -> Result<Cache> {
         if let Some(ref c) = cfg.redis {
-            return Ok(Box::new(Redis::new(cfg.namespace.clone(), c.pool()?)));
+            return Ok(Cache::Redis((cfg.namespace.clone(), c.pool()?)));
         }
         Err(Error::WithDescription(s!(
             "unsupport messaging cache provider"

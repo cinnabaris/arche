@@ -1,4 +1,4 @@
-use juniper::{self, FieldResult};
+// use juniper::{self, FieldResult};
 
 use super::super::env;
 use super::context::Context;

@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use std::{ffi, fs};
 
-use chrono::Utc;
+use chrono::{NaiveDateTime, Utc};
 use diesel::prelude::*;
 use diesel::{insert_into, update};
 use handlebars::Handlebars;
@@ -21,6 +21,21 @@ use super::context::Context;
 use super::env;
 use super::repositories::PostgreSql;
 use super::result::{Error, Result};
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Model {
+    pub id: i64,
+    pub lang: String,
+    pub code: String,
+    pub message: String,
+    pub updated_at: NaiveDateTime,
+    pub created_at: NaiveDateTime,
+}
+
+impl Model {}
+
+//-----------------------------------------------------------------------------
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Params(pub HashMap<String, String>);
