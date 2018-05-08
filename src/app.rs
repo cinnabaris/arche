@@ -135,6 +135,7 @@ impl App {
                 origins: vec![s!("http://localhost:3000")],
             },
             database: env::Database {
+                #[cfg(feature = "postgresql")]
                 postgresql: Some(env::PostgreSql {
                     host: s!(localhost),
                     port: 5432,
@@ -142,6 +143,7 @@ impl App {
                     user: s!("postgres"),
                     password: s!(""),
                 }),
+                #[cfg(feature = "mysql")]
                 mysql: Some(env::MySql {
                     host: s!(localhost),
                     port: 3306,
@@ -152,6 +154,7 @@ impl App {
             },
             cache: env::Cache {
                 namespace: s!("www.change-me.com"),
+                #[cfg(feature = "cache-redis")]
                 redis: Some(env::Redis {
                     host: s!(localhost),
                     port: 6379,
@@ -161,6 +164,7 @@ impl App {
             },
             queue: env::Queue {
                 name: s!("tasks"),
+                #[cfg(feature = "rabbitmq")]
                 rabbitmq: Some(env::RabbitMQ {
                     host: s!(localhost),
                     port: 5672,

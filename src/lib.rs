@@ -16,6 +16,7 @@ extern crate validator_derive;
 #[macro_use]
 extern crate juniper;
 
+#[cfg(feature = "rabbitmq")]
 extern crate amqp;
 extern crate base64;
 extern crate chrono;
@@ -38,14 +39,25 @@ extern crate maxminddb;
 extern crate md5;
 extern crate mime;
 extern crate r2d2;
+#[cfg(feature = "cache-redis")]
 extern crate r2d2_redis;
+#[cfg(feature = "cache-redis")]
 extern crate redis;
 extern crate regex;
 extern crate rocket_contrib;
 extern crate rocket_cors;
+#[cfg(any(feature = "aws-s3", feature = "aws-sqs", feature = "aws-sqs"))]
+extern crate rusoto_core;
+#[cfg(feature = "aws-s3")]
+extern crate rusoto_s3;
+#[cfg(feature = "aws-sns")]
+extern crate rusoto_sns;
+#[cfg(feature = "aws-sqs")]
+extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
 extern crate sha2;
+#[cfg(feature = "sodium")]
 extern crate sodiumoxide;
 extern crate stardict;
 extern crate sys_info;

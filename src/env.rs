@@ -1,13 +1,18 @@
 use std::default::Default;
 
+#[cfg(feature = "rabbitmq")]
 use amqp::Options as AmqpOptions;
 use base64;
+#[cfg(feature = "mysql")]
 use diesel::mysql::MysqlConnection;
+#[cfg(feature = "postgresql")]
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager as DieselConnectionManager;
 use hyper::header::{Authorization, Bearer, ContentType, Header};
 use r2d2::Pool;
+#[cfg(feature = "cache-redis")]
 use r2d2_redis::RedisConnectionManager;
+#[cfg(feature = "cache-redis")]
 use redis::{ConnectionAddr as RedisConnectionAddr, ConnectionInfo as RedisConnectionInfo};
 use rocket::config::{Environment, Limits};
 use rocket::http::Method;
@@ -109,7 +114,9 @@ impl Http {
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Database {
+    #[cfg(feature = "postgresql")]
     pub postgresql: Option<PostgreSql>,
+    #[cfg(feature = "mysql")]
     pub mysql: Option<MySql>,
 }
 
@@ -129,6 +136,7 @@ impl PostgreSql {
     sudo gpasswd -a YOUR-NAME wheel
     journalctl -f -u postgresql
     */
+    #[cfg(feature = "postgresql")]
     pub fn pool(&self) -> Result<Pool<DieselConnectionManager<PgConnection>>> {
         Ok(Pool::new(DieselConnectionManager::<PgConnection>::new(
             format!(
@@ -153,6 +161,7 @@ pub struct MySql {
 }
 
 impl MySql {
+    #[cfg(feature = "mysql")]
     pub fn pool(&self) -> Result<Pool<DieselConnectionManager<MysqlConnection>>> {
         Ok(Pool::new(DieselConnectionManager::<MysqlConnection>::new(
             format!(
@@ -170,6 +179,7 @@ impl MySql {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Cache {
     pub namespace: String,
+    #[cfg(feature = "cache-redis")]
     pub redis: Option<Redis>,
 }
 
@@ -182,6 +192,7 @@ pub struct Redis {
 }
 
 impl Redis {
+    #[cfg(feature = "cache-redis")]
     pub fn pool(&self) -> Result<Pool<RedisConnectionManager>> {
         Ok(Pool::new(RedisConnectionManager::new(
             RedisConnectionInfo {
@@ -196,6 +207,7 @@ impl Redis {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Queue {
     pub name: String,
+    #[cfg(feature = "rabbitmq")]
     pub rabbitmq: Option<RabbitMQ>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -209,17 +221,18 @@ pub struct RabbitMQ {
 }
 
 impl RabbitMQ {
-    pub fn url(&self) -> String {
-        // amqp://username:password@host:port/virtual_host
-        format!(
-            "amqp://{user}:{password}@{host}:{port}/{virtual}",
-            user = self.user,
-            password = self.password,
-            virtual = self._virtual,
-            host = self.host,
-            port = self.port
-        )
-    }
+    // pub fn url(&self) -> String {
+    //     // amqp://username:password@host:port/virtual_host
+    //     format!(
+    //         "amqp://{user}:{password}@{host}:{port}/{virtual}",
+    //         user = self.user,
+    //         password = self.password,
+    //         virtual = self._virtual,
+    //         host = self.host,
+    //         port = self.port
+    //     )
+    // }
+    #[cfg(feature = "rabbitmq")]
     pub fn options(&self) -> AmqpOptions {
         AmqpOptions {
             host: self.host.clone(),
