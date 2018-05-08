@@ -6,13 +6,13 @@ use super::jwt::Jwt;
 use super::queue::Queue;
 use super::repositories::Pool as Repository;
 use super::result::{Error, Result};
-use super::security::{Security, Sodium};
+use super::security::Encryptor;
 
 pub struct Context {
     pub repository: Repository,
     pub cache: Cache,
     pub queue: Queue,
-    pub security: Box<Security>,
+    pub encryptor: Encryptor,
     pub jwt: Jwt,
 }
 
@@ -22,7 +22,7 @@ impl Context {
             repository: Self::open_database(&cfg.database)?,
             cache: Self::open_cache(&cfg.cache)?,
             queue: Self::open_queue(&cfg.queue)?,
-            security: Box::new(Sodium::new(cfg.secret_key()?.as_slice())?),
+            encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
             jwt: Jwt::new(cfg.secret_key()?.as_slice(), Algorithm::HS512),
         })
     }
