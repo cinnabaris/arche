@@ -18,7 +18,7 @@ use toml;
 
 use super::context::Context;
 use super::result::Result;
-use super::{env, i18n};
+use super::{env, i18n, security};
 
 pub struct App {
     ctx: Context,
@@ -118,13 +118,11 @@ impl App {
         })
     }
     fn generate_config() -> Result<()> {
-        use sodiumoxide::randombytes;
-
         let localhost = "localhost";
 
         let cfg = env::Config {
             name: s!("www.change-me.com"),
-            secret_key: base64::encode(&randombytes::randombytes(32)),
+            secret_key: base64::encode(&security::random_bytes(32)),
             env: rocket::config::Environment::Development.to_string(),
             languages: vec![s!("en-US"), s!("zh-Hans"), s!("zh-Hant")],
             workers: 32,

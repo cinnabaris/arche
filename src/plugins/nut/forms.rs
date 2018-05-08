@@ -1,7 +1,7 @@
 use validator::Validate;
 
-use super::super::graphql::context::Context;
-use super::super::result::Result;
+use super::super::super::graphql::context::Context;
+use super::super::super::result::Result;
 
 #[derive(Serialize, GraphQLInputObject, Deserialize, Debug, Validate)]
 #[graphql(description = "Create a new account")]
