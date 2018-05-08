@@ -115,9 +115,9 @@ impl Http {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Database {
     #[cfg(feature = "postgresql")]
-    pub postgresql: Option<PostgreSql>,
+    pub postgresql: PostgreSql,
     #[cfg(feature = "mysql")]
-    pub mysql: Option<MySql>,
+    pub mysql: MySql,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -180,7 +180,7 @@ impl MySql {
 pub struct Cache {
     pub namespace: String,
     #[cfg(feature = "cache-redis")]
-    pub redis: Option<Redis>,
+    pub redis: Redis,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -208,7 +208,7 @@ impl Redis {
 pub struct Queue {
     pub name: String,
     #[cfg(feature = "rabbitmq")]
-    pub rabbitmq: Option<RabbitMQ>,
+    pub rabbitmq: RabbitMQ,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RabbitMQ {

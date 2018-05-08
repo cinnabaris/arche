@@ -5,7 +5,7 @@ use super::env;
 use super::jwt::Jwt;
 use super::queue::Queue;
 use super::repositories::Pool as Repository;
-use super::result::{Error, Result};
+use super::result::Result;
 use super::security::Encryptor;
 
 pub struct Context {
@@ -27,30 +27,18 @@ impl Context {
         })
     }
 
+    #[cfg(feature = "postgresql")]
     fn open_database(cfg: &env::Database) -> Result<Repository> {
-        if let Some(ref c) = cfg.postgresql {
-            return Ok(Repository::PostgreSql(c.pool()?));
-        }
-        Err(Error::WithDescription(s!(
-            "unsupport messaging database provider"
-        )))
+        Ok(Repository::PostgreSql(cfg.postgresql.pool()?))
     }
 
+    #[cfg(feature = "cache-redis")]
     fn open_cache(cfg: &env::Cache) -> Result<Cache> {
-        if let Some(ref c) = cfg.redis {
-            return Ok(Cache::Redis((cfg.namespace.clone(), c.pool()?)));
-        }
-        Err(Error::WithDescription(s!(
-            "unsupport messaging cache provider"
-        )))
+        return Ok(Cache::new(cfg.namespace.clone(), cfg.redis.pool()?));
     }
 
+    #[cfg(feature = "rabbitmq")]
     fn open_queue(cfg: &env::Queue) -> Result<Queue> {
-        if let Some(ref c) = cfg.rabbitmq {
-            return Ok(Queue::RabbitMQ((cfg.name.clone(), c.clone())));
-        }
-        Err(Error::WithDescription(s!(
-            "unsupport messaging queue provider"
-        )))
+        return Ok(Queue::RabbitMQ((cfg.name.clone(), cfg.rabbitmq.clone())));
     }
 }

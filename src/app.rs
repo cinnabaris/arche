@@ -134,42 +134,42 @@ impl App {
             },
             database: env::Database {
                 #[cfg(feature = "postgresql")]
-                postgresql: Some(env::PostgreSql {
+                postgresql: env::PostgreSql {
                     host: s!(localhost),
                     port: 5432,
                     name: s!(env::NAME),
                     user: s!("postgres"),
                     password: s!(""),
-                }),
+                },
                 #[cfg(feature = "mysql")]
-                mysql: Some(env::MySql {
+                mysql: env::MySql {
                     host: s!(localhost),
                     port: 3306,
                     name: s!(env::NAME),
                     user: s!("postgres"),
                     password: s!(""),
-                }),
+                },
             },
             cache: env::Cache {
                 namespace: s!("www.change-me.com"),
                 #[cfg(feature = "cache-redis")]
-                redis: Some(env::Redis {
+                redis: env::Redis {
                     host: s!(localhost),
                     port: 6379,
                     db: 6,
                     password: None,
-                }),
+                },
             },
             queue: env::Queue {
                 name: s!("tasks"),
                 #[cfg(feature = "rabbitmq")]
-                rabbitmq: Some(env::RabbitMQ {
+                rabbitmq: env::RabbitMQ {
                     host: s!(localhost),
                     port: 5672,
                     _virtual: s!(env::NAME),
                     user: s!("guest"),
                     password: s!("guest"),
-                }),
+                },
             },
             aws: Some(env::Aws {
                 access_key_id: s!("change-me"),
