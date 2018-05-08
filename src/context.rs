@@ -4,12 +4,12 @@ use super::cache::Cache;
 use super::env;
 use super::jwt::Jwt;
 use super::queue::Queue;
-use super::repositories::{PostgreSql, Repository};
+use super::repositories::Pool as Repository;
 use super::result::{Error, Result};
 use super::security::{Security, Sodium};
 
 pub struct Context {
-    pub repository: Box<Repository>,
+    pub repository: Repository,
     pub cache: Cache,
     pub queue: Queue,
     pub security: Box<Security>,
@@ -27,9 +27,9 @@ impl Context {
         })
     }
 
-    fn open_database(cfg: &env::Database) -> Result<Box<Repository>> {
+    fn open_database(cfg: &env::Database) -> Result<Repository> {
         if let Some(ref c) = cfg.postgresql {
-            return Ok(Box::new(PostgreSql::new(c.pool()?)));
+            return Ok(Repository::PostgreSql(c.pool()?));
         }
         Err(Error::WithDescription(s!(
             "unsupport messaging database provider"

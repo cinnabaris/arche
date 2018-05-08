@@ -2,7 +2,6 @@ use validator::Validate;
 
 use super::super::graphql::context::Context;
 use super::super::result::Result;
-use super::schema;
 
 #[derive(Serialize, GraphQLInputObject, Deserialize, Debug, Validate)]
 #[graphql(description = "Create a new account")]
@@ -22,9 +21,9 @@ pub struct UsersSignUpR {
 }
 
 impl UsersSignUp {
-    pub fn call(&self, _ctx: &Context) -> Result<schema::User> {
+    pub fn call(&self, _ctx: &Context) -> Result<UsersSignUpR> {
         self.validate()?;
-        Ok(schema::User {
+        Ok(UsersSignUpR {
             id: s!("123"),
             name: s!("aaa"),
         })

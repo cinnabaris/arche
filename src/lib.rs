@@ -69,7 +69,7 @@ pub mod repositories;
 pub mod result;
 pub mod router;
 pub mod security;
-// pub mod settings;
+pub mod settings;
 
 pub mod cbeta;
 pub mod donate;

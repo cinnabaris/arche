@@ -1,25 +1,24 @@
 use std::env::current_dir;
 use std::io::{Read, Write};
-use std::ops::Deref;
+// use std::ops::Deref;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
-use std::time::Duration;
-use std::{fs, thread};
+// use std::time::Duration;
+use std::fs; //thread
 
 use base64;
 use clap;
-use diesel::Connection as DieselConnection;
+// use diesel::Connection as DieselConnection;
 use handlebars::Handlebars;
 use log;
 use rocket;
-use rocket_contrib::Template;
-use sys_info;
+// use rocket_contrib::Template;
+// use sys_info;
 use toml;
 
 use super::context::Context;
-use super::repositories::Repository;
 use super::result::Result;
-use super::{env, i18n, mall, nut};
+use super::{env, i18n};
 
 pub struct App {
     ctx: Context,
@@ -119,7 +118,6 @@ impl App {
         })
     }
     fn generate_config() -> Result<()> {
-        use super::security::{Encryptor, Sodium};
         use sodiumoxide::randombytes;
 
         let localhost = "localhost";

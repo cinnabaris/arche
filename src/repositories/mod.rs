@@ -1,42 +1,30 @@
 pub mod mysql;
 pub mod postgresql;
 
-use diesel::mysql::MysqlConnection;
+// use std::ops::Deref;
+
+// use diesel::mysql::MysqlConnection;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, PooledConnection};
-use r2d2::Pool;
+use r2d2;
 
 use super::result::Result;
-use super::{i18n, mall};
 
-pub trait Repository: Send + Sync + i18n::Repository {}
-
-pub struct PostgreSql {
-    pool: Pool<ConnectionManager<PgConnection>>,
+pub enum Connection {
+    PostgreSql(PooledConnection<ConnectionManager<PgConnection>>),
+    // PostgreSql(PgConnection),
+    // MySql(MysqlConnection)
 }
 
-impl PostgreSql {
-    pub fn new(pool: Pool<ConnectionManager<PgConnection>>) -> Self {
-        Self { pool: pool }
-    }
-    pub fn db(&self) -> Result<PooledConnection<ConnectionManager<PgConnection>>> {
-        Ok(self.pool.get()?)
-    }
+pub enum Pool {
+    PostgreSql(r2d2::Pool<ConnectionManager<PgConnection>>),
+    // MySql(r2d2::Pool<ConnectionManager<MysqlConnection>>),
 }
 
-impl Repository for PostgreSql {}
-
-//-----------------------------------------------------------------------------
-
-pub struct MySql {
-    pool: Pool<ConnectionManager<MysqlConnection>>,
-}
-
-impl MySql {
-    pub fn new(pool: Pool<ConnectionManager<MysqlConnection>>) -> Self {
-        Self { pool: pool }
-    }
-    pub fn db(&self) -> Result<PooledConnection<ConnectionManager<MysqlConnection>>> {
-        Ok(self.pool.get()?)
+impl Pool {
+    pub fn get(&self) -> Result<Connection> {
+        match self {
+            Pool::PostgreSql(pool) => Ok(Connection::PostgreSql(pool.get()?)),
+        }
     }
 }

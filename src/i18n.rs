@@ -1,5 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
-use std::ops::Deref;
+// use std::ops::Deref;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::{ffi, fs};
@@ -19,8 +19,20 @@ use url::Url;
 
 use super::context::Context;
 use super::env;
-use super::repositories::PostgreSql;
+use super::repositories::Connection;
 use super::result::{Error, Result};
+
+pub trait Repository {
+    fn get_locale_message(&self, lang: &String, code: &String) -> Result<String>;
+    fn get_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>>;
+    fn set_locale(
+        &self,
+        lang: &String,
+        code: &String,
+        message: &String,
+        _override: bool,
+    ) -> Result<Option<i32>>;
+}
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -33,7 +45,99 @@ pub struct Model {
     pub created_at: NaiveDateTime,
 }
 
-impl Model {}
+impl Repository for Connection {
+    fn get_locale_message(&self, lang: &String, code: &String) -> Result<String> {
+        match self {
+            Connection::PostgreSql(db) => {
+                use super::repositories::postgresql::locales;
+
+                let msg = locales::dsl::locales
+                    .select(locales::dsl::message)
+                    .filter(locales::dsl::lang.eq(lang))
+                    .filter(locales::dsl::code.eq(code))
+                    .first::<String>(db)?;
+                Ok(msg)
+            }
+        }
+    }
+    fn set_locale(
+        &self,
+        lang: &String,
+        code: &String,
+        message: &String,
+        _override: bool,
+    ) -> Result<Option<i32>> {
+        match self {
+            Connection::PostgreSql(db) => {
+                use super::repositories::postgresql::locales;
+
+                let now = Utc::now().naive_utc();
+                match locales::dsl::locales
+                    .select(locales::dsl::id)
+                    .filter(locales::dsl::lang.eq(lang))
+                    .filter(locales::dsl::code.eq(code))
+                    .first::<i32>(db)
+                {
+                    Ok(id) => {
+                        let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
+                        if _override {
+                            update(it)
+                                .set((
+                                    locales::dsl::message.eq(message),
+                                    locales::dsl::updated_at.eq(&now),
+                                ))
+                                .execute(db)?;
+                            Ok(Some(id))
+                        } else {
+                            Ok(None)
+                        }
+                    }
+                    Err(_) => {
+                        let id = insert_into(locales::dsl::locales)
+                            .values((
+                                locales::dsl::lang.eq(&lang),
+                                locales::dsl::code.eq(&code),
+                                locales::dsl::message.eq(&message),
+                                locales::dsl::updated_at.eq(Utc::now().naive_utc()),
+                            ))
+                            .returning(locales::dsl::id)
+                            .get_result::<i32>(db)?;
+                        Ok(Some(id))
+                    }
+                }
+            }
+        }
+    }
+
+    // fn get_locales_by_lang(&self, lang: &String) -> Result<Vec<Model>> {
+    //     use super::repositories::postgresql::locales;
+    //
+    //     let db = self.db()?;
+    //     let items = locales::dsl::locales
+    //         .filter(locales::dsl::lang.eq(lang))
+    //         .get_results::<Model>(db)?;
+    //     Ok(items)
+    // }
+
+    fn get_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>> {
+        match self {
+            Connection::PostgreSql(db) => {
+                use super::repositories::postgresql::locales;
+
+                let mut items = BTreeMap::new();
+                for (code, message) in locales::dsl::locales
+                    .select((locales::dsl::code, locales::dsl::message))
+                    .order(locales::dsl::code.asc())
+                    .filter(locales::dsl::lang.eq(lang))
+                    .load::<(String, String)>(db)?
+                {
+                    items.insert(code, message);
+                }
+                Ok(items)
+            }
+        }
+    }
+}
 
 //-----------------------------------------------------------------------------
 
@@ -48,105 +152,6 @@ impl<'a, 'r> FromRequest<'a, 'r> for Params {
             Ok(u) => Outcome::Success(Params(u.query_pairs().into_owned().collect())),
             _ => Outcome::Failure((Status::BadRequest, ())),
         }
-    }
-}
-
-//-----------------------------------------------------------------------------
-
-pub trait Repository: Send + Sync {
-    fn get_locale_message(&self, lang: &String, code: &String) -> Result<String>;
-    fn get_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>>;
-    fn set_locale(
-        &self,
-        lang: &String,
-        code: &String,
-        message: &String,
-        _override: bool,
-    ) -> Result<Option<i32>>;
-}
-
-impl Repository for PostgreSql {
-    fn get_locale_message(&self, lang: &String, code: &String) -> Result<String> {
-        use super::repositories::postgresql::locales;
-
-        let db = self.db()?;
-        let msg = locales::dsl::locales
-            .select(locales::dsl::message)
-            .filter(locales::dsl::lang.eq(lang))
-            .filter(locales::dsl::code.eq(code))
-            .first::<String>(db.deref())?;
-        Ok(msg)
-    }
-    fn set_locale(
-        &self,
-        lang: &String,
-        code: &String,
-        message: &String,
-        _override: bool,
-    ) -> Result<Option<i32>> {
-        use super::repositories::postgresql::locales;
-
-        let now = Utc::now().naive_utc();
-        let db = self.db()?;
-        match locales::dsl::locales
-            .select(locales::dsl::id)
-            .filter(locales::dsl::lang.eq(lang))
-            .filter(locales::dsl::code.eq(code))
-            .first::<i32>(db.deref())
-        {
-            Ok(id) => {
-                let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
-                if _override {
-                    update(it)
-                        .set((
-                            locales::dsl::message.eq(message),
-                            locales::dsl::updated_at.eq(&now),
-                        ))
-                        .execute(db.deref())?;
-                    Ok(Some(id))
-                } else {
-                    Ok(None)
-                }
-            }
-            Err(_) => {
-                let id = insert_into(locales::dsl::locales)
-                    .values((
-                        locales::dsl::lang.eq(&lang),
-                        locales::dsl::code.eq(&code),
-                        locales::dsl::message.eq(&message),
-                        locales::dsl::updated_at.eq(Utc::now().naive_utc()),
-                    ))
-                    .returning(locales::dsl::id)
-                    .get_result::<i32>(db.deref())?;
-                Ok(Some(id))
-            }
-        }
-    }
-
-    // fn get_locales_by_lang(&self, lang: &String) -> Result<Vec<Model>> {
-    //     use super::repositories::postgresql::locales;
-    //
-    //     let db = self.db()?;
-    //     let items = locales::dsl::locales
-    //         .filter(locales::dsl::lang.eq(lang))
-    //         .get_results::<Model>(db.deref())?;
-    //     Ok(items)
-    // }
-
-    fn get_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>> {
-        use super::repositories::postgresql::locales;
-
-        let db = self.db()?;
-        let mut items = BTreeMap::new();
-        for (code, message) in locales::dsl::locales
-            .select((locales::dsl::code, locales::dsl::message))
-            .order(locales::dsl::code.asc())
-            .filter(locales::dsl::lang.eq(lang))
-            .load::<(String, String)>(db.deref())?
-        {
-            items.insert(code, message);
-        }
-        Ok(items)
     }
 }
 
@@ -240,11 +245,13 @@ impl Locale {
     }
 
     pub fn sync(ctx: &Context, dir: PathBuf) -> Result<(usize, usize)> {
+        let db = ctx.repository.get()?;
+        // let db = db.deref();
         let mut total = 0;
         let mut inserted = 0;
         for (lang, items) in Locale::load_from_files(dir)? {
             for (code, message) in items {
-                if let Some(_) = ctx.repository.set_locale(&lang, &code, &message, false)? {
+                if let Some(_) = db.set_locale(&lang, &code, &message, false)? {
                     inserted = inserted + 1;
                 }
                 total = total + 1;
