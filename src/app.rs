@@ -1,23 +1,24 @@
 use std::env::current_dir;
 use std::io::{Read, Write};
-// use std::ops::Deref;
+use std::ops::Deref;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
-// use std::time::Duration;
-use std::fs; //thread
+use std::time::Duration;
+use std::{fs, thread};
 
 use base64;
 use clap;
-// use diesel::Connection as DieselConnection;
+use diesel::Connection;
 use handlebars::Handlebars;
 use log;
 use rocket;
-// use rocket_contrib::Template;
-// use sys_info;
+use rocket_contrib::Template;
+use sys_info;
 use toml;
 
 use super::context::Context;
-use super::result::Result;
+use super::orm::Connection as Db;
+use super::result::{Error, Result};
 use super::{env, i18n, security};
 
 pub struct App {
@@ -246,11 +247,15 @@ impl App {
     }
     fn db_seed(&self) -> Result<()> {
         let root = Path::new("db").join("seed");
-        self.load_locales(&root)?;
-        // mall::seed::load(&self.ctx, &root)?;
-        // nut::seed::administrator(&self.ctx)?;
-        log::info!("Done!!!");
-        Ok(())
+        let db = self.ctx.db()?;
+        let db = db.deref();
+        db.transaction::<_, Error, _>(|| {
+            self.load_locales(db, &root)?;
+            // mall::seed::load(&self.ctx, &root)?;
+            // nut::seed::administrator(&self.ctx)?;
+            log::info!("Done!!!");
+            Ok(())
+        })
     }
     fn db_dump(&self) -> Result<()> {
         // TODO
@@ -275,10 +280,10 @@ impl App {
         return "config.toml";
     }
 
-    fn load_locales(&self, root: &PathBuf) -> Result<()> {
+    fn load_locales(&self, db: &Db, root: &PathBuf) -> Result<()> {
         let dir = root.join("locales");
         log::info!("load locales from {:?}...", &dir);
-        let (total, inserted) = i18n::Locale::sync(&self.ctx, dir)?;
+        let (total, inserted) = i18n::Locale::sync(&db, dir)?;
         log::info!("total {}, inserted {}", total, inserted);
         Ok(())
     }

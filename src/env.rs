@@ -3,11 +3,6 @@ use std::default::Default;
 #[cfg(feature = "rabbitmq")]
 use amqp::Options as AmqpOptions;
 use base64;
-#[cfg(feature = "mysql")]
-use diesel::mysql::MysqlConnection;
-#[cfg(feature = "postgresql")]
-use diesel::pg::PgConnection;
-use diesel::r2d2::ConnectionManager as DieselConnectionManager;
 use hyper::header::{Authorization, Bearer, ContentType, Header};
 use r2d2::Pool;
 #[cfg(feature = "cache-redis")]
@@ -137,17 +132,15 @@ impl PostgreSql {
     journalctl -f -u postgresql
     */
     #[cfg(feature = "postgresql")]
-    pub fn pool(&self) -> Result<Pool<DieselConnectionManager<PgConnection>>> {
-        Ok(Pool::new(DieselConnectionManager::<PgConnection>::new(
-            format!(
-                "postgres://{user}:{password}@{host}:{port}/{name}",
-                user = self.user,
-                password = self.password,
-                name = self.name,
-                host = self.host,
-                port = self.port,
-            ),
-        ))?)
+    pub fn url(&self) -> String {
+        format!(
+            "postgres://{user}:{password}@{host}:{port}/{name}",
+            user = self.user,
+            password = self.password,
+            name = self.name,
+            host = self.host,
+            port = self.port,
+        )
     }
 }
 
@@ -162,17 +155,15 @@ pub struct MySql {
 
 impl MySql {
     #[cfg(feature = "mysql")]
-    pub fn pool(&self) -> Result<Pool<DieselConnectionManager<MysqlConnection>>> {
-        Ok(Pool::new(DieselConnectionManager::<MysqlConnection>::new(
-            format!(
-                "mysql://{user}:{password}@{host}:{port}/{name}",
-                user = self.user,
-                password = self.password,
-                name = self.name,
-                host = self.host,
-                port = self.port
-            ),
-        ))?)
+    pub fn url(&self) -> String {
+        format!(
+            "mysql://{user}:{password}@{host}:{port}/{name}",
+            user = self.user,
+            password = self.password,
+            name = self.name,
+            host = self.host,
+            port = self.port
+        )
     }
 }
 
