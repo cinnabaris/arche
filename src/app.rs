@@ -1,5 +1,6 @@
 use std::env::current_dir;
 use std::io::{Read, Write};
+use std::ops::Deref;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -16,11 +17,13 @@ use sys_info;
 use toml;
 
 use super::context::Context;
-use super::env;
+use super::repositories::Repository;
 use super::result::Result;
+use super::{env, i18n, mall, nut};
 
 pub struct App {
-    // ctx: Context,
+    ctx: Context,
+    cfg: env::Config,
 }
 
 impl App {
@@ -102,11 +105,18 @@ impl App {
 }
 
 impl App {
-    const CONFIG_FILE: &'static str = "config.toml";
-
     fn new() -> Result<Self> {
-        // TODO
-        Ok(Self {})
+        let name = Self::config_file();
+        log::info!("load config from file {}", name);
+        let mut file = fs::File::open(name)?;
+        let mut buf = Vec::new();
+        file.read_to_end(&mut buf)?;
+        let cfg: env::Config = toml::from_slice(&buf)?;
+
+        Ok(Self {
+            ctx: Context::new(&cfg)?,
+            cfg: cfg,
+        })
     }
     fn generate_config() -> Result<()> {
         use super::security::{Encryptor, Sodium};
@@ -181,12 +191,12 @@ impl App {
         };
         let buf = toml::to_vec(&cfg)?;
 
-        log::info!("generate file {}", Self::CONFIG_FILE);
+        log::info!("generate file {}", Self::config_file());
         let mut file = fs::OpenOptions::new()
             .write(true)
             .create_new(true)
             .mode(0o600)
-            .open(Self::CONFIG_FILE)?;
+            .open(Self::config_file())?;
         file.write_all(&buf)?;
 
         Ok(())
@@ -196,7 +206,34 @@ impl App {
         Ok(())
     }
     fn generate_nginx(&self) -> Result<()> {
-        // TODO
+        let cur = current_dir()?;
+        let mut fd = fs::OpenOptions::new()
+            .read(true)
+            .open(Path::new("templates").join("nginx.conf.hbs"))?;
+        let mut buf = String::new();
+        fd.read_to_string(&mut buf)?;
+
+        let body = Handlebars::new().render_template(
+            &buf,
+            &json!({
+                    "name": self.cfg.name,
+                    "port": self.cfg.http.port,
+                    "root": cur,
+                    "version":"v1",
+                }),
+        )?;
+
+        let root = Path::new("tmp");
+        fs::create_dir_all(&root)?;
+        let file = root.join("nginx.conf");
+        log::info!("generate file {}", file.display());
+        let mut tpl = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o644)
+            .open(file)?;
+        tpl.write_all(body.as_bytes())?;
+
         Ok(())
     }
     fn db_migrate(&self) -> Result<()> {
@@ -208,7 +245,11 @@ impl App {
         Ok(())
     }
     fn db_seed(&self) -> Result<()> {
-        // TODO
+        let root = Path::new("db").join("seed");
+        self.load_locales(&root)?;
+        // mall::seed::load(&self.ctx, &root)?;
+        // nut::seed::administrator(&self.ctx)?;
+        log::info!("Done!!!");
         Ok(())
     }
     fn db_dump(&self) -> Result<()> {
@@ -225,6 +266,20 @@ impl App {
     }
     fn server(&self) -> Result<()> {
         // TODO
+        Ok(())
+    }
+}
+
+impl App {
+    fn config_file() -> &'static str {
+        return "config.toml";
+    }
+
+    fn load_locales(&self, root: &PathBuf) -> Result<()> {
+        let dir = root.join("locales");
+        log::info!("load locales from {:?}...", &dir);
+        let (total, inserted) = i18n::Locale::sync(&self.ctx, dir)?;
+        log::info!("total {}, inserted {}", total, inserted);
         Ok(())
     }
 }

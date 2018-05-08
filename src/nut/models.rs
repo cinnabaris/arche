@@ -16,6 +16,8 @@ use super::super::result::Result;
 use super::super::schema::{logs, policies, roles, users};
 use super::super::security::hash;
 
+pub trait Repository: Send + Sync {}
+
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Policy {
     pub id: i32,

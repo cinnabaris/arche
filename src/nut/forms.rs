@@ -15,6 +15,12 @@ pub struct UsersSignUp {
     pub password: String,
 }
 
+#[derive(Serialize, GraphQLObject, Deserialize, Debug)]
+pub struct UsersSignUpR {
+    pub id: String,
+    pub name: String,
+}
+
 impl UsersSignUp {
     pub fn call(&self, _ctx: &Context) -> Result<schema::User> {
         self.validate()?;

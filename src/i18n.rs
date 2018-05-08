@@ -17,6 +17,7 @@ use rocket::{Outcome, Request, State};
 use serde::ser::Serialize;
 use url::Url;
 
+use super::context::Context;
 use super::env;
 use super::repositories::PostgreSql;
 use super::result::{Error, Result};
@@ -223,12 +224,12 @@ impl Locale {
         return format!("{}.{}", lang, code);
     }
 
-    pub fn sync<R: Repository>(rep: &R, dir: PathBuf) -> Result<(usize, usize)> {
+    pub fn sync(ctx: &Context, dir: PathBuf) -> Result<(usize, usize)> {
         let mut total = 0;
         let mut inserted = 0;
         for (lang, items) in Locale::load_from_files(dir)? {
             for (code, message) in items {
-                if let Some(_) = rep.set_locale(&lang, &code, &message, false)? {
+                if let Some(_) = ctx.repository.set_locale(&lang, &code, &message, false)? {
                     inserted = inserted + 1;
                 }
                 total = total + 1;

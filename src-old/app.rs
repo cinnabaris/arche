@@ -77,55 +77,9 @@ pub fn server() -> Result<()> {
 
 pub fn generate_config() -> Result<()> {}
 
-pub fn generate_nginx() -> Result<()> {
-    let cfg = parse_config()?;
-    let cur = current_dir()?;
-    let mut fd = fs::OpenOptions::new()
-        .read(true)
-        .open(Path::new("templates").join("nginx.conf.hbs"))?;
-    let mut buf = String::new();
-    fd.read_to_string(&mut buf)?;
+pub fn generate_nginx() -> Result<()> {}
 
-    let body = Handlebars::new().render_template(
-        &buf,
-        &json!({
-                "name": cfg.name,
-                "port": cfg.http.port,
-                "root": cur,
-                "version":"v1",
-            }),
-    )?;
-
-    let root = Path::new("tmp");
-    fs::create_dir_all(&root)?;
-    let file = root.join("nginx.conf");
-    log::info!("generate file {}", file.display());
-    let mut tpl = fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o644)
-        .open(file)?;
-    tpl.write_all(body.as_bytes())?;
-
-    return Ok(());
-}
-
-pub fn db_seed() -> Result<()> {
-    let etc = parse_config()?;
-    let pool = orm::new(etc.database)?;
-    let db = orm::Connection(pool.get()?);
-    let root = Path::new("db").join("seed");
-
-    db.transaction::<_, Error, _>(|| {
-        load_locales(&db, &root)?;
-        super::mall::seed::load(&db, &root)?;
-        super::nut::seed::administrator(&db)?;
-        Ok(())
-    })?;
-
-    log::info!("Done!!!");
-    Ok(())
-}
+pub fn db_seed() -> Result<()> {}
 
 pub fn db_dump() -> Result<()> {
     // TODO
@@ -138,25 +92,3 @@ pub fn db_restore(_name: &String) -> Result<()> {
 }
 
 //-----------------------------------------------------------------------------
-
-fn load_locales(db: &Db, root: &PathBuf) -> Result<()> {
-    let dir = root.join("locales");
-    log::info!("load locales from {:?}...", &dir);
-    let (total, inserted) = i18n::Locale::sync(db, dir)?;
-    log::info!("total {}, inserted {}", total, inserted);
-    Ok(())
-}
-
-fn parse_config() -> Result<env::Config> {
-    let name = config_file();
-    log::info!("load config from file {}", name);
-    let mut file = fs::File::open(name)?;
-    let mut buf = Vec::new();
-    file.read_to_end(&mut buf)?;
-    let cfg: env::Config = toml::from_slice(&buf)?;
-    return Ok(cfg);
-}
-
-fn config_file() -> &'static str {
-    return "config.toml";
-}
