@@ -27,9 +27,7 @@ impl Pool {
     }
 }
 
-pub struct PooledConnection(
-    diesel::r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Connection>>,
-);
+pub struct PooledConnection(r2d2::PooledConnection<diesel::r2d2::ConnectionManager<Connection>>);
 
 impl<'a, 'r> FromRequest<'a, 'r> for PooledConnection {
     type Error = ();

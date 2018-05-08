@@ -1,6 +1,6 @@
 use frank_jwt::Algorithm;
 
-use super::cache::Cache;
+use super::cache::{Connection as Cache, Pool as CachePool};
 use super::env;
 use super::jwt::Jwt;
 use super::orm::{Pool as DbPool, PooledConnection as Db};
@@ -9,8 +9,8 @@ use super::result::Result;
 use super::security::Encryptor;
 
 pub struct Context {
-    dbp: DbPool,
-    pub cache: Cache,
+    db: DbPool,
+    cache: CachePool,
     pub queue: Queue,
     pub encryptor: Encryptor,
     pub jwt: Jwt,
@@ -19,15 +19,19 @@ pub struct Context {
 impl Context {
     pub fn new(cfg: &env::Config) -> Result<Self> {
         Ok(Self {
-            dbp: Self::open_database(&cfg.database)?,
+            db: Self::open_database(&cfg.database)?,
             cache: Self::open_cache(&cfg.cache)?,
             queue: Self::open_queue(&cfg.queue)?,
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
             jwt: Jwt::new(cfg.secret_key()?.as_slice(), Algorithm::HS512),
         })
     }
+
     pub fn db(&self) -> Result<Db> {
-        self.dbp.get()
+        self.db.get()
+    }
+    pub fn cache(&self) -> Result<Cache> {
+        self.cache.get()
     }
 
     #[cfg(feature = "postgresql")]
@@ -36,8 +40,8 @@ impl Context {
     }
 
     #[cfg(feature = "cache-redis")]
-    fn open_cache(cfg: &env::Cache) -> Result<Cache> {
-        return Ok(Cache::new(cfg.namespace.clone(), cfg.redis.pool()?));
+    fn open_cache(cfg: &env::Cache) -> Result<CachePool> {
+        return Ok(CachePool::new(cfg.namespace.clone(), cfg.redis.pool()?));
     }
 
     #[cfg(feature = "rabbitmq")]

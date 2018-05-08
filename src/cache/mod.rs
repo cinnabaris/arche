@@ -1,7 +1,9 @@
 #[cfg(feature = "cache-redis")]
 pub mod redis;
 #[cfg(feature = "cache-redis")]
-pub type Cache = redis::Redis;
+pub type Connection = redis::Connection;
+#[cfg(feature = "cache-redis")]
+pub type Pool = redis::Pool;
 
 use chrono::Duration;
 use serde::de::DeserializeOwned;
@@ -10,7 +12,7 @@ use serde_json;
 
 use super::result::Result;
 
-pub trait Provider {
+pub trait Cache {
     fn keys(&self) -> Result<Vec<(String, isize)>>;
     fn get(&self, k: &String) -> Result<Vec<u8>>;
     fn set(&self, k: &String, v: &[u8], t: &Duration) -> Result<()>;
