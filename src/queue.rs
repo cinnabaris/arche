@@ -8,9 +8,10 @@ use serde::ser::Serialize;
 use serde_json;
 use uuid::Uuid;
 
+use super::env;
 use super::result::{Error, Result};
 
-pub fn put<Q: Queue, T: Serialize>(
+pub fn put<T: Serialize>(
     qu: &Queue,
     _type: &String,
     content_type: &String,
@@ -63,59 +64,6 @@ impl Worker {
     }
 }
 
-//-----------------------------------------------------------------------------
-
-pub trait Queue: Send + Sync {
-    fn publish(
-        &self,
-        _type: &String,
-        content_type: &String,
-        priority: u8,
-        payload: &[u8],
-    ) -> Result<()>;
-    fn consume(&self, name: String, worker: Worker) -> Result<()>;
-}
-
-//-----------------------------------------------------------------------------
-
-pub struct RabbitMq {
-    url: String,
-    queue: String,
-}
-
-impl RabbitMq {
-    pub fn new(url: String, queue: String) -> Self {
-        return Self {
-            url: url,
-            queue: queue,
-        };
-    }
-
-    fn open<F>(&self, f: F) -> Result<()>
-    where
-        F: Fn(&mut Channel) -> Result<()>,
-    {
-        let mut ss = Session::open_url(&self.url[..])?;
-        let mut ch = ss.open_channel(1)?;
-        ch.queue_declare(
-            &self.queue[..],
-            false, // passive,
-            true,  // durable
-            false, // exclusive
-            false, // auto_delete
-            false, // nowait
-            Table::new(),
-        )?;
-
-        f(&mut ch)?;
-
-        ch.close(200, "Bye")?;
-        ss.close(200, "Good Bye");
-
-        Ok(())
-    }
-}
-
 impl amqp::Consumer for Worker {
     fn handle_delivery(
         &mut self,
@@ -143,51 +91,89 @@ impl amqp::Consumer for Worker {
     }
 }
 
-impl Queue for RabbitMq {
-    fn publish(
+//-----------------------------------------------------------------------------
+
+pub enum Queue {
+    RabbitMQ((String, env::RabbitMQ)),
+}
+
+impl Queue {
+    fn rabbitmq<F>(name: &String, cfg: &env::RabbitMQ, f: F) -> Result<()>
+    where
+        F: Fn(&mut Channel) -> Result<()>,
+    {
+        let mut ss = Session::new(cfg.options())?;
+        let mut ch = ss.open_channel(1)?;
+        ch.queue_declare(
+            &name[..],
+            false, // passive,
+            true,  // durable
+            false, // exclusive
+            false, // auto_delete
+            false, // nowait
+            Table::new(),
+        )?;
+
+        f(&mut ch)?;
+
+        ch.close(200, "Bye")?;
+        ss.close(200, "Good Bye");
+
+        Ok(())
+    }
+}
+
+impl Queue {
+    pub fn publish(
         &self,
         _type: &String,
         content_type: &String,
         priority: u8,
         payload: &[u8],
     ) -> Result<()> {
-        return self.open(|ch| {
-            let id = Uuid::new_v4().to_string();
-            log::info!("push task into queue {}@{}", id, self.queue);
-            ch.basic_publish(
-                "",
-                &self.queue[..],
-                true,
-                false,
-                protocol::basic::BasicProperties {
-                    content_type: Some(content_type.to_string()),
-                    _type: Some(_type.to_string()),
-                    priority: Some(priority),
-                    timestamp: Some(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs()),
-                    message_id: Some(id),
-                    ..Default::default()
-                },
-                payload.to_vec(),
-            )?;
-            return Ok(());
-        });
+        let id = Uuid::new_v4().to_string();
+        match self {
+            Queue::RabbitMQ((name, cfg)) => {
+                log::info!("push task into queue {}@{}", id, name);
+                Queue::rabbitmq(name, cfg, |ch| {
+                    ch.basic_publish(
+                        "",
+                        name,
+                        true,
+                        false,
+                        protocol::basic::BasicProperties {
+                            content_type: Some(content_type.to_string()),
+                            _type: Some(_type.to_string()),
+                            priority: Some(priority),
+                            timestamp: Some(
+                                SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs(),
+                            ),
+                            message_id: Some(id.clone()),
+                            ..Default::default()
+                        },
+                        payload.to_vec(),
+                    )?;
+                    return Ok(());
+                })
+            }
+        }
     }
 
-    fn consume(&self, name: String, worker: Worker) -> Result<()> {
-        self.open(|ch| {
-            let it = ch.basic_consume(
-                worker.clone(),
-                self.queue.clone(),
-                name.clone(), // consumer_tag
-                false,        // no_local
-                false,        // no_ack
-                false,        // exclusive
-                false,        // nowait
-                Table::new(),
-            )?;
-            log::info!("Starting consumer {:?}", it);
-            ch.start_consuming();
-            Ok(())
-        })
-    }
+    // fn consume(&self, name: String, worker: Worker) -> Result<()> {
+    //     self.open(|ch| {
+    //         let it = ch.basic_consume(
+    //             worker.clone(),
+    //             self.queue.clone(),
+    //             name.clone(), // consumer_tag
+    //             false,        // no_local
+    //             false,        // no_ack
+    //             false,        // exclusive
+    //             false,        // nowait
+    //             Table::new(),
+    //         )?;
+    //         log::info!("Starting consumer {:?}", it);
+    //         ch.start_consuming();
+    //         Ok(())
+    //     })
+    // }
 }

@@ -3,7 +3,7 @@ use frank_jwt::Algorithm;
 use super::cache::Cache;
 use super::env;
 use super::jwt::Jwt;
-use super::queue::{Queue, RabbitMq};
+use super::queue::Queue;
 use super::repositories::{PostgreSql, Repository};
 use super::result::{Error, Result};
 use super::security::{Security, Sodium};
@@ -11,7 +11,7 @@ use super::security::{Security, Sodium};
 pub struct Context {
     pub repository: Box<Repository>,
     pub cache: Cache,
-    pub queue: Box<Queue>,
+    pub queue: Queue,
     pub security: Box<Security>,
     pub jwt: Jwt,
 }
@@ -45,9 +45,9 @@ impl Context {
         )))
     }
 
-    fn open_queue(cfg: &env::Queue) -> Result<Box<Queue>> {
+    fn open_queue(cfg: &env::Queue) -> Result<Queue> {
         if let Some(ref c) = cfg.rabbitmq {
-            return Ok(Box::new(RabbitMq::new(c.url(), cfg.name.clone())));
+            return Ok(Queue::RabbitMQ((cfg.name.clone(), c.clone())));
         }
         Err(Error::WithDescription(s!(
             "unsupport messaging queue provider"
