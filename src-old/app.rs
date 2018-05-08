@@ -1,20 +1,3 @@
-use std::env::current_dir;
-use std::io::{Read, Write};
-use std::os::unix::fs::OpenOptionsExt;
-use std::path::{Path, PathBuf};
-use std::time::Duration;
-use std::{fs, thread};
-
-use base64;
-use diesel::Connection as DieselConnection;
-use frank_jwt::Algorithm;
-use handlebars::Handlebars;
-use log;
-use rocket;
-use rocket_contrib::Template;
-use sys_info;
-use toml;
-
 use super::orm::{self, Connection as Db};
 use super::queue::{self, Provider as QueueProvider};
 use super::result::{Error, Result};
@@ -73,10 +56,7 @@ pub fn server() -> Result<()> {
         .manage(cache::new(&etc.cache.url, etc.cache.namespace.clone())?)
         .manage(security::Encryptor::new(etc.secret_key()?.as_slice())?)
         .manage(queue::new(etc.queue.url.clone(), etc.queue.name.clone()))
-        .manage(jwt::Jwt::new(
-            etc.secret_key()?.as_slice(),
-            Algorithm::HS512,
-        ))
+        .manage()
         .manage(etc.clone());
 
     if !etc.is_prod() {
@@ -95,61 +75,7 @@ pub fn server() -> Result<()> {
     Ok(())
 }
 
-pub fn generate_config() -> Result<()> {
-    let cfg = env::Config {
-        name: s!("www.change-me.com"),
-        secret_key: base64::encode(&security::random_bytes(32)),
-        env: rocket::config::Environment::Development.to_string(),
-        languages: vec![s!("en-US"), s!("zh-Hans"), s!("zh-Hant")],
-        workers: 32,
-        http: env::Http {
-            theme: s!("bootstrap"),
-            limits: 1 << 25,
-            port: 8080,
-            origins: vec![s!("http://localhost:3000")],
-        },
-        #[cfg(feature = "postgresql")]
-        database: s!("postgres://postgres:@localhost:5432/arche"),
-        #[cfg(feature = "mysql")]
-        database: s!("mysql://root:@localhost:3306/arche"),
-        cache: env::Cache {
-            namespace: s!("www.change-me.com"),
-            url: s!("redis://:@localhost:6379/6"),
-        },
-        queue: env::Queue {
-            url: s!("rabbitmq://guest:guest@localhost:5672/arche"),
-            name: s!("tasks"),
-        },
-        aws: Some(env::Aws {
-            access_key_id: s!("change-me"),
-            secret_access_key: s!("change-me"),
-        }),
-        elasticsearch: env::ElasticSearch {
-            hosts: vec![s!("http://localhost:9200")],
-        },
-        storage: env::Storage {
-            local: Some(env::Local {
-                end_point: s!("/upload"),
-                local_root: s!("tmp/upload"),
-            }),
-            s3: Some(env::S3 {
-                region: s!("us-west-2"),
-                bucket: s!("www.change-me.com"),
-            }),
-        },
-    };
-    let buf = toml::to_vec(&cfg)?;
-
-    let name = config_file();
-    log::info!("generate file {}", name);
-    let mut file = fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o600)
-        .open(name)?;
-    file.write_all(&buf)?;
-    return Ok(());
-}
+pub fn generate_config() -> Result<()> {}
 
 pub fn generate_nginx() -> Result<()> {
     let cfg = parse_config()?;

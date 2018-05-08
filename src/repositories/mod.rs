@@ -16,6 +16,9 @@ pub struct PostgreSql {
 }
 
 impl PostgreSql {
+    pub fn new(pool: Pool<ConnectionManager<PgConnection>>) -> Self {
+        Self { pool: pool }
+    }
     pub fn db(&self) -> Result<PooledConnection<ConnectionManager<PgConnection>>> {
         Ok(self.pool.get()?)
     }
@@ -30,6 +33,9 @@ pub struct MySql {
 }
 
 impl MySql {
+    pub fn new(pool: Pool<ConnectionManager<MysqlConnection>>) -> Self {
+        Self { pool: pool }
+    }
     pub fn db(&self) -> Result<PooledConnection<ConnectionManager<MysqlConnection>>> {
         Ok(self.pool.get()?)
     }

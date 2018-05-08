@@ -38,7 +38,7 @@ pub struct Config {
     #[serde(rename = "secretkey")]
     pub secret_key: String, // 32-bits base64 encode string
     pub workers: u16,
-    pub database: Option<Database>,
+    pub database: Database,
     pub http: Http,
     pub cache: Cache,
     pub queue: Queue,
@@ -119,8 +119,7 @@ pub struct PostgreSql {
     pub port: u16,
     pub name: String,
     pub user: String,
-    pub password: Option<String>,
-    pub ssl_mode: String,
+    pub password: String,
 }
 
 impl PostgreSql {
@@ -130,15 +129,12 @@ impl PostgreSql {
     sudo gpasswd -a YOUR-NAME wheel
     journalctl -f -u postgresql
     */
-    pub fn new(&self) -> Result<Pool<DieselConnectionManager<PgConnection>>> {
+    pub fn pool(&self) -> Result<Pool<DieselConnectionManager<PgConnection>>> {
         Ok(Pool::new(DieselConnectionManager::<PgConnection>::new(
             format!(
                 "postgres://{user}:{password}@{host}:{port}/{name}",
                 user = self.user,
-                password = match self.password {
-                    Some(ref p) => p.clone(),
-                    None => s!(""),
-                },
+                password = self.password,
                 name = self.name,
                 host = self.host,
                 port = self.port,
@@ -153,19 +149,16 @@ pub struct MySql {
     pub port: u16,
     pub name: String,
     pub user: String,
-    pub password: Option<String>,
+    pub password: String,
 }
 
 impl MySql {
-    pub fn new(&self) -> Result<Pool<DieselConnectionManager<MysqlConnection>>> {
+    pub fn pool(&self) -> Result<Pool<DieselConnectionManager<MysqlConnection>>> {
         Ok(Pool::new(DieselConnectionManager::<MysqlConnection>::new(
             format!(
                 "mysql://{user}:{password}@{host}:{port}/{name}",
                 user = self.user,
-                password = match self.password {
-                    Some(ref p) => p.clone(),
-                    None => s!(""),
-                },
+                password = self.password,
                 name = self.name,
                 host = self.host,
                 port = self.port
@@ -189,7 +182,7 @@ pub struct Redis {
 }
 
 impl Redis {
-    pub fn new(&self) -> Result<Pool<RedisConnectionManager>> {
+    pub fn pool(&self) -> Result<Pool<RedisConnectionManager>> {
         Ok(Pool::new(RedisConnectionManager::new(
             RedisConnectionInfo {
                 addr: Box::new(RedisConnectionAddr::Tcp(self.host.clone(), self.port)),
@@ -202,8 +195,8 @@ impl Redis {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Queue {
-    pub rabbitmq: Option<RabbitMQ>,
     pub name: String,
+    pub rabbitmq: Option<RabbitMQ>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RabbitMQ {

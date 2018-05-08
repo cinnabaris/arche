@@ -1,4 +1,19 @@
+use std::env::current_dir;
+use std::io::{Read, Write};
+use std::os::unix::fs::OpenOptionsExt;
+use std::path::{Path, PathBuf};
+use std::time::Duration;
+use std::{fs, thread};
+
+use base64;
 use clap;
+use diesel::Connection as DieselConnection;
+use handlebars::Handlebars;
+use log;
+use rocket;
+use rocket_contrib::Template;
+use sys_info;
+use toml;
 
 use super::context::Context;
 use super::env;
@@ -87,12 +102,93 @@ impl App {
 }
 
 impl App {
+    const CONFIG_FILE: &'static str = "config.toml";
+
     fn new() -> Result<Self> {
         // TODO
         Ok(Self {})
     }
     fn generate_config() -> Result<()> {
-        // TODO
+        use super::security::{Encryptor, Sodium};
+        use sodiumoxide::randombytes;
+
+        let localhost = "localhost";
+
+        let cfg = env::Config {
+            name: s!("www.change-me.com"),
+            secret_key: base64::encode(&randombytes::randombytes(32)),
+            env: rocket::config::Environment::Development.to_string(),
+            languages: vec![s!("en-US"), s!("zh-Hans"), s!("zh-Hant")],
+            workers: 32,
+            http: env::Http {
+                theme: s!("bootstrap"),
+                limits: 1 << 25,
+                port: 8080,
+                origins: vec![s!("http://localhost:3000")],
+            },
+            database: env::Database {
+                postgresql: Some(env::PostgreSql {
+                    host: s!(localhost),
+                    port: 5432,
+                    name: s!(env::NAME),
+                    user: s!("postgres"),
+                    password: s!(""),
+                }),
+                mysql: Some(env::MySql {
+                    host: s!(localhost),
+                    port: 3306,
+                    name: s!(env::NAME),
+                    user: s!("postgres"),
+                    password: s!(""),
+                }),
+            },
+            cache: env::Cache {
+                namespace: s!("www.change-me.com"),
+                redis: Some(env::Redis {
+                    host: s!(localhost),
+                    port: 6379,
+                    db: 6,
+                    password: None,
+                }),
+            },
+            queue: env::Queue {
+                name: s!("tasks"),
+                rabbitmq: Some(env::RabbitMQ {
+                    host: s!(localhost),
+                    port: 5672,
+                    _virtual: s!(env::NAME),
+                    user: s!("guest"),
+                    password: s!("guest"),
+                }),
+            },
+            aws: Some(env::Aws {
+                access_key_id: s!("change-me"),
+                secret_access_key: s!("change-me"),
+            }),
+            elasticsearch: env::ElasticSearch {
+                hosts: vec![s!("http://localhost:9200")],
+            },
+            storage: env::Storage {
+                local: Some(env::Local {
+                    end_point: s!("/upload"),
+                    local_root: s!("tmp/upload"),
+                }),
+                s3: Some(env::S3 {
+                    region: s!("us-west-2"),
+                    bucket: s!("www.change-me.com"),
+                }),
+            },
+        };
+        let buf = toml::to_vec(&cfg)?;
+
+        log::info!("generate file {}", Self::CONFIG_FILE);
+        let mut file = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(Self::CONFIG_FILE)?;
+        file.write_all(&buf)?;
+
         Ok(())
     }
     fn routes() -> Result<()> {

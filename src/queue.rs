@@ -78,12 +78,12 @@ pub trait Queue: Send + Sync {
 
 //-----------------------------------------------------------------------------
 
-pub struct Amqp {
+pub struct RabbitMq {
     url: String,
     queue: String,
 }
 
-impl Amqp {
+impl RabbitMq {
     pub fn new(url: String, queue: String) -> Self {
         return Self {
             url: url,
@@ -143,7 +143,7 @@ impl amqp::Consumer for Worker {
     }
 }
 
-impl Queue for Amqp {
+impl Queue for RabbitMq {
     fn publish(
         &self,
         _type: &String,

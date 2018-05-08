@@ -49,6 +49,13 @@ pub struct Redis {
 }
 
 impl Redis {
+    pub fn new(ns: String, pool: Pool<RedisConnectionManager>) -> Self {
+        Self {
+            namespace: ns,
+            pool: pool,
+        }
+    }
+
     fn key(&self, k: &String) -> String {
         format!("{}://{}", self.namespace, k)
     }
