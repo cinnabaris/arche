@@ -73,6 +73,7 @@ pub mod app;
 pub mod cache;
 pub mod context;
 pub mod env;
+pub mod format;
 pub mod graphql;
 pub mod i18n;
 pub mod jwt;

@@ -54,7 +54,9 @@ pub fn migrate(db: &Db) -> Result<()> {
 
         log::info!("{action} migration {version}", action = act, version = v);
     }
-
+    if script.is_empty() {
+        return Ok(());
+    }
     db.transaction::<_, Error, _>(|| {
         db.batch_execute(&script[..])?;
         log::info!("Done!!!");

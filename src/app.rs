@@ -23,6 +23,7 @@ use super::result::{Error, Result};
 use super::{
     cache::Cache,
     env,
+    format::RFC822,
     graphql,
     i18n,
     migrations,
@@ -292,7 +293,7 @@ impl App {
         let db = db.deref();
         println!("{:16} {}", "VERSION", "RUN ON");
         for it in migrations::versions(db)? {
-            println!("{:16} {}", it.version, it.run_on.format("%c"));
+            println!("{:16} {}", it.version, it.run_on.to_rfc822());
         }
         Ok(())
     }
