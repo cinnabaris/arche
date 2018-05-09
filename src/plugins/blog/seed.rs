@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 use std::fs::{read_dir, DirEntry, File};
 use std::io::prelude::*;
 use std::io::BufReader;
+use std::io::SeekFrom;
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -56,6 +57,19 @@ impl Markdown {
             }
         }
         Err(Error::WithDescription(format!("bad file {:?}", pt)))
+    }
+
+    pub fn read<P: AsRef<Path>>(uri: P) -> Result<(String, String)> {
+        let mut title = String::new();
+        let fd = File::open(path(Some(uri)))?;
+        let mut buf = BufReader::new(fd);
+        buf.read_line(&mut title)?;
+        let title = s!(title.trim_left_matches('#').trim());
+
+        let mut body = String::new();
+        buf.seek(SeekFrom::Start(0))?;
+        buf.read_to_string(&mut body)?;
+        Ok((title, body))
     }
 }
 

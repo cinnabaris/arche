@@ -17,9 +17,10 @@ pub fn sitemap() -> Vec<(String, f32, ChangeFreq, NaiveDateTime)> {
     vec![(s!("/"), 0.1, ChangeFreq::Daily, Utc::now().naive_utc())]
 }
 
-pub fn application_layout(lang: &String) -> Result<HashMap<String, Value>> {
+pub fn application_layout(lang: &String, title: &String) -> Result<HashMap<String, Value>> {
     let mut out = HashMap::new();
     out.insert(s!("locale"), json!(lang));
+    out.insert(s!("title"), json!(title));
     Ok(out)
 }
 

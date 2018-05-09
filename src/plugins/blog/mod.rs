@@ -24,7 +24,7 @@ pub fn sitemap() -> Result<Vec<(String, f32, ChangeFreq, NaiveDateTime)>> {
 }
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
-    vec![(ROOT, routes!(controllers::index))]
+    vec![(ROOT, routes!(controllers::index, controllers::show))]
 }
 
 pub fn rss(_lang: &String) -> Vec<(String, String, String, NaiveDateTime)> {
