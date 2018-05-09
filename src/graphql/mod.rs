@@ -10,6 +10,7 @@ use rocket::response::content::Html;
 use rocket::{Route, State};
 
 use super::i18n::Locale;
+use super::orm::PooledConnection as Db;
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![("/", routes!(doc, get, post))]
@@ -22,6 +23,7 @@ fn doc() -> Html<String> {
 
 #[get("/graphql?<request>")]
 fn get(
+    db: Db,
     locale: Locale,
     remote: SocketAddr,
     request: GraphQLRequest,
@@ -32,12 +34,14 @@ fn get(
         &context::Context {
             locale: locale.name,
             remote: remote,
+            db: db,
         },
     )
 }
 
 #[post("/graphql", data = "<request>")]
 fn post(
+    db: Db,
     locale: Locale,
     remote: SocketAddr,
     request: GraphQLRequest,
@@ -48,6 +52,7 @@ fn post(
         &context::Context {
             locale: locale.name,
             remote: remote,
+            db: db,
         },
     )
 }

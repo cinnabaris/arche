@@ -1,6 +1,6 @@
-pub mod forms;
-// pub mod models;
-// pub mod seed;
+pub mod models;
+pub mod schema;
+pub mod seed;
 
 use rocket::Route;
 

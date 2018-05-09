@@ -19,7 +19,7 @@ use toml;
 use super::context::Context;
 use super::orm::Connection as Db;
 use super::result::{Error, Result};
-use super::{env, i18n, security};
+use super::{env, i18n, plugins, security};
 
 pub struct App {
     ctx: Context,
@@ -251,8 +251,8 @@ impl App {
         let db = db.deref();
         db.transaction::<_, Error, _>(|| {
             self.load_locales(db, &root)?;
-            // mall::seed::load(&self.ctx, &root)?;
-            // nut::seed::administrator(&self.ctx)?;
+            plugins::mall::seed::load(db, &root)?;
+            plugins::nut::seed::administrator(db)?;
             log::info!("Done!!!");
             Ok(())
         })
@@ -283,7 +283,7 @@ impl App {
     fn load_locales(&self, db: &Db, root: &PathBuf) -> Result<()> {
         let dir = root.join("locales");
         log::info!("load locales from {:?}...", &dir);
-        let (total, inserted) = i18n::Locale::sync(&db, dir)?;
+        let (total, inserted) = i18n::sync(&db, dir)?;
         log::info!("total {}, inserted {}", total, inserted);
         Ok(())
     }

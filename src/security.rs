@@ -12,7 +12,7 @@ pub fn random_bytes(l: usize) -> Vec<u8> {
 
 //-----------------------------------------------------------------------------
 
-pub mod password {
+pub mod hash {
     #[cfg(feature = "sodium")]
     use sodiumoxide::crypto::pwhash;
 

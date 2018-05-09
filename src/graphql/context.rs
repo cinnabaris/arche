@@ -2,18 +2,12 @@ use std::net::SocketAddr;
 
 use juniper;
 
+use super::super::orm::PooledConnection as Db;
+
 pub struct Context {
     pub locale: String,
     pub remote: SocketAddr,
-}
-
-impl Context {
-    pub fn new(locale: String, remote: SocketAddr) -> Self {
-        Self {
-            locale: locale,
-            remote: remote,
-        }
-    }
+    pub db: Db,
 }
 
 impl juniper::Context for Context {}

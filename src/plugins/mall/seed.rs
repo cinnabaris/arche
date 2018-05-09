@@ -5,9 +5,9 @@ use std::path::PathBuf;
 use log;
 use serde_json;
 
-use super::super::i18n::Locale;
-use super::super::orm::Connection as Db;
-use super::super::result::Result;
+use super::super::super::i18n;
+use super::super::super::orm::Connection as Db;
+use super::super::super::result::Result;
 use super::models::{Country, Currency, State, Zone, ZoneMember};
 
 pub fn load(db: &Db, root: &PathBuf) -> Result<()> {
@@ -144,7 +144,7 @@ fn regions(db: &Db, root: &PathBuf) -> Result<()> {
         let items: Vec<LocaleItem> = serde_json::from_reader(File::open(file)?)?;
         let mut total = 0;
         for it in items {
-            Locale::set(db, &s!(l), &it.code, &it.message)?;
+            i18n::set(db, &s!(l), &it.code, &it.message)?;
             total = total + 1;
         }
         log::info!("insert {}", total);

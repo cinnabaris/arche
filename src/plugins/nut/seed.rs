@@ -4,13 +4,12 @@ use chrono::Duration;
 use log;
 use validator::Validate;
 
-use super::super::context::Context;
-use super::super::orm::Connection as Db;
-use super::super::result::Result;
-use super::forms::UsersSignUp;
+use super::super::super::orm::Connection as Db;
+use super::super::super::result::Result;
 use super::models::{Policy, Role, User};
+use super::schema::UsersSignUp;
 
-pub fn administrator(db: &Context) -> Result<()> {
+pub fn administrator(db: &Db) -> Result<()> {
     if User::count(db)? > 0 {
         log::warn!("ingnore create administrator");
         return Ok(());

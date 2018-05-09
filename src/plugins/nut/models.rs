@@ -10,11 +10,11 @@ use md5::{self, Digest};
 use serde::ser::Serialize;
 use uuid::Uuid;
 
-use super::super::i18n::Locale;
-use super::super::orm::Connection as Db;
-use super::super::result::Result;
-use super::super::schema::{logs, policies, roles, users};
-use super::super::security::hash;
+use super::super::super::i18n;
+use super::super::super::orm::Connection as Db;
+use super::super::super::result::Result;
+use super::super::super::schema::{logs, policies, roles, users};
+use super::super::super::security::hash;
 
 pub trait Repository: Send + Sync {}
 
@@ -359,7 +359,7 @@ impl Log {
         args: Option<S>,
     ) -> Result<()> {
         let ip = format!("{}", remote.ip());
-        let message = Locale::t(db, lang, code, args);
+        let message = i18n::t(db, lang, code, args);
 
         insert_into(logs::dsl::logs)
             .values((

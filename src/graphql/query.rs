@@ -1,6 +1,7 @@
-// use juniper::{self, FieldResult};
+use juniper::{self, FieldResult};
 
 use super::super::env;
+use super::super::plugins::nut;
 use super::context::Context;
 
 pub struct Query;
@@ -11,8 +12,8 @@ graphql_object!(Query: Context |&self| {
         env::VERSION
     }
 
-    // field locales(&executor, lang: String) -> FieldResult<Vec<i18n::Model>> {
-    //     ge!(i18n::Model::by_lang(&executor.context().db, &lang))
-    // }
+    field locales(&executor, form: nut::schema::Locales) -> FieldResult<Vec<nut::schema::LocalesOut>> {
+        gq!(executor, form)
+    }
 
 });
