@@ -328,7 +328,11 @@ impl App {
 
         // worker
         loop {
-            let mut consumers = HashMap::new();
+            let mut consumers: HashMap<String, Box<queue::Consumer>> = HashMap::new();
+            consumers.insert(
+                s!(plugins::nut::consumers::SEND_EMAIL),
+                Box::new(plugins::nut::consumers::SendEmail {}),
+            );
             let name = sys_info::hostname()?;
             log::info!("Starting worker thread {}", name);
             match self.ctx

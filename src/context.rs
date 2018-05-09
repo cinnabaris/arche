@@ -15,6 +15,7 @@ pub struct Context {
     pub queue: Queue,
     pub encryptor: Encryptor,
     pub jwt: Jwt,
+    pub config: env::Config,
 }
 
 impl Context {
@@ -25,6 +26,7 @@ impl Context {
             queue: Self::open_queue(&cfg.queue),
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
+            config: cfg.clone(),
         })
     }
 

@@ -1,3 +1,4 @@
+pub mod consumers;
 pub mod models;
 pub mod schema;
 pub mod seed;
