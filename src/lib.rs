@@ -44,6 +44,7 @@ extern crate r2d2_redis;
 #[cfg(feature = "cache-redis")]
 extern crate redis;
 extern crate regex;
+extern crate robots_txt;
 extern crate rocket_contrib;
 extern crate rocket_cors;
 #[cfg(any(feature = "aws-s3", feature = "aws-sqs", feature = "aws-sqs"))]

@@ -15,16 +15,6 @@ use super::super::result::Result;
 use super::super::security::Encryptor;
 use super::super::settings::Setting;
 
-#[get("/")]
-fn index(flash: Option<FlashMessage>) -> Template {
-    let mut layout = json!({"lang":"en-US", "aaa":111, "bbb":"hi"});
-    if let Some(flash) = flash {
-        // let items = flash.map(|msg| (msg.name(), msg.msg())).collect();
-        layout["flash"] = json!(flash.msg());
-    }
-    Template::render("index", layout)
-}
-
 #[get("/locales/<lang>")]
 fn get_locales(ch: State<Cache>, db: Db, lang: &RawStr) -> Result<Json<BTreeMap<String, String>>> {
     let items = cache::get(ch.deref(), &format!("locales/{}", lang), 1, || {
