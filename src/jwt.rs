@@ -1,8 +1,7 @@
 use std::ops::Add;
-use std::result;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use frank_jwt::{decode, encode, error, Algorithm, ToKey};
+use frank_jwt::{decode, encode, Algorithm};
 use hyper::header::{Header, Host};
 use rocket::http::Status;
 use rocket::request::{self, FromRequest};
@@ -28,29 +27,18 @@ impl<'a, 'r> FromRequest<'a, 'r> for Home {
 
 //-----------------------------------------------------------------------------
 
-struct Key(Vec<u8>);
-
-impl ToKey for Key {
-    fn to_key(&self) -> result::Result<Vec<u8>, error::Error> {
-        let Key(k) = self;
-        Ok(k.to_vec())
-    }
-}
-
 // https://www.ibm.com/support/knowledgecenter/zh/SSEQTP_8.5.5/com.ibm.websphere.wlp.doc/ae/cwlp_jwttoken.html
 // https://jwt.io/
 // https://tools.ietf.org/html/rfc7519
+#[derive(Clone)]
 pub struct Jwt {
-    key: Key,
+    key: String,
     alg: Algorithm,
 }
 
 impl Jwt {
-    pub fn new(key: &[u8], alg: Algorithm) -> Jwt {
-        return Jwt {
-            key: Key(key.to_vec()),
-            alg: alg,
-        };
+    pub fn new(key: String, alg: Algorithm) -> Jwt {
+        return Jwt { key: key, alg: alg };
     }
 
     pub fn sum(&self, payload: &mut Value, ttl: Duration) -> Result<String> {

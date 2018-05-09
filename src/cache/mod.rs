@@ -19,11 +19,12 @@ pub trait Cache {
     fn clear(&self) -> Result<isize>;
 }
 
-pub fn get<C, K, V, F>(ch: &Cache, key: &String, days: i64, fun: F) -> Result<V>
+pub fn get<C, K, V, F>(ch: &C, key: &String, days: i64, fun: F) -> Result<V>
 where
     F: FnOnce() -> Result<V>,
     K: Serialize,
     V: DeserializeOwned + Serialize,
+    C: Cache,
 {
     if let Ok(buf) = ch.get(key) {
         if let Ok(val) = serde_json::from_slice(buf.as_slice()) {

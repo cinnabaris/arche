@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::env::current_dir;
 use std::io::{Read, Write};
 use std::ops::Deref;
@@ -19,7 +20,15 @@ use toml;
 use super::context::Context;
 use super::orm::Connection as Db;
 use super::result::{Error, Result};
-use super::{env, graphql, i18n, plugins, router, security};
+use super::{
+    env,
+    graphql,
+    i18n,
+    plugins,
+    queue::{self, Queue},
+    router,
+    security,
+};
 
 pub struct App {
     ctx: Context,
@@ -270,30 +279,7 @@ impl App {
         Ok(())
     }
     fn server(&self) -> Result<()> {
-        // worker
-        // thread::spawn(|| loop {
-        //     let worker = || -> Result<()> {
-        //         let name = sys_info::hostname()?;
-        //         log::info!("Starting worker thread {}", name);
-        //         let etc = parse_config()?;
-        //         queue::new(etc.queue.url.clone(), etc.queue.name.clone()).consume(
-        //             queue::Consumer::new(
-        //                 name,
-        //                 etc.env()?,
-        //                 orm::new(etc.database.clone())?,
-        //                 security::Encryptor::new(etc.secret_key()?.as_slice())?,
-        //             ),
-        //         )?;
-        //         Ok(())
-        //     };
-        //     match worker() {
-        //         Ok(_) => log::info!("exiting worker"),
-        //         Err(e) => log::error!("{:?}", e),
-        //     }
-        //     thread::sleep(Duration::from_secs(10));
-        // });
         // http
-
         let mut app = rocket::custom(
             rocket::config::Config::build(self.cfg.env()?)
                 .address("localhost")
@@ -317,6 +303,7 @@ impl App {
         ).manage(self.ctx.db.clone())
             .manage(self.ctx.cache.clone())
             .manage(self.ctx.encryptor.clone())
+            .manage(self.ctx.queue.clone())
             .manage(graphql::schema::Schema::new(
                 graphql::query::Query {},
                 graphql::mutation::Mutation {},
@@ -331,12 +318,28 @@ impl App {
             app = app.mount(pt, rt);
         }
 
-        app.attach(Template::fairing())
-            .attach(self.cfg.http.cors())
-            .catch(router::catchers())
-            .launch();
+        let cors = self.cfg.http.cors();
+        thread::spawn(|| {
+            app.attach(Template::fairing())
+                .attach(cors)
+                .catch(router::catchers())
+                .launch();
+        });
 
-        Ok(())
+        // worker
+        loop {
+            let mut consumers = HashMap::new();
+            let name = sys_info::hostname()?;
+            log::info!("Starting worker thread {}", name);
+            match self.ctx
+                .queue
+                .consume(name, queue::Worker::new(self.ctx.clone(), consumers))
+            {
+                Ok(_) => log::info!("exiting worker"),
+                Err(e) => log::error!("{:?}", e),
+            };
+            thread::sleep(Duration::from_secs(10));
+        }
     }
 }
 

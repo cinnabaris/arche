@@ -4,10 +4,11 @@ use super::cache::{Connection as Cache, Pool as CachePool};
 use super::env;
 use super::jwt::Jwt;
 use super::orm::{Pool as DbPool, PooledConnection as Db};
-use super::queue::Queue;
+use super::queue::Client as Queue;
 use super::result::Result;
 use super::security::Encryptor;
 
+#[derive(Clone)]
 pub struct Context {
     pub db: DbPool,
     pub cache: CachePool,
@@ -21,9 +22,9 @@ impl Context {
         Ok(Self {
             db: Self::open_database(&cfg.database)?,
             cache: Self::open_cache(&cfg.cache)?,
-            queue: Self::open_queue(&cfg.queue)?,
+            queue: Self::open_queue(&cfg.queue),
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
-            jwt: Jwt::new(cfg.secret_key()?.as_slice(), Algorithm::HS512),
+            jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
         })
     }
 
@@ -41,11 +42,11 @@ impl Context {
 
     #[cfg(feature = "cache-redis")]
     fn open_cache(cfg: &env::Cache) -> Result<CachePool> {
-        return Ok(CachePool::new(cfg.namespace.clone(), cfg.redis.pool()?));
+        Ok(CachePool::new(cfg.namespace.clone(), cfg.redis.pool()?))
     }
 
     #[cfg(feature = "rabbitmq")]
-    fn open_queue(cfg: &env::Queue) -> Result<Queue> {
-        return Ok(Queue::RabbitMQ((cfg.name.clone(), cfg.rabbitmq.clone())));
+    fn open_queue(cfg: &env::Queue) -> Queue {
+        Queue::new(cfg.name.clone(), cfg.rabbitmq.clone())
     }
 }
