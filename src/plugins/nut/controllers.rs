@@ -1,8 +1,4 @@
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
-
-use handlebars::Handlebars;
+use robots_txt::Robots;
 use rocket::http::RawStr;
 use rocket_contrib::Template;
 
@@ -29,11 +25,16 @@ fn sitemap(lng: Locale) -> Result<Template> {
 #[get("/robots.txt")]
 fn robots(home: Home) -> Result<String> {
     let Home(home) = home;
-    let mut fd = File::open(Path::new("templates").join("robots.txt.hbs"))?;
-    let mut buf = String::new();
-    fd.read_to_string(&mut buf)?;
-
-    Ok(Handlebars::new().render_template(&buf, &json!({ "home": home }))?)
+    Ok(format!(
+        "{}",
+        Robots::start_build()
+            .host(home.clone())
+            .start_section_for("*")
+            .disallow("/my/")
+            .sitemap((home + "/sitemap.xml.gz").parse()?)
+            .end_section()
+            .finalize()
+    ))
 }
 
 #[get("/rss/<lang>")]
