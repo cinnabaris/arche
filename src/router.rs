@@ -4,7 +4,7 @@ use rocket::http::Status;
 use rocket::response::NamedFile;
 use rocket::{self, Catcher, Route, State};
 
-use super::{env, graphql};
+use super::{env, graphql, plugins};
 
 pub fn catchers() -> Vec<Catcher> {
     errors![not_found, bad_request, forbidden, internal_server]
@@ -12,7 +12,7 @@ pub fn catchers() -> Vec<Catcher> {
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();
-    // items.extend_from_slice(nut::routes().as_slice());
+    items.extend_from_slice(plugins::nut::routes().as_slice());
     items.extend_from_slice(graphql::routes().as_slice());
     return items;
 }

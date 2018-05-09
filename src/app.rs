@@ -36,7 +36,6 @@ use super::{
 
 pub struct App {
     ctx: Context,
-    cfg: env::Config,
 }
 
 impl App {
@@ -140,7 +139,6 @@ impl App {
 
         Ok(Self {
             ctx: Context::new(&cfg)?,
-            cfg: cfg,
         })
     }
     fn generate_config() -> Result<()> {
@@ -254,8 +252,8 @@ impl App {
         let body = Handlebars::new().render_template(
             &buf,
             &json!({
-                    "name": self.cfg.name,
-                    "port": self.cfg.http.port,
+                    "name": self.ctx.config.name,
+                    "port": self.ctx.config.http.port,
                     "root": cur,
                     "version":"v1",
                 }),
@@ -333,16 +331,16 @@ impl App {
     fn server(&self) -> Result<()> {
         // http
         let mut app = rocket::custom(
-            rocket::config::Config::build(self.cfg.env()?)
+            rocket::config::Config::build(self.ctx.config.env()?)
                 .address("localhost")
-                .workers(self.cfg.workers)
-                .secret_key(self.cfg.secret_key.clone())
-                .port(self.cfg.http.port)
-                .limits(self.cfg.http.limits())
+                .workers(self.ctx.config.workers)
+                .secret_key(self.ctx.config.secret_key.clone())
+                .port(self.ctx.config.http.port)
+                .limits(self.ctx.config.http.limits())
                 .extra(
                     "template_dir",
                     match Path::new("themes")
-                        .join(&self.cfg.http.theme)
+                        .join(&self.ctx.config.http.theme)
                         .join("views")
                         .to_str()
                     {
@@ -360,9 +358,9 @@ impl App {
                 graphql::query::Query {},
                 graphql::mutation::Mutation {},
             ))
-            .manage(self.cfg.clone());
+            .manage(self.ctx.config.clone());
 
-        if !self.cfg.is_prod() {
+        if !self.ctx.config.is_prod() {
             app = app.mount("/", routes!(router::get_assets))
         }
 
@@ -370,7 +368,7 @@ impl App {
             app = app.mount(pt, rt);
         }
 
-        let cors = self.cfg.http.cors();
+        let cors = self.ctx.config.http.cors();
         thread::spawn(|| {
             app.attach(Template::fairing())
                 .attach(cors)
