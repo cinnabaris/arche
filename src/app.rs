@@ -21,6 +21,7 @@ use super::context::Context;
 use super::orm::Connection as Db;
 use super::result::{Error, Result};
 use super::{
+    cache::Cache,
     env,
     graphql,
     i18n,
@@ -58,8 +59,12 @@ impl App {
                     .help("Sets a custom config file")
                     .takes_value(true),
             );
+
         let routes = clap::SubCommand::with_name("routes")
             .about("Print out all defined routes in match order");
+
+        let cache_clear = clap::SubCommand::with_name("cache:clear").about("Clear all cache items");
+        let cache_list = clap::SubCommand::with_name("cache:list").about("List all cache items");
 
         let matches = clap::App::new(env::NAME)
             .version(env::VERSION)
@@ -75,6 +80,8 @@ impl App {
             .subcommand(db_dump)
             .subcommand(db_version)
             .subcommand(db_restore)
+            .subcommand(cache_list)
+            .subcommand(cache_clear)
             .subcommand(routes)
             .get_matches();
 
@@ -102,6 +109,12 @@ impl App {
         }
         if let Some(_) = matches.subcommand_matches("db:version") {
             return app.db_version();
+        }
+        if let Some(_) = matches.subcommand_matches("cache:clear") {
+            return app.cache_clear();
+        }
+        if let Some(_) = matches.subcommand_matches("cache:list") {
+            return app.cache_list();
         }
         if let Some(matches) = matches.subcommand_matches("db:restore") {
             if let Some(name) = matches.value_of("name") {
@@ -276,6 +289,21 @@ impl App {
     }
     fn db_restore(&self, _name: &String) -> Result<()> {
         // TODO
+        Ok(())
+    }
+    fn cache_list(&self) -> Result<()> {
+        let con = self.ctx.cache.get()?;
+        let items = con.keys()?;
+        println!("{:64} {}", "KEY", "TTL");
+        for (key, ttl) in items {
+            println!("{:64} {}", key, ttl);
+        }
+        Ok(())
+    }
+    fn cache_clear(&self) -> Result<()> {
+        let con = self.ctx.cache.get()?;
+        let cnt = con.clear()?;
+        log::info!("remove {} items from cache", cnt);
         Ok(())
     }
     fn server(&self) -> Result<()> {
