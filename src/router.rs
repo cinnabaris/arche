@@ -1,10 +1,14 @@
 use std::path::{Path, PathBuf};
 
-use rocket::http::Status;
-use rocket::response::NamedFile;
+use chrono::{DateTime, FixedOffset, Utc};
+use robots_txt::Robots;
+use rocket::http::{RawStr, Status};
+use rocket::response::{content::Xml, NamedFile};
 use rocket::{self, Catcher, Route, State};
+use sitemap::structs::UrlEntry;
+use sitemap::writer::SiteMapWriter;
 
-use super::{env, graphql, plugins};
+use super::{env, graphql, jwt::Home, plugins, result::Result};
 
 pub fn catchers() -> Vec<Catcher> {
     errors![not_found, bad_request, forbidden, internal_server]
@@ -12,12 +16,65 @@ pub fn catchers() -> Vec<Catcher> {
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();
+    items.push(("/", routes!(sitemap, robots, rss)));
     items.extend_from_slice(plugins::nut::routes().as_slice());
     items.extend_from_slice(graphql::routes().as_slice());
-    return items;
+
+    items
 }
 
 //-----------------------------------------------------------------------------
+
+// https://en.wikipedia.org/wiki/Site_map
+// https://www.sitemaps.org/protocol.html
+#[get("/sitemap.xml")]
+fn sitemap<'a>(home: Home) -> Result<Xml<Vec<u8>>> {
+    let mut items = Vec::new();
+    items.extend_from_slice(plugins::nut::sitemap().as_slice());
+
+    let Home(home) = home;
+    let mut buf = Vec::new();
+    {
+        let fix = FixedOffset::east(0);
+        let smw = SiteMapWriter::new(&mut buf);
+        let mut uw = smw.start_urlset()?;
+
+        for (url, pri, freq, last) in items {
+            uw.url(
+                UrlEntry::builder()
+                    .loc(format!("{}{}", home, url))
+                    .lastmod(DateTime::<Utc>::from_utc(last, Utc).with_timezone(&fix))
+                    .priority(pri)
+                    .changefreq(freq),
+            )?;
+        }
+
+        uw.end()?;
+    }
+
+    Ok(Xml(buf))
+}
+
+// https://en.wikipedia.org/wiki/Robots_exclusion_standard
+#[get("/robots.txt")]
+fn robots(home: Home) -> Result<String> {
+    let Home(home) = home;
+    Ok(format!(
+        "{}",
+        Robots::start_build()
+            .host(home.clone())
+            .start_section_for("*")
+            .disallow("/my/")
+            .sitemap((home + "/sitemap.xml").parse()?)
+            .end_section()
+            .finalize()
+    ))
+}
+
+#[get("/rss/<lang>")]
+fn rss(lang: &RawStr) -> Result<String> {
+    Ok(s!(lang))
+}
 
 #[get("/assets/<file..>")]
 pub fn get_assets(cfg: State<env::Config>, file: PathBuf) -> Option<NamedFile> {

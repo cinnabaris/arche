@@ -21,6 +21,7 @@ use regex;
 use rocket;
 use serde_json;
 use serde_xml_rs;
+use sitemap;
 use stardict;
 use sys_info;
 use toml;
@@ -397,5 +398,11 @@ impl From<validator::ValidationErrors> for Error {
 impl From<chrono::ParseError> for Error {
     fn from(err: chrono::ParseError) -> Error {
         Error::ChronoParse(err)
+    }
+}
+
+impl From<sitemap::Error> for Error {
+    fn from(err: sitemap::Error) -> Error {
+        Error::WithDescription(format!("{:?}", err))
     }
 }

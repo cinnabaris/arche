@@ -58,6 +58,7 @@ extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
 extern crate sha2;
+extern crate sitemap;
 #[cfg(feature = "sodium")]
 extern crate sodiumoxide;
 extern crate stardict;
