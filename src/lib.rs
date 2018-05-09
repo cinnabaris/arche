@@ -76,6 +76,7 @@ pub mod env;
 pub mod graphql;
 pub mod i18n;
 pub mod jwt;
+pub mod migrations;
 pub mod orm;
 pub mod plugins;
 pub mod queue;

@@ -3,6 +3,7 @@ use std::{env, error, fmt, io, num, result, string, time};
 
 use amqp;
 use base64;
+use chrono;
 use clap;
 use diesel;
 use epub;
@@ -62,6 +63,7 @@ pub enum Error {
     TomlSer(toml::ser::Error),
     Diesel(diesel::result::Error),
     Validation(validator::ValidationErrors),
+    ChronoParse(chrono::ParseError),
     WithDescription(String),
 }
 
@@ -100,6 +102,7 @@ impl fmt::Display for Error {
             Error::TomlSer(ref err) => err.fmt(f),
             Error::Diesel(ref err) => err.fmt(f),
             Error::Validation(ref err) => err.fmt(f),
+            Error::ChronoParse(ref err) => err.fmt(f),
             Error::WithDescription(ref desc) => write!(f, "{}", desc),
         }
     }
@@ -140,6 +143,7 @@ impl StdError for Error {
             Error::TomlSer(ref err) => err.description(),
             Error::Diesel(ref err) => err.description(),
             Error::Validation(ref err) => err.description(),
+            Error::ChronoParse(ref err) => err.description(),
             Error::WithDescription(ref desc) => &desc,
         }
     }
@@ -177,6 +181,7 @@ impl StdError for Error {
             Error::TomlSer(ref err) => Some(err),
             Error::Diesel(ref err) => Some(err),
             Error::Validation(ref err) => Some(err),
+            Error::ChronoParse(ref err) => Some(err),
             _ => None,
         }
     }
@@ -386,5 +391,11 @@ impl From<diesel::result::Error> for Error {
 impl From<validator::ValidationErrors> for Error {
     fn from(err: validator::ValidationErrors) -> Error {
         Error::Validation(err)
+    }
+}
+
+impl From<chrono::ParseError> for Error {
+    fn from(err: chrono::ParseError) -> Error {
+        Error::ChronoParse(err)
     }
 }

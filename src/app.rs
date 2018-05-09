@@ -25,6 +25,7 @@ use super::{
     env,
     graphql,
     i18n,
+    migrations,
     plugins,
     queue::{self, Queue},
     router,
@@ -260,12 +261,14 @@ impl App {
         Ok(())
     }
     fn db_migrate(&self) -> Result<()> {
-        // TODO
-        Ok(())
+        let db = self.ctx.db()?;
+        let db = db.deref();
+        migrations::migrate(db)
     }
     fn db_rollback(&self) -> Result<()> {
-        // TODO
-        Ok(())
+        let db = self.ctx.db()?;
+        let db = db.deref();
+        migrations::rollback(db)
     }
     fn db_seed(&self) -> Result<()> {
         let root = Path::new("db").join("seed");
@@ -280,16 +283,23 @@ impl App {
         })
     }
     fn db_dump(&self) -> Result<()> {
-        // TODO
-        Ok(())
+        let db = self.ctx.db()?;
+        let db = db.deref();
+        migrations::dump(db)
     }
     fn db_version(&self) -> Result<()> {
-        // TODO
+        let db = self.ctx.db()?;
+        let db = db.deref();
+        println!("{:16} {}", "VERSION", "RUN ON");
+        for it in migrations::version(db)? {
+            println!("{:16} {}", it.version, it.run_on.format("%c"));
+        }
         Ok(())
     }
     fn db_restore(&self, _name: &String) -> Result<()> {
-        // TODO
-        Ok(())
+        let db = self.ctx.db()?;
+        let db = db.deref();
+        migrations::restore(db)
     }
     fn cache_list(&self) -> Result<()> {
         let con = self.ctx.cache.get()?;
