@@ -11,6 +11,7 @@ use rocket::{Outcome, Request, State};
 use super::super::result::Result;
 use super::Cache;
 
+#[derive(Clone)]
 pub struct Pool {
     namespace: String,
     pool: r2d2::Pool<RedisConnectionManager>,

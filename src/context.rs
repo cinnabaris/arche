@@ -9,8 +9,8 @@ use super::result::Result;
 use super::security::Encryptor;
 
 pub struct Context {
-    db: DbPool,
-    cache: CachePool,
+    pub db: DbPool,
+    pub cache: CachePool,
     pub queue: Queue,
     pub encryptor: Encryptor,
     pub jwt: Jwt,

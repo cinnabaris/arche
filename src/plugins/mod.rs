@@ -1,3 +1,4 @@
+pub mod blog;
 pub mod cbeta;
 pub mod donate;
 pub mod erp;

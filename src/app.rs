@@ -19,7 +19,7 @@ use toml;
 use super::context::Context;
 use super::orm::Connection as Db;
 use super::result::{Error, Result};
-use super::{env, i18n, plugins, security};
+use super::{env, graphql, i18n, plugins, router, security};
 
 pub struct App {
     ctx: Context,
@@ -270,7 +270,72 @@ impl App {
         Ok(())
     }
     fn server(&self) -> Result<()> {
-        // TODO
+        // worker
+        // thread::spawn(|| loop {
+        //     let worker = || -> Result<()> {
+        //         let name = sys_info::hostname()?;
+        //         log::info!("Starting worker thread {}", name);
+        //         let etc = parse_config()?;
+        //         queue::new(etc.queue.url.clone(), etc.queue.name.clone()).consume(
+        //             queue::Consumer::new(
+        //                 name,
+        //                 etc.env()?,
+        //                 orm::new(etc.database.clone())?,
+        //                 security::Encryptor::new(etc.secret_key()?.as_slice())?,
+        //             ),
+        //         )?;
+        //         Ok(())
+        //     };
+        //     match worker() {
+        //         Ok(_) => log::info!("exiting worker"),
+        //         Err(e) => log::error!("{:?}", e),
+        //     }
+        //     thread::sleep(Duration::from_secs(10));
+        // });
+        // http
+
+        let mut app = rocket::custom(
+            rocket::config::Config::build(self.cfg.env()?)
+                .address("localhost")
+                .workers(self.cfg.workers)
+                .secret_key(self.cfg.secret_key.clone())
+                .port(self.cfg.http.port)
+                .limits(self.cfg.http.limits())
+                .extra(
+                    "template_dir",
+                    match Path::new("themes")
+                        .join(&self.cfg.http.theme)
+                        .join("views")
+                        .to_str()
+                    {
+                        Some(v) => v,
+                        None => "views",
+                    },
+                )
+                .finalize()?,
+            false,
+        ).manage(self.ctx.db.clone())
+            .manage(self.ctx.cache.clone())
+            .manage(self.ctx.encryptor.clone())
+            .manage(graphql::schema::Schema::new(
+                graphql::query::Query {},
+                graphql::mutation::Mutation {},
+            ))
+            .manage(self.cfg.clone());
+
+        if !self.cfg.is_prod() {
+            app = app.mount("/", routes!(router::get_assets))
+        }
+
+        for (pt, rt) in router::routes() {
+            app = app.mount(pt, rt);
+        }
+
+        app.attach(Template::fairing())
+            .attach(self.cfg.http.cors())
+            .catch(router::catchers())
+            .launch();
+
         Ok(())
     }
 }

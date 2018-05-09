@@ -13,6 +13,7 @@ pub type Connection = diesel::mysql::MysqlConnection;
 #[cfg(feature = "postgresql")]
 pub type Connection = diesel::pg::PgConnection;
 
+#[derive(Clone)]
 pub struct Pool(r2d2::Pool<diesel::r2d2::ConnectionManager<Connection>>);
 
 impl Pool {

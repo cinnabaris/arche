@@ -41,6 +41,7 @@ pub mod hash {
 
 //-----------------------------------------------------------------------------
 
+#[derive(Clone)]
 #[cfg(feature = "sodium")]
 pub struct Encryptor {
     key: secretbox::Key,
