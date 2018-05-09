@@ -13,6 +13,7 @@ use diesel::Connection;
 use handlebars::Handlebars;
 use log;
 use rocket;
+use rocket::config::{Config, Environment, LoggingLevel};
 use rocket_contrib::Template;
 use sys_info;
 use toml;
@@ -227,7 +228,19 @@ impl App {
         Ok(())
     }
     fn routes() -> Result<()> {
-        // TODO
+        let mut app = rocket::custom(
+            Config::build(Environment::Production)
+                .log_level(LoggingLevel::Critical)
+                .finalize()?,
+            false,
+        );
+        for (pt, rt) in router::routes() {
+            app = app.mount(pt, rt);
+        }
+        println!("{:8} {:<8} {}", "METHOD", "RANK", "PATH");
+        for it in app.routes() {
+            println!("{:8} {:<8} {}", it.method, it.rank, it.uri.path());
+        }
         Ok(())
     }
     fn generate_nginx(&self) -> Result<()> {
