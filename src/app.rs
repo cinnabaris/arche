@@ -291,7 +291,7 @@ impl App {
         let db = self.ctx.db()?;
         let db = db.deref();
         println!("{:16} {}", "VERSION", "RUN ON");
-        for it in migrations::version(db)? {
+        for it in migrations::versions(db)? {
             println!("{:16} {}", it.version, it.run_on.format("%c"));
         }
         Ok(())
