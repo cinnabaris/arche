@@ -1,5 +1,5 @@
 use std::error::Error as StdError;
-use std::{env, error, fmt, io, num, result, string, time};
+use std::{env, error, fmt, io, num, path, result, string, time};
 
 use amqp;
 use base64;
@@ -67,6 +67,7 @@ pub enum Error {
     Validation(validator::ValidationErrors),
     ChronoParse(chrono::ParseError),
     Rss(rss::Error),
+    PathStripPrefixError(path::StripPrefixError),
     WithDescription(String),
 }
 
@@ -107,6 +108,7 @@ impl fmt::Display for Error {
             Error::Validation(ref err) => err.fmt(f),
             Error::ChronoParse(ref err) => err.fmt(f),
             Error::Rss(ref err) => err.fmt(f),
+            Error::PathStripPrefixError(ref err) => err.fmt(f),
             Error::WithDescription(ref desc) => write!(f, "{}", desc),
         }
     }
@@ -149,6 +151,7 @@ impl StdError for Error {
             Error::Validation(ref err) => err.description(),
             Error::ChronoParse(ref err) => err.description(),
             Error::Rss(ref err) => err.description(),
+            Error::PathStripPrefixError(ref err) => err.description(),
             Error::WithDescription(ref desc) => &desc,
         }
     }
@@ -187,6 +190,7 @@ impl StdError for Error {
             Error::Diesel(ref err) => Some(err),
             Error::Validation(ref err) => Some(err),
             Error::ChronoParse(ref err) => Some(err),
+            Error::PathStripPrefixError(ref err) => Some(err),
             _ => None,
         }
     }
@@ -420,5 +424,11 @@ impl From<sitemap::Error> for Error {
 impl From<rss::Error> for Error {
     fn from(err: rss::Error) -> Error {
         Error::Rss(err)
+    }
+}
+
+impl From<path::StripPrefixError> for Error {
+    fn from(err: path::StripPrefixError) -> Error {
+        Error::PathStripPrefixError(err)
     }
 }
