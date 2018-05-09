@@ -1674,10 +1674,6 @@
         "abbr": "ES"
       },
       {
-        "name": "Fernando de Noronha",
-        "abbr": "FN"
-      },
-      {
         "name": "Goiás",
         "abbr": "GO"
       },
@@ -6569,32 +6565,192 @@
     "states_required": true,
     "states": [
       {
-        "name": "Nairobi Municipality",
-        "abbr": "110"
+        "name": "Baringo",
+        "abbr": "01"
       },
       {
-        "name": "Central",
-        "abbr": "200"
+        "name": "Bomet",
+        "abbr": "02"
       },
       {
-        "name": "Coast",
-        "abbr": "300"
+        "name": "Bungoma",
+        "abbr": "03"
       },
       {
-        "name": "Eastern",
-        "abbr": "400"
+        "name": "Busia",
+        "abbr": "04"
       },
       {
-        "name": "North-Eastern Kaskazini Mashariki",
-        "abbr": "500"
+        "name": "Elgeyo/Marakwet",
+        "abbr": "05"
       },
       {
-        "name": "Rift Valley",
-        "abbr": "700"
+        "name": "Embu",
+        "abbr": "06"
       },
       {
-        "name": "Western Magharibi",
-        "abbr": "800"
+        "name": "Garissa",
+        "abbr": "07"
+      },
+      {
+        "name": "Homa Bay",
+        "abbr": "08"
+      },
+      {
+        "name": "Isiolo",
+        "abbr": "09"
+      },
+      {
+        "name": "Kajiado",
+        "abbr": "10"
+      },
+      {
+        "name": "Kakamega",
+        "abbr": "11"
+      },
+      {
+        "name": "Kericho",
+        "abbr": "12"
+      },
+      {
+        "name": "Kiambu",
+        "abbr": "13"
+      },
+      {
+        "name": "Kilifi",
+        "abbr": "14"
+      },
+      {
+        "name": "Kirinyaga",
+        "abbr": "15"
+      },
+      {
+        "name": "Kisii",
+        "abbr": "16"
+      },
+      {
+        "name": "Kisumu",
+        "abbr": "17"
+      },
+      {
+        "name": "Kitui",
+        "abbr": "18"
+      },
+      {
+        "name": "Kwale",
+        "abbr": "19"
+      },
+      {
+        "name": "Laikipia",
+        "abbr": "20"
+      },
+      {
+        "name": "Lamu",
+        "abbr": "21"
+      },
+      {
+        "name": "Machakos",
+        "abbr": "22"
+      },
+      {
+        "name": "Makueni",
+        "abbr": "23"
+      },
+      {
+        "name": "Mandera",
+        "abbr": "24"
+      },
+      {
+        "name": "Marsabit",
+        "abbr": "25"
+      },
+      {
+        "name": "Meru",
+        "abbr": "26"
+      },
+      {
+        "name": "Migori",
+        "abbr": "27"
+      },
+      {
+        "name": "Mombasa",
+        "abbr": "28"
+      },
+      {
+        "name": "Murang'a",
+        "abbr": "29"
+      },
+      {
+        "name": "Nairobi City",
+        "abbr": "30"
+      },
+      {
+        "name": "Nakuru",
+        "abbr": "31"
+      },
+      {
+        "name": "Nandi",
+        "abbr": "32"
+      },
+      {
+        "name": "Narok",
+        "abbr": "33"
+      },
+      {
+        "name": "Nyamira",
+        "abbr": "34"
+      },
+      {
+        "name": "Nyandarua",
+        "abbr": "35"
+      },
+      {
+        "name": "Nyeri",
+        "abbr": "36"
+      },
+      {
+        "name": "Samburu",
+        "abbr": "37"
+      },
+      {
+        "name": "Siaya",
+        "abbr": "38"
+      },
+      {
+        "name": "Taita/Taveta",
+        "abbr": "39"
+      },
+      {
+        "name": "Tana River",
+        "abbr": "40"
+      },
+      {
+        "name": "Tharaka-Nithi",
+        "abbr": "41"
+      },
+      {
+        "name": "Trans Nzoia",
+        "abbr": "42"
+      },
+      {
+        "name": "Turkana",
+        "abbr": "43"
+      },
+      {
+        "name": "Uasin Gishu",
+        "abbr": "44"
+      },
+      {
+        "name": "Vihiga",
+        "abbr": "45"
+      },
+      {
+        "name": "Wajir",
+        "abbr": "46"
+      },
+      {
+        "name": "West Pokot",
+        "abbr": "47"
       }
     ]
   },
@@ -9656,8 +9812,8 @@
         "abbr": "COL"
       },
       {
-        "name": "Distrito Federal",
-        "abbr": "DIF"
+        "name": "Ciudad de México",
+        "abbr": "CDMX"
       },
       {
         "name": "Durango",
@@ -10539,12 +10695,68 @@
         "abbr": "CIT"
       },
       {
-        "name": "North Island",
-        "abbr": "N"
+        "name": "Auckland",
+        "abbr": "AUK"
       },
       {
-        "name": "South Island",
-        "abbr": "S"
+        "name": "Bay of Plenty",
+        "abbr": "BOP"
+      },
+      {
+        "name": "Canterbury",
+        "abbr": "CAN"
+      },
+      {
+        "name": "Gisborne",
+        "abbr": "GIS"
+      },
+      {
+        "name": "Hawke's Bay",
+        "abbr": "HKB"
+      },
+      {
+        "name": "Manawatu-Wanganui",
+        "abbr": "MWT"
+      },
+      {
+        "name": "Marlborough",
+        "abbr": "MBH"
+      },
+      {
+        "name": "Nelson",
+        "abbr": "NSN"
+      },
+      {
+        "name": "Northland",
+        "abbr": "NTL"
+      },
+      {
+        "name": "Otago",
+        "abbr": "OTA"
+      },
+      {
+        "name": "Southland",
+        "abbr": "STL"
+      },
+      {
+        "name": "Taranaki",
+        "abbr": "TKI"
+      },
+      {
+        "name": "Tasman",
+        "abbr": "TAS"
+      },
+      {
+        "name": "Wellington",
+        "abbr": "WGN"
+      },
+      {
+        "name": "Waikato",
+        "abbr": "WKO"
+      },
+      {
+        "name": "West Coast",
+        "abbr": "WTC"
       }
     ]
   },

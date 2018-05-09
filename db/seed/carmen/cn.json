@@ -1484,10 +1484,6 @@
     "message": "Espírito Santo"
   },
   {
-    "code": "countries.BRA.states.FN",
-    "message": "Fernando de Noronha"
-  },
-  {
     "code": "countries.BRA.states.GO",
     "message": "Goiás"
   },
@@ -5856,32 +5852,192 @@
     "message": "肯尼亚"
   },
   {
-    "code": "countries.KEN.states.110",
-    "message": "Nairobi Municipality"
+    "code": "countries.KEN.states.01",
+    "message": "Baringo"
   },
   {
-    "code": "countries.KEN.states.200",
-    "message": "Central"
+    "code": "countries.KEN.states.02",
+    "message": "Bomet"
   },
   {
-    "code": "countries.KEN.states.300",
-    "message": "Coast"
+    "code": "countries.KEN.states.03",
+    "message": "Bungoma"
   },
   {
-    "code": "countries.KEN.states.400",
-    "message": "Eastern"
+    "code": "countries.KEN.states.04",
+    "message": "Busia"
   },
   {
-    "code": "countries.KEN.states.500",
-    "message": "North-Eastern Kaskazini Mashariki"
+    "code": "countries.KEN.states.05",
+    "message": "Elgeyo/Marakwet"
   },
   {
-    "code": "countries.KEN.states.700",
-    "message": "Rift Valley"
+    "code": "countries.KEN.states.06",
+    "message": "Embu"
   },
   {
-    "code": "countries.KEN.states.800",
-    "message": "Western Magharibi"
+    "code": "countries.KEN.states.07",
+    "message": "Garissa"
+  },
+  {
+    "code": "countries.KEN.states.08",
+    "message": "Homa Bay"
+  },
+  {
+    "code": "countries.KEN.states.09",
+    "message": "Isiolo"
+  },
+  {
+    "code": "countries.KEN.states.10",
+    "message": "Kajiado"
+  },
+  {
+    "code": "countries.KEN.states.11",
+    "message": "Kakamega"
+  },
+  {
+    "code": "countries.KEN.states.12",
+    "message": "Kericho"
+  },
+  {
+    "code": "countries.KEN.states.13",
+    "message": "Kiambu"
+  },
+  {
+    "code": "countries.KEN.states.14",
+    "message": "Kilifi"
+  },
+  {
+    "code": "countries.KEN.states.15",
+    "message": "Kirinyaga"
+  },
+  {
+    "code": "countries.KEN.states.16",
+    "message": "Kisii"
+  },
+  {
+    "code": "countries.KEN.states.17",
+    "message": "Kisumu"
+  },
+  {
+    "code": "countries.KEN.states.18",
+    "message": "Kitui"
+  },
+  {
+    "code": "countries.KEN.states.19",
+    "message": "Kwale"
+  },
+  {
+    "code": "countries.KEN.states.20",
+    "message": "Laikipia"
+  },
+  {
+    "code": "countries.KEN.states.21",
+    "message": "Lamu"
+  },
+  {
+    "code": "countries.KEN.states.22",
+    "message": "Machakos"
+  },
+  {
+    "code": "countries.KEN.states.23",
+    "message": "Makueni"
+  },
+  {
+    "code": "countries.KEN.states.24",
+    "message": "Mandera"
+  },
+  {
+    "code": "countries.KEN.states.25",
+    "message": "Marsabit"
+  },
+  {
+    "code": "countries.KEN.states.26",
+    "message": "Meru"
+  },
+  {
+    "code": "countries.KEN.states.27",
+    "message": "Migori"
+  },
+  {
+    "code": "countries.KEN.states.28",
+    "message": "Mombasa"
+  },
+  {
+    "code": "countries.KEN.states.29",
+    "message": "Murang'a"
+  },
+  {
+    "code": "countries.KEN.states.30",
+    "message": "Nairobi City"
+  },
+  {
+    "code": "countries.KEN.states.31",
+    "message": "Nakuru"
+  },
+  {
+    "code": "countries.KEN.states.32",
+    "message": "Nandi"
+  },
+  {
+    "code": "countries.KEN.states.33",
+    "message": "Narok"
+  },
+  {
+    "code": "countries.KEN.states.34",
+    "message": "Nyamira"
+  },
+  {
+    "code": "countries.KEN.states.35",
+    "message": "Nyandarua"
+  },
+  {
+    "code": "countries.KEN.states.36",
+    "message": "Nyeri"
+  },
+  {
+    "code": "countries.KEN.states.37",
+    "message": "Samburu"
+  },
+  {
+    "code": "countries.KEN.states.38",
+    "message": "Siaya"
+  },
+  {
+    "code": "countries.KEN.states.39",
+    "message": "Taita/Taveta"
+  },
+  {
+    "code": "countries.KEN.states.40",
+    "message": "Tana River"
+  },
+  {
+    "code": "countries.KEN.states.41",
+    "message": "Tharaka-Nithi"
+  },
+  {
+    "code": "countries.KEN.states.42",
+    "message": "Trans Nzoia"
+  },
+  {
+    "code": "countries.KEN.states.43",
+    "message": "Turkana"
+  },
+  {
+    "code": "countries.KEN.states.44",
+    "message": "Uasin Gishu"
+  },
+  {
+    "code": "countries.KEN.states.45",
+    "message": "Vihiga"
+  },
+  {
+    "code": "countries.KEN.states.46",
+    "message": "Wajir"
+  },
+  {
+    "code": "countries.KEN.states.47",
+    "message": "West Pokot"
   },
   {
     "code": "countries.KGZ.name",
@@ -8684,8 +8840,8 @@
     "message": "Colima"
   },
   {
-    "code": "countries.MEX.states.DIF",
-    "message": "Distrito Federal"
+    "code": "countries.MEX.states.CDMX",
+    "message": "Ciudad de México"
   },
   {
     "code": "countries.MEX.states.DUR",
@@ -9480,12 +9636,68 @@
     "message": "Chatham Islands Territory"
   },
   {
-    "code": "countries.NZL.states.N",
-    "message": "North Island"
+    "code": "countries.NZL.states.AUK",
+    "message": "Auckland"
   },
   {
-    "code": "countries.NZL.states.S",
-    "message": "South Island"
+    "code": "countries.NZL.states.BOP",
+    "message": "Bay of Plenty"
+  },
+  {
+    "code": "countries.NZL.states.CAN",
+    "message": "Canterbury"
+  },
+  {
+    "code": "countries.NZL.states.GIS",
+    "message": "Gisborne"
+  },
+  {
+    "code": "countries.NZL.states.HKB",
+    "message": "Hawke's Bay"
+  },
+  {
+    "code": "countries.NZL.states.MWT",
+    "message": "Manawatu-Wanganui"
+  },
+  {
+    "code": "countries.NZL.states.MBH",
+    "message": "Marlborough"
+  },
+  {
+    "code": "countries.NZL.states.NSN",
+    "message": "Nelson"
+  },
+  {
+    "code": "countries.NZL.states.NTL",
+    "message": "Northland"
+  },
+  {
+    "code": "countries.NZL.states.OTA",
+    "message": "Otago"
+  },
+  {
+    "code": "countries.NZL.states.STL",
+    "message": "Southland"
+  },
+  {
+    "code": "countries.NZL.states.TKI",
+    "message": "Taranaki"
+  },
+  {
+    "code": "countries.NZL.states.TAS",
+    "message": "Tasman"
+  },
+  {
+    "code": "countries.NZL.states.WGN",
+    "message": "Wellington"
+  },
+  {
+    "code": "countries.NZL.states.WKO",
+    "message": "Waikato"
+  },
+  {
+    "code": "countries.NZL.states.WTC",
+    "message": "West Coast"
   },
   {
     "code": "countries.OMN.name",

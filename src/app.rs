@@ -404,7 +404,7 @@ impl App {
 
     fn load_locales(&self, db: &Db, root: &PathBuf) -> Result<()> {
         let dir = root.join("locales");
-        log::info!("load locales from {:?}...", &dir);
+        log::info!("load locales");
         let (total, inserted) = i18n::sync(&db, dir)?;
         log::info!("total {}, inserted {}", total, inserted);
         Ok(())
