@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, FixedOffset, Utc};
@@ -5,10 +6,12 @@ use robots_txt::Robots;
 use rocket::http::{RawStr, Status};
 use rocket::response::{content::Xml, NamedFile};
 use rocket::{self, Catcher, Route, State};
+use rss::{ChannelBuilder, ItemBuilder};
+use serde_json::Value;
 use sitemap::structs::UrlEntry;
 use sitemap::writer::SiteMapWriter;
 
-use super::{env, graphql, jwt::Home, plugins, result::Result};
+use super::{env, graphql, i18n, jwt::Home, orm::PooledConnection as Db, plugins, result::Result};
 
 pub fn catchers() -> Vec<Catcher> {
     errors![not_found, bad_request, forbidden, internal_server]
@@ -72,8 +75,38 @@ fn robots(home: Home) -> Result<String> {
 }
 
 #[get("/rss/<lang>")]
-fn rss(lang: &RawStr) -> Result<String> {
-    Ok(s!(lang))
+fn rss(db: Db, home: Home, lang: &RawStr) -> Result<Xml<Vec<u8>>> {
+    let Home(home) = home;
+    let lang = s!(lang);
+    let db = db.deref();
+
+    let mut items = Vec::new();
+    items.extend_from_slice(plugins::blog::rss(&lang).as_slice());
+
+    let mut fields = Vec::new();
+    for (url, title, desc, last) in items {
+        fields.push(ItemBuilder::default()
+            .link(format!("{}{}", home, url))
+            .title(title)
+            .description(desc)
+            .pub_date(DateTime::<Utc>::from_utc(last, Utc).to_rfc3339())
+            .build()?);
+    }
+
+    let mut buf = Vec::new();
+    let ch = ChannelBuilder::default()
+        .link(home.clone())
+        .language(lang.clone())
+        .pub_date(Utc::now().to_rfc3339())
+        .title(i18n::t(db, &lang, &s!("site.title"), None::<Value>))
+        .description(i18n::t(db, &lang, &s!("site.description"), None::<Value>))
+        .copyright(i18n::t(db, &lang, &s!("site.copyright"), None::<Value>))
+        .items(fields)
+        .build()?;
+
+    ch.write_to(&mut buf)?;
+
+    Ok(Xml(buf))
 }
 
 #[get("/assets/<file..>")]

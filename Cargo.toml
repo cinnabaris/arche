@@ -62,6 +62,7 @@ juniper_rocket = "0.1"
 sodiumoxide = {version = "*", optional = true}
 robots_txt = "0.5"
 sitemap = "0.2"
+rss = "1.5"
 frank_jwt = "*"
 sys-info = "*"
 

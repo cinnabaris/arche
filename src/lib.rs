@@ -47,6 +47,7 @@ extern crate regex;
 extern crate robots_txt;
 extern crate rocket_contrib;
 extern crate rocket_cors;
+extern crate rss;
 #[cfg(any(feature = "aws-s3", feature = "aws-sqs", feature = "aws-sqs"))]
 extern crate rusoto_core;
 #[cfg(feature = "aws-s3")]

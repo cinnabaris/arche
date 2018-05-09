@@ -19,6 +19,7 @@ use r2d2;
 use redis;
 use regex;
 use rocket;
+use rss;
 use serde_json;
 use serde_xml_rs;
 use sitemap;
@@ -65,6 +66,7 @@ pub enum Error {
     Diesel(diesel::result::Error),
     Validation(validator::ValidationErrors),
     ChronoParse(chrono::ParseError),
+    Rss(rss::Error),
     WithDescription(String),
 }
 
@@ -104,6 +106,7 @@ impl fmt::Display for Error {
             Error::Diesel(ref err) => err.fmt(f),
             Error::Validation(ref err) => err.fmt(f),
             Error::ChronoParse(ref err) => err.fmt(f),
+            Error::Rss(ref err) => err.fmt(f),
             Error::WithDescription(ref desc) => write!(f, "{}", desc),
         }
     }
@@ -145,6 +148,7 @@ impl StdError for Error {
             Error::Diesel(ref err) => err.description(),
             Error::Validation(ref err) => err.description(),
             Error::ChronoParse(ref err) => err.description(),
+            Error::Rss(ref err) => err.description(),
             Error::WithDescription(ref desc) => &desc,
         }
     }
@@ -401,8 +405,20 @@ impl From<chrono::ParseError> for Error {
     }
 }
 
+impl From<String> for Error {
+    fn from(err: String) -> Error {
+        Error::WithDescription(err)
+    }
+}
+
 impl From<sitemap::Error> for Error {
     fn from(err: sitemap::Error) -> Error {
         Error::WithDescription(format!("{:?}", err))
+    }
+}
+
+impl From<rss::Error> for Error {
+    fn from(err: rss::Error) -> Error {
+        Error::Rss(err)
     }
 }
