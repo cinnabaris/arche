@@ -32,6 +32,50 @@ table! {
 }
 
 table! {
+    cbeta_books (id) {
+        id -> Int4,
+        uid -> Varchar,
+        author -> Varchar,
+        publisher -> Varchar,
+        title -> Varchar,
+        #[sql_name = "type"]
+        type_ -> Varchar,
+        lang -> Varchar,
+        subject -> Nullable<Varchar>,
+        description -> Nullable<Text>,
+        published_at -> Date,
+        cover -> Nullable<Varchar>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    cbeta_notes (id) {
+        id -> Int4,
+        user_id -> Int4,
+        page_id -> Int4,
+        body -> Text,
+        #[sql_name = "type"]
+        type_ -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    cbeta_pages (id) {
+        id -> Int4,
+        name -> Int4,
+        book_id -> Int4,
+        media_type -> Varchar,
+        body -> Bytea,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
     donate_payments (id) {
         id -> Int4,
         title -> Varchar,
@@ -353,38 +397,6 @@ table! {
 }
 
 table! {
-    reading_books (id) {
-        id -> Int4,
-        author -> Varchar,
-        publisher -> Varchar,
-        title -> Varchar,
-        #[sql_name = "type"]
-        type_ -> Varchar,
-        lang -> Varchar,
-        file -> Varchar,
-        subject -> Nullable<Varchar>,
-        description -> Nullable<Text>,
-        published_at -> Date,
-        cover -> Nullable<Varchar>,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-    }
-}
-
-table! {
-    reading_notes (id) {
-        id -> Int4,
-        user_id -> Int4,
-        book_id -> Int4,
-        body -> Text,
-        #[sql_name = "type"]
-        type_ -> Varchar,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-    }
-}
-
-table! {
     roles (id) {
         id -> Int4,
         name -> Varchar,
@@ -551,6 +563,9 @@ table! {
 allow_tables_to_appear_in_same_query!(
     attachments,
     cards,
+    cbeta_books,
+    cbeta_notes,
+    cbeta_pages,
     donate_payments,
     donate_projects,
     forum_categories,
@@ -577,8 +592,6 @@ allow_tables_to_appear_in_same_query!(
     mall_zones,
     members,
     policies,
-    reading_books,
-    reading_notes,
     roles,
     settings,
     survey_fields,

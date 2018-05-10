@@ -1,3 +1,3 @@
-DROP TABLE reading_notes;
-
-DROP TABLE reading_books;
+DROP TABLE cbeta_notes;
+DROP TABLE cbeta_pages;
+DROP TABLE cbeta_books;
