@@ -14,6 +14,7 @@ use super::application_layout;
 fn index(db: Db, lng: Locale) -> Result<Template> {
     let db = db.deref();
     let lyt = application_layout(
+        db,
         &lng.name,
         &i18n::t(db, &lng.name, &s!("nut.index.title"), None::<Value>),
     )?;

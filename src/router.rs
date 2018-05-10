@@ -22,6 +22,7 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     items.push(("/", routes!(sitemap, robots, rss)));
     items.extend_from_slice(plugins::nut::routes().as_slice());
     items.extend_from_slice(plugins::blog::routes().as_slice());
+    items.extend_from_slice(plugins::cbeta::routes().as_slice());
     items.extend_from_slice(graphql::routes().as_slice());
 
     items
@@ -36,6 +37,7 @@ fn sitemap<'a>(home: Home) -> Result<Xml<Vec<u8>>> {
     let mut items = Vec::new();
     items.extend_from_slice(plugins::nut::sitemap().as_slice());
     items.extend_from_slice(plugins::blog::sitemap()?.as_slice());
+    items.extend_from_slice(plugins::cbeta::sitemap()?.as_slice());
 
     let Home(home) = home;
     let mut buf = Vec::new();

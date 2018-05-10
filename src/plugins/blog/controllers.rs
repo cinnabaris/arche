@@ -18,6 +18,7 @@ use super::seed;
 fn index(db: Db, lng: Locale) -> Result<Template> {
     let db = db.deref();
     let mut lyt = application_layout(
+        db,
         &lng.name,
         &i18n::t(db, &lng.name, &s!("blog.index.title"), None::<Value>),
     )?;
@@ -26,15 +27,16 @@ fn index(db: Db, lng: Locale) -> Result<Template> {
 }
 
 #[get("/<file..>")]
-fn show<'r>(lng: Locale, file: PathBuf) -> Result<Blog> {
+fn show(db: Db, lng: Locale, file: PathBuf) -> Result<Blog> {
     let pt = file.as_path();
+    let db = db.deref();
 
     if let Some(ext) = file.extension() {
         if let Some(ext) = ext.to_str() {
             if ext == seed::Markdown::EXT {
                 let (title, body) = seed::Markdown::read(pt)?;
 
-                let mut lyt = application_layout(&lng.name, &title)?;
+                let mut lyt = application_layout(db, &lng.name, &title)?;
                 lyt.insert(s!("body"), json!(body));
                 return Ok(Blog::Html(Template::render("blog/show", lyt)));
             }
