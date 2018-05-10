@@ -13,8 +13,10 @@ use diesel::sql_query;
 use diesel::sql_types::Text;
 use log;
 
-use super::orm::Connection as Db;
-use super::result::{Error, Result};
+use super::{
+    orm::Connection as Db,
+    result::{Error, Result},
+};
 
 #[cfg(feature = "mysql")]
 const DRIVER: &'static str = "mysql";

@@ -1,12 +1,14 @@
 use frank_jwt::Algorithm;
 
-use super::cache::{Connection as Cache, Pool as CachePool};
-use super::env;
-use super::jwt::Jwt;
-use super::orm::{Pool as DbPool, PooledConnection as Db};
-use super::queue::Client as Queue;
-use super::result::Result;
-use super::security::Encryptor;
+use super::{
+    cache::{Connection as Cache, Pool as CachePool},
+    env,
+    jwt::Jwt,
+    orm::{Pool as DbPool, PooledConnection as Db},
+    queue::Client as Queue,
+    result::Result,
+    security::Encryptor,
+};
 
 #[derive(Clone)]
 pub struct Context {

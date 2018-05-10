@@ -65,7 +65,7 @@ table! {
 table! {
     cbeta_pages (id) {
         id -> Int4,
-        href -> Int4,
+        href -> Varchar,
         book_id -> Int4,
         body -> Bytea,
         media_type -> Varchar,

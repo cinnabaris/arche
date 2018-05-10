@@ -9,8 +9,10 @@ pub type Client = rabbitmq::RabbitMQ;
 use serde::ser::Serialize;
 use serde_json;
 
-use super::context::Context;
-use super::result::{Error, Result};
+use super::{
+    context::Context,
+    result::{Error, Result},
+};
 
 pub trait Consumer: Send + Sync {
     fn run(&self, ctx: &Context, id: &String, content_type: &String, payload: &[u8]) -> Result<()>;

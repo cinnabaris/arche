@@ -11,10 +11,7 @@ use mime;
 use serde_json;
 use sys_info;
 
-use super::super::super::context::Context;
-use super::super::super::queue::Consumer;
-use super::super::super::result::Result;
-use super::super::super::settings;
+use super::super::super::{context::Context, queue::Consumer, result::Result, settings};
 
 pub const SEND_EMAIL: &'static str = "send-email";
 

@@ -24,7 +24,7 @@ CREATE INDEX idx_cbeta_books_lang ON cbeta_books (lang);
 
 CREATE TABLE cbeta_pages (
   id SERIAL PRIMARY KEY,
-  href INT NOT NULL,
+  href VARCHAR(255) NOT NULL,
   book_id INT NOT NULL,
   body BYTEA NOT NULL,
   media_type VARCHAR(255) NOT NULL,

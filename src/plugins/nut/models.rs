@@ -1,6 +1,5 @@
 use std::net::SocketAddr;
 use std::ops::Add;
-use std::ops::Deref;
 
 use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::prelude::*;
@@ -10,11 +9,13 @@ use md5::{self, Digest};
 use serde::ser::Serialize;
 use uuid::Uuid;
 
-use super::super::super::i18n;
-use super::super::super::orm::Connection as Db;
-use super::super::super::result::Result;
-use super::super::super::schema::{logs, policies, roles, users};
-use super::super::super::security::hash;
+use super::super::super::{
+    i18n,
+    orm::Connection as Db,
+    result::Result,
+    schema::{logs, policies, roles, users},
+    security::hash,
+};
 
 pub trait Repository: Send + Sync {}
 
@@ -31,7 +32,6 @@ pub struct Policy {
 
 impl Policy {
     pub fn users(db: &Db, role: &i32) -> Result<Vec<i32>> {
-        let db = db.deref();
         let ids = policies::dsl::policies
             .select((
                 policies::dsl::user_id,
@@ -52,7 +52,6 @@ impl Policy {
     }
 
     pub fn roles(db: &Db, user: &i32) -> Result<Vec<i32>> {
-        let db = db.deref();
         let ids = policies::dsl::policies
             .select((
                 policies::dsl::role_id,
@@ -77,7 +76,7 @@ impl Policy {
             .select((policies::dsl::nbf, policies::dsl::exp))
             .filter(policies::dsl::user_id.eq(user))
             .filter(policies::dsl::role_id.eq(role))
-            .first::<(NaiveDate, NaiveDate)>(db.deref())
+            .first::<(NaiveDate, NaiveDate)>(db)
         {
             let today = Utc::now().date().naive_utc();
             return nbf <= today && today <= exp;
@@ -86,7 +85,6 @@ impl Policy {
     }
 
     pub fn apply(db: &Db, user: &i32, role: &i32, ttl: Duration) -> Result<()> {
-        let db = db.deref();
         let nbf = Utc::now();
         let exp = nbf.add(ttl);
         let nbf = nbf.date().naive_utc();
@@ -130,7 +128,7 @@ impl Policy {
             .filter(policies::dsl::user_id.eq(user))
             .filter(policies::dsl::role_id.eq(role));
 
-        let num = delete(it).execute(db.deref())?;
+        let num = delete(it).execute(db)?;
         Ok(num)
     }
 }
@@ -153,7 +151,7 @@ impl Role {
     pub fn by_id(db: &Db, id: &i32) -> Result<Role> {
         Ok(roles::dsl::roles
             .filter(roles::dsl::id.eq(id))
-            .first::<Role>(db.deref())?)
+            .first::<Role>(db)?)
     }
 
     pub fn get(
@@ -162,7 +160,6 @@ impl Role {
         resource_type: &Option<String>,
         resource_id: &Option<i32>,
     ) -> Result<i32> {
-        let db = db.deref();
         let now = Utc::now().naive_utc();
         match roles::dsl::roles
             .select(roles::dsl::id)
@@ -243,17 +240,17 @@ impl User {
     pub fn get_by_uid(db: &Db, uid: &String) -> Result<User> {
         let it = users::dsl::users
             .filter(users::dsl::uid.eq(uid))
-            .first::<User>(db.deref())?;
+            .first::<User>(db)?;
         Ok(it)
     }
     pub fn get_by_email(db: &Db, email: &String) -> Result<User> {
         let it = users::dsl::users
             .filter(users::dsl::email.eq(email))
-            .first::<User>(db.deref())?;
+            .first::<User>(db)?;
         Ok(it)
     }
     pub fn count(db: &Db) -> Result<i64> {
-        let cnt: i64 = users::dsl::users.count().get_result(db.deref())?;
+        let cnt: i64 = users::dsl::users.count().get_result(db)?;
         Ok(cnt)
     }
     pub fn sign_in(
@@ -276,7 +273,7 @@ impl User {
                 users::dsl::current_sign_in_at.eq(&now),
                 users::dsl::updated_at.eq(&now),
             ))
-            .execute(db.deref())?;
+            .execute(db)?;
         Ok(())
     }
     pub fn sign_up(db: &Db, name: &String, email: &String, password: &String) -> Result<User> {
@@ -292,7 +289,7 @@ impl User {
                 users::dsl::logo.eq(&User::gravatar_logo(email)),
                 users::dsl::updated_at.eq(&now),
             ))
-            .get_result(db.deref())?;
+            .get_result(db)?;
         Ok(it)
     }
     pub fn set_confirmed(db: &Db, user: &i32) -> Result<()> {
@@ -303,7 +300,7 @@ impl User {
                 users::dsl::confirmed_at.eq(&now),
                 users::dsl::updated_at.eq(&now),
             ))
-            .execute(db.deref())?;
+            .execute(db)?;
         Ok(())
     }
 
@@ -314,7 +311,7 @@ impl User {
                 users::dsl::password.eq(&Some(hash::sum(password.as_bytes())?)),
                 users::dsl::updated_at.eq(Utc::now().naive_utc()),
             ))
-            .execute(db.deref())?;
+            .execute(db)?;
         Ok(())
     }
 
@@ -326,7 +323,7 @@ impl User {
                 users::dsl::locked_at.eq(if ok { Some(now) } else { None }),
                 users::dsl::updated_at.eq(&now),
             ))
-            .execute(db.deref())?;
+            .execute(db)?;
         Ok(())
     }
 }
@@ -347,7 +344,7 @@ impl Log {
         let it = logs::dsl::logs
             .filter(logs::dsl::user_id.eq(user))
             .order(logs::dsl::created_at.desc())
-            .get_results::<Log>(db.deref())?;
+            .get_results::<Log>(db)?;
         Ok(it)
     }
     pub fn add<S: Serialize>(
@@ -367,7 +364,7 @@ impl Log {
                 logs::dsl::ip.eq(ip),
                 logs::dsl::message.eq(&message),
             ))
-            .execute(db.deref())?;
+            .execute(db)?;
         Ok(())
     }
 }

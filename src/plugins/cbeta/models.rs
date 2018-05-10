@@ -1,12 +1,10 @@
 use chrono::{NaiveDate, NaiveDateTime, Utc};
-use diesel::insert_into;
 use diesel::prelude::*;
-use epub;
-use serde_json;
+use diesel::{delete, insert_into, update};
 
 use super::super::super::{
     orm::Connection as Db,
-    result::{Error, Result},
+    result::Result,
     schema::{cbeta_books, cbeta_notes, cbeta_pages},
 };
 
@@ -34,18 +32,66 @@ impl Book {
         let cnt: i64 = cbeta_books::dsl::cbeta_books.count().get_result(db)?;
         Ok(cnt)
     }
-    pub fn add(db: &Db, bk: &mut epub::book::Book) -> Result<i32> {
-        let mut ct = bk.container()?;
-        // get the only opf
-        let opf = ct.opf();
-        if opf.len() > 1 {
-            return Err(Error::WithDescription(format!("multi opf names")));
+    pub fn set(
+        db: &Db,
+        uid: &String,
+        author: &String,
+        publisher: &String,
+        title: &String,
+        mime_type: &String,
+        lang: &String,
+        subject: &Option<String>,
+        description: &Option<String>,
+        published_at: &Option<NaiveDate>,
+        cover: &Option<String>,
+        home: &String,
+    ) -> Result<i32> {
+        let now = Utc::now().naive_utc();
+        match cbeta_books::dsl::cbeta_books
+            .select(cbeta_books::dsl::id)
+            .filter(cbeta_books::dsl::uid.eq(uid))
+            .first::<i32>(db)
+        {
+            Ok(id) => {
+                let it = cbeta_books::dsl::cbeta_books.filter(cbeta_books::dsl::id.eq(&id));
+                update(it)
+                    .set((
+                        cbeta_books::dsl::author.eq(author),
+                        cbeta_books::dsl::publisher.eq(publisher),
+                        cbeta_books::dsl::title.eq(title),
+                        cbeta_books::dsl::mime_type.eq(mime_type),
+                        cbeta_books::dsl::lang.eq(lang),
+                        cbeta_books::dsl::subject.eq(subject),
+                        cbeta_books::dsl::description.eq(description),
+                        cbeta_books::dsl::published_at.eq(published_at),
+                        cbeta_books::dsl::cover.eq(cover),
+                        cbeta_books::dsl::home.eq(home),
+                        cbeta_books::dsl::updated_at.eq(&now),
+                    ))
+                    .execute(db)?;
+                Ok(id)
+            }
+            Err(_) => {
+                let id = insert_into(cbeta_books::dsl::cbeta_books)
+                    .values((
+                        cbeta_books::dsl::uid.eq(uid),
+                        cbeta_books::dsl::author.eq(author),
+                        cbeta_books::dsl::publisher.eq(publisher),
+                        cbeta_books::dsl::title.eq(title),
+                        cbeta_books::dsl::mime_type.eq(mime_type),
+                        cbeta_books::dsl::lang.eq(lang),
+                        cbeta_books::dsl::subject.eq(subject),
+                        cbeta_books::dsl::description.eq(description),
+                        cbeta_books::dsl::published_at.eq(published_at),
+                        cbeta_books::dsl::cover.eq(cover),
+                        cbeta_books::dsl::home.eq(home),
+                        cbeta_books::dsl::updated_at.eq(&now),
+                    ))
+                    .returning(cbeta_books::dsl::id)
+                    .get_result::<i32>(db)?;
+                Ok(id)
+            }
         }
-        if let Some(opf) = opf.first() {
-            let opf = bk.opf(opf)?;
-            let uid = opf.unique_identifier;
-        }
-        Ok((0))
     }
 }
 
@@ -65,6 +111,34 @@ impl Page {
     pub fn count(db: &Db) -> Result<i64> {
         let cnt: i64 = cbeta_pages::dsl::cbeta_pages.count().get_result(db)?;
         Ok(cnt)
+    }
+
+    pub fn clear(db: &Db, book: &i32) -> Result<usize> {
+        let it = cbeta_pages::dsl::cbeta_pages.filter(cbeta_pages::dsl::book_id.eq(book));
+
+        let num = delete(it).execute(db)?;
+        Ok(num)
+    }
+
+    pub fn add(
+        db: &Db,
+        book: &i32,
+        href: &String,
+        body: &[u8],
+        media_type: &String,
+    ) -> Result<i32> {
+        let now = Utc::now().naive_utc();
+        let id = insert_into(cbeta_pages::dsl::cbeta_pages)
+            .values((
+                cbeta_pages::dsl::book_id.eq(book),
+                cbeta_pages::dsl::href.eq(href),
+                cbeta_pages::dsl::body.eq(body),
+                cbeta_pages::dsl::media_type.eq(media_type),
+                cbeta_pages::dsl::updated_at.eq(&now),
+            ))
+            .returning(cbeta_pages::dsl::id)
+            .get_result::<i32>(db)?;
+        Ok(id)
     }
 }
 

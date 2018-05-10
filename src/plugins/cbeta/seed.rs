@@ -19,13 +19,14 @@ pub fn load(db: &Db) -> Result<()> {
 fn books(db: &Db, root: PathBuf) -> Result<()> {
     log::info!("load books from {:?}", root);
     walk(root.as_path(), &|file| {
-        log::info!("find book {:?}", file);
-        let it = epub::open(file.path())?;
-        db.transaction::<_, Error, _>(|| {
-            Book::add(db, &it)?;
-            Ok(())
-        })
+        db.transaction::<_, Error, _>(|| parse(db, file.path()))
     })
+}
+
+fn parse(db: &Db, file: PathBuf) -> Result<()> {
+    log::info!("find book {:?}", file);
+    let book = epub::open(file)?;
+    Ok(())
 }
 
 fn walk(dir: &Path, cb: &Fn(&DirEntry) -> Result<()>) -> Result<()> {

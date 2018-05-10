@@ -4,8 +4,7 @@ use amqp::{self, protocol, Basic, Channel, Session, Table};
 use log;
 use uuid::Uuid;
 
-use super::super::env;
-use super::super::result::Result;
+use super::super::{env, result::Result};
 use super::{Queue, Worker};
 
 impl amqp::Consumer for Worker {

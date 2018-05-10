@@ -17,18 +17,18 @@ use rocket_contrib::Template;
 use sys_info;
 use toml;
 
-use super::context::Context;
-use super::orm::Connection as Db;
-use super::result::Result;
 use super::{
     cache::Cache,
+    context::Context,
     env,
     format::RFC822,
     graphql,
     i18n,
     migrations,
+    orm::Connection as Db,
     plugins,
     queue::{self, Queue},
+    result::Result,
     router,
     security,
 };

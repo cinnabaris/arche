@@ -9,8 +9,7 @@ use juniper_rocket::{graphiql_source, GraphQLRequest, GraphQLResponse};
 use rocket::response::content::Html;
 use rocket::{Route, State};
 
-use super::i18n::Locale;
-use super::orm::PooledConnection as Db;
+use super::{i18n::Locale, orm::PooledConnection as Db};
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![("/", routes!(doc, get, post))]

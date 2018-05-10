@@ -4,8 +4,7 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use validator::Validate;
 
-use super::super::super::graphql::context::Context;
-use super::super::super::result::Result;
+use super::super::super::{graphql::context::Context, result::Result};
 
 #[derive(Serialize, GraphQLInputObject, Deserialize, Debug, Validate)]
 #[graphql(description = "Locales by lang")]

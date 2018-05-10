@@ -1,7 +1,6 @@
 use juniper::{self, FieldResult};
 
-use super::super::env;
-use super::super::plugins::nut;
+use super::super::{env, plugins::nut};
 use super::context::Context;
 
 pub struct Query;

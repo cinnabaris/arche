@@ -16,10 +16,12 @@ use rocket::{Outcome, Request, State};
 use serde::ser::Serialize;
 use url::Url;
 
-use super::env;
-use super::orm::Connection as Db;
-use super::result::{Error, Result};
-use super::schema::locales;
+use super::{
+    env,
+    orm::Connection as Db,
+    result::{Error, Result},
+    schema::locales,
+};
 
 pub fn get(db: &Db, lang: &String, code: &String) -> Result<String> {
     let msg = locales::dsl::locales
@@ -30,7 +32,7 @@ pub fn get(db: &Db, lang: &String, code: &String) -> Result<String> {
     Ok(msg)
 }
 
-pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<Option<i32>> {
+pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<i32> {
     let now = Utc::now().naive_utc();
     match locales::dsl::locales
         .select(locales::dsl::id)
@@ -46,19 +48,19 @@ pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<Op
                     locales::dsl::updated_at.eq(&now),
                 ))
                 .execute(db)?;
-            Ok(Some(id))
+            Ok(id)
         }
         Err(_) => {
             let id = insert_into(locales::dsl::locales)
                 .values((
-                    locales::dsl::lang.eq(&lang),
-                    locales::dsl::code.eq(&code),
-                    locales::dsl::message.eq(&message),
-                    locales::dsl::updated_at.eq(Utc::now().naive_utc()),
+                    locales::dsl::lang.eq(lang),
+                    locales::dsl::code.eq(code),
+                    locales::dsl::message.eq(message),
+                    locales::dsl::updated_at.eq(&now),
                 ))
                 .returning(locales::dsl::id)
                 .get_result::<i32>(db)?;
-            Ok(Some(id))
+            Ok(id)
         }
     }
 }

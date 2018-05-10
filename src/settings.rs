@@ -5,10 +5,7 @@ use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 use serde_json;
 
-use super::orm::Connection as Db;
-use super::result::Result;
-use super::schema::settings;
-use super::security::Encryptor;
+use super::{orm::Connection as Db, result::Result, schema::settings, security::Encryptor};
 
 pub fn get<K: Serialize, V: DeserializeOwned>(db: &Db, enc: &Encryptor, k: &K) -> Result<V> {
     let k = serde_json::to_string(k)?;
