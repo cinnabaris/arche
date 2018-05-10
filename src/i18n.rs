@@ -5,7 +5,7 @@ use std::{ffi, fs};
 
 use chrono::Utc;
 use diesel::prelude::*;
-use diesel::{insert_into, update};
+use diesel::{insert_into, update, Connection};
 use handlebars::Handlebars;
 use hyper::header::{AcceptLanguage, Header, LanguageTag, Raw};
 use ini::Ini;
@@ -172,30 +172,32 @@ pub fn t<T: Serialize>(db: &Db, lang: &String, code: &String, args: Option<T>) -
 }
 
 pub fn sync(db: &Db, dir: PathBuf) -> Result<(usize, usize)> {
-    let mut total = 0;
-    let mut inserted = 0;
-    for (lang, items) in load_from_files(dir)? {
-        for (code, message) in items {
-            total = total + 1;
-            let cnt: i64 = locales::dsl::locales
-                .filter(locales::dsl::lang.eq(&lang))
-                .filter(locales::dsl::code.eq(&code))
-                .count()
-                .get_result(db)?;
-            if cnt == 0 {
-                inserted = inserted + 1;
-                insert_into(locales::dsl::locales)
-                    .values((
-                        locales::dsl::lang.eq(&lang),
-                        locales::dsl::code.eq(&code),
-                        locales::dsl::message.eq(&message),
-                        locales::dsl::updated_at.eq(Utc::now().naive_utc()),
-                    ))
-                    .execute(db)?;
+    db.transaction::<_, Error, _>(|| {
+        let mut total = 0;
+        let mut inserted = 0;
+        for (lang, items) in load_from_files(dir)? {
+            for (code, message) in items {
+                total = total + 1;
+                let cnt: i64 = locales::dsl::locales
+                    .filter(locales::dsl::lang.eq(&lang))
+                    .filter(locales::dsl::code.eq(&code))
+                    .count()
+                    .get_result(db)?;
+                if cnt == 0 {
+                    inserted = inserted + 1;
+                    insert_into(locales::dsl::locales)
+                        .values((
+                            locales::dsl::lang.eq(&lang),
+                            locales::dsl::code.eq(&code),
+                            locales::dsl::message.eq(&message),
+                            locales::dsl::updated_at.eq(Utc::now().naive_utc()),
+                        ))
+                        .execute(db)?;
+                }
             }
         }
-    }
-    Ok((total, inserted))
+        Ok((total, inserted))
+    })
 }
 
 fn load_from_files(dir: PathBuf) -> Result<(BTreeMap<String, BTreeMap<String, String>>)> {

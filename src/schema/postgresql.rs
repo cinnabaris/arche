@@ -38,13 +38,13 @@ table! {
         author -> Varchar,
         publisher -> Varchar,
         title -> Varchar,
-        #[sql_name = "type"]
-        type_ -> Varchar,
+        mime_type -> Varchar,
         lang -> Varchar,
         subject -> Nullable<Varchar>,
         description -> Nullable<Text>,
-        published_at -> Date,
+        published_at -> Nullable<Date>,
         cover -> Nullable<Varchar>,
+        home -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -54,10 +54,9 @@ table! {
     cbeta_notes (id) {
         id -> Int4,
         user_id -> Int4,
-        page_id -> Int4,
+        book_id -> Int4,
         body -> Text,
-        #[sql_name = "type"]
-        type_ -> Varchar,
+        media_type -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -66,10 +65,10 @@ table! {
 table! {
     cbeta_pages (id) {
         id -> Int4,
-        name -> Int4,
+        href -> Int4,
         book_id -> Int4,
-        media_type -> Varchar,
         body -> Bytea,
+        media_type -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

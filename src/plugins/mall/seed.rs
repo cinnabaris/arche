@@ -2,18 +2,22 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::path::PathBuf;
 
+use diesel::Connection;
 use log;
 use serde_json;
 
-use super::super::super::i18n;
-use super::super::super::orm::Connection as Db;
-use super::super::super::result::Result;
+use super::super::super::{
+    i18n,
+    orm::Connection as Db,
+    result::{Error, Result},
+};
 use super::models::{Country, Currency, State, Zone, ZoneMember};
 
 pub fn load(db: &Db, root: &PathBuf) -> Result<()> {
     regions(db, root)?;
     zones(db)?;
     currencies(db, root)?;
+
     Ok(())
 }
 
@@ -40,37 +44,39 @@ fn currencies(db: &Db, root: &PathBuf) -> Result<()> {
         return Ok(());
     }
 
-    let root = root.join("money");
-    // https://www.iso.org/iso-4217-currency-codes.html
-    let file = root.join("currencies.json");
-    log::info!("load currencies data from {:?}...", &file);
-    let currencies: Vec<CurrencyItem> = serde_json::from_reader(File::open(file)?)?;
+    db.transaction::<_, Error, _>(|| {
+        let root = root.join("money");
+        // https://www.iso.org/iso-4217-currency-codes.html
+        let file = root.join("currencies.json");
+        log::info!("load currencies data from {:?}...", &file);
+        let currencies: Vec<CurrencyItem> = serde_json::from_reader(File::open(file)?)?;
 
-    let mut total: isize = 0;
+        let mut total: isize = 0;
 
-    for it in currencies {
-        Currency::add(
-            db,
-            &it.key,
-            &it.iso_code,
-            &it.name,
-            &it.symbol,
-            &it.alternate_symbols,
-            &it.subunit,
-            &it.subunit_to_unit,
-            &it.symbol_first,
-            &it.html_entity,
-            &it.decimal_mark,
-            &it.thousands_separator,
-            &it.iso_numeric,
-            &it.smallest_denomination,
-        )?;
+        for it in currencies {
+            Currency::add(
+                db,
+                &it.key,
+                &it.iso_code,
+                &it.name,
+                &it.symbol,
+                &it.alternate_symbols,
+                &it.subunit,
+                &it.subunit_to_unit,
+                &it.symbol_first,
+                &it.html_entity,
+                &it.decimal_mark,
+                &it.thousands_separator,
+                &it.iso_numeric,
+                &it.smallest_denomination,
+            )?;
 
-        total = total + 1;
-    }
-    log::info!("find {} currencies", total);
+            total = total + 1;
+        }
+        log::info!("find {} currencies", total);
 
-    Ok(())
+        Ok(())
+    })
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -101,56 +107,57 @@ fn regions(db: &Db, root: &PathBuf) -> Result<()> {
         log::warn!("ingnore import countries,states,zones");
         return Ok(());
     }
+    db.transaction::<_, Error, _>(|| {
+        let root = root.join("carmen");
+        // https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
+        // https://github.com/carmen-ruby/carmen
+        // https://github.com/spree/spree/blob/master/core/db/default/spree/countries.rb
+        // https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
+        let file = root.join("countries.json");
+        log::info!("load regions data from {:?}...", &file);
+        let countries: Vec<CountryItem> = serde_json::from_reader(File::open(file)?)?;
 
-    let root = root.join("carmen");
-    // https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes
-    // https://github.com/carmen-ruby/carmen
-    // https://github.com/spree/spree/blob/master/core/db/default/spree/countries.rb
-    // https://github.com/spree/spree/blob/master/core/db/default/spree/states.rb
-    let file = root.join("countries.json");
-    log::info!("load regions data from {:?}...", &file);
-    let countries: Vec<CountryItem> = serde_json::from_reader(File::open(file)?)?;
+        let mut ct: isize = 0;
+        let mut st: isize = 0;
 
-    let mut ct: isize = 0;
-    let mut st: isize = 0;
-
-    for c in countries {
-        let it = Country::add(
-            db,
-            &c.name,
-            &c.iso_name,
-            &c.numcode,
-            &c.iso,
-            &c.iso3,
-            &c.states_required,
-        )?;
-        for s in c.states {
-            State::add(db, &it.id, &s.name, &s.abbr)?;
-            st = st + 1;
+        for c in countries {
+            let it = Country::add(
+                db,
+                &c.name,
+                &c.iso_name,
+                &c.numcode,
+                &c.iso,
+                &c.iso3,
+                &c.states_required,
+            )?;
+            for s in c.states {
+                State::add(db, &it.id, &s.name, &s.abbr)?;
+                st = st + 1;
+            }
+            ct = ct + 1;
         }
-        ct = ct + 1;
-    }
 
-    log::info!("find {} countries, {} states", ct, st);
+        log::info!("find {} countries, {} states", ct, st);
 
-    let mut langs = HashMap::new();
-    langs.insert("en-US", "en");
-    langs.insert("zh-Hans", "cn");
-    langs.insert("zh-Hant", "tw");
-    for (l, n) in langs {
-        let mut file = root.join(n);
-        file.set_extension("json");
-        log::info!("load locales from {:?}", file);
-        let items: Vec<LocaleItem> = serde_json::from_reader(File::open(file)?)?;
-        let mut total = 0;
-        for it in items {
-            i18n::set(db, &s!(l), &it.code, &it.message)?;
-            total = total + 1;
+        let mut langs = HashMap::new();
+        langs.insert("en-US", "en");
+        langs.insert("zh-Hans", "cn");
+        langs.insert("zh-Hant", "tw");
+        for (l, n) in langs {
+            let mut file = root.join(n);
+            file.set_extension("json");
+            log::info!("load locales from {:?}", file);
+            let items: Vec<LocaleItem> = serde_json::from_reader(File::open(file)?)?;
+            let mut total = 0;
+            for it in items {
+                i18n::set(db, &s!(l), &it.code, &it.message)?;
+                total = total + 1;
+            }
+            log::info!("insert {}", total);
         }
-        log::info!("insert {}", total);
-    }
 
-    Ok(())
+        Ok(())
+    })
 }
 
 fn zones(db: &Db) -> Result<()> {
@@ -158,24 +165,26 @@ fn zones(db: &Db) -> Result<()> {
         log::warn!("ingnore import zones");
         return Ok(());
     }
+    db.transaction::<_, Error, _>(|| {
+        // https://github.com/spree/spree/blob/master/core/db/default/spree/zones.rb
+        add_zone(
+            db,
+            &s!("EU_VAT"),
+            &s!("Countries that make up the EU VAT zone."),
+            &vec![
+                "PL", "FI", "PT", "RO", "DE", "FR", "SK", "HU", "SI", "IE", "AT", "ES", "IT", "BE",
+                "SE", "LV", "BG", "GB", "LT", "CY", "LU", "MT", "DK", "NL", "EE", "HR", "CZ", "GR",
+            ],
+        )?;
+        add_zone(
+            db,
+            &s!("North America"),
+            &s!("USA + Canada"),
+            &vec!["US", "CA"],
+        )?;
 
-    // https://github.com/spree/spree/blob/master/core/db/default/spree/zones.rb
-    add_zone(
-        db,
-        &s!("EU_VAT"),
-        &s!("Countries that make up the EU VAT zone."),
-        &vec![
-            "PL", "FI", "PT", "RO", "DE", "FR", "SK", "HU", "SI", "IE", "AT", "ES", "IT", "BE",
-            "SE", "LV", "BG", "GB", "LT", "CY", "LU", "MT", "DK", "NL", "EE", "HR", "CZ", "GR",
-        ],
-    )?;
-    add_zone(
-        db,
-        &s!("North America"),
-        &s!("USA + Canada"),
-        &vec!["US", "CA"],
-    )?;
-    Ok(())
+        Ok(())
+    })
 }
 
 fn add_zone(

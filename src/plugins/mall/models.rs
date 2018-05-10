@@ -3,10 +3,10 @@ use diesel::insert_into;
 use diesel::prelude::*;
 use serde_json;
 
-use super::super::super::orm::Connection as Db;
-use super::super::super::result::Result;
-use super::super::super::schema::{
-    mall_countries, mall_currencies, mall_states, mall_zone_members, mall_zones,
+use super::super::super::{
+    orm::Connection as Db,
+    result::Result,
+    schema::{mall_countries, mall_currencies, mall_states, mall_zone_members, mall_zones},
 };
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]

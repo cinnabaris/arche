@@ -1,4 +1,5 @@
 pub mod c_books;
+pub mod models;
 pub mod seed;
 
 use chrono::{NaiveDateTime, Utc};

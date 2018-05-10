@@ -9,7 +9,6 @@ use std::{fs, thread};
 
 use base64;
 use clap;
-use diesel::Connection;
 use handlebars::Handlebars;
 use log;
 use rocket;
@@ -20,7 +19,7 @@ use toml;
 
 use super::context::Context;
 use super::orm::Connection as Db;
-use super::result::{Error, Result};
+use super::result::Result;
 use super::{
     cache::Cache,
     env,
@@ -286,13 +285,12 @@ impl App {
         let root = Path::new("db").join("seed");
         let db = self.ctx.db()?;
         let db = db.deref();
-        db.transaction::<_, Error, _>(|| {
-            self.load_locales(db, &root)?;
-            plugins::mall::seed::load(db, &root)?;
-            plugins::nut::seed::administrator(db)?;
-            log::info!("Done!!!");
-            Ok(())
-        })
+        self.load_locales(db, &root)?;
+        plugins::mall::seed::load(db, &root)?;
+        plugins::cbeta::seed::load(db)?;
+        plugins::nut::seed::administrator(db)?;
+        log::info!("Done!!!");
+        Ok(())
     }
     fn db_dump(&self) -> Result<()> {
         let db = self.ctx.db()?;
