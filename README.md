@@ -21,14 +21,7 @@ rustup default nightly
 cargo install rustfmt-nightly
 cargo install racer
 racer complete std::io::B
-rustup component add rust-src
-```
-
--   upgrade
-
-```bash
-rustup update
-cargo update
+rustup component add rls-preview rust-analysis rust-src
 ```
 
 ## Usage
