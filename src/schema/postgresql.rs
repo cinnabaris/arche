@@ -40,10 +40,7 @@ table! {
         title -> Varchar,
         mime_type -> Varchar,
         lang -> Varchar,
-        subject -> Nullable<Varchar>,
-        description -> Nullable<Text>,
-        published_at -> Nullable<Date>,
-        cover -> Nullable<Varchar>,
+        published_at -> Date,
         home -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -65,8 +62,8 @@ table! {
 table! {
     cbeta_pages (id) {
         id -> Int4,
-        href -> Varchar,
         book_id -> Int4,
+        href -> Varchar,
         body -> Bytea,
         media_type -> Varchar,
         created_at -> Timestamp,

@@ -6,10 +6,7 @@ CREATE TABLE cbeta_books (
   title VARCHAR(255) NOT NULL,
   mime_type VARCHAR(36) NOT NULL,
   lang VARCHAR(32) NOT NULL,
-  subject VARCHAR(255),
-  description TEXT,
-  published_at DATE,
-  cover VARCHAR(255),
+  published_at DATE NOT NULL,
   home TEXT NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
@@ -21,11 +18,10 @@ CREATE INDEX idx_cbeta_books_publisher ON cbeta_books (publisher);
 CREATE INDEX idx_cbeta_books_mime_type ON cbeta_books (mime_type);
 CREATE INDEX idx_cbeta_books_lang ON cbeta_books (lang);
 
-
 CREATE TABLE cbeta_pages (
   id SERIAL PRIMARY KEY,
-  href VARCHAR(255) NOT NULL,
   book_id INT NOT NULL,
+  href VARCHAR(255) NOT NULL,
   body BYTEA NOT NULL,
   media_type VARCHAR(255) NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),

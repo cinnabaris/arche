@@ -18,10 +18,7 @@ pub struct Book {
     pub title: String,
     pub mime_type: String,
     pub lang: String,
-    pub subject: Option<String>,
-    pub description: Option<String>,
-    pub published_at: Option<NaiveDate>,
-    pub cover: Option<String>,
+    pub published_at: NaiveDate,
     pub home: String,
     pub updated_at: NaiveDateTime,
     pub created_at: NaiveDateTime,
@@ -40,10 +37,7 @@ impl Book {
         title: &String,
         mime_type: &String,
         lang: &String,
-        subject: &Option<String>,
-        description: &Option<String>,
-        published_at: &Option<NaiveDate>,
-        cover: &Option<String>,
+        published_at: &NaiveDate,
         home: &String,
     ) -> Result<i32> {
         let now = Utc::now().naive_utc();
@@ -61,10 +55,7 @@ impl Book {
                         cbeta_books::dsl::title.eq(title),
                         cbeta_books::dsl::mime_type.eq(mime_type),
                         cbeta_books::dsl::lang.eq(lang),
-                        cbeta_books::dsl::subject.eq(subject),
-                        cbeta_books::dsl::description.eq(description),
                         cbeta_books::dsl::published_at.eq(published_at),
-                        cbeta_books::dsl::cover.eq(cover),
                         cbeta_books::dsl::home.eq(home),
                         cbeta_books::dsl::updated_at.eq(&now),
                     ))
@@ -80,10 +71,7 @@ impl Book {
                         cbeta_books::dsl::title.eq(title),
                         cbeta_books::dsl::mime_type.eq(mime_type),
                         cbeta_books::dsl::lang.eq(lang),
-                        cbeta_books::dsl::subject.eq(subject),
-                        cbeta_books::dsl::description.eq(description),
                         cbeta_books::dsl::published_at.eq(published_at),
-                        cbeta_books::dsl::cover.eq(cover),
                         cbeta_books::dsl::home.eq(home),
                         cbeta_books::dsl::updated_at.eq(&now),
                     ))
@@ -99,8 +87,8 @@ impl Book {
 #[serde(rename_all = "camelCase")]
 pub struct Page {
     pub id: i32,
-    pub href: String,
     pub book_id: String,
+    pub href: String,
     pub body: Vec<u8>,
     pub media_type: String,
     pub updated_at: NaiveDateTime,
