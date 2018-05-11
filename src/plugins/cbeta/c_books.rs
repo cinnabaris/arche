@@ -1,7 +1,6 @@
 use std::ops::Deref;
 use std::path::PathBuf;
 
-use rocket::http::RawStr;
 use rocket_contrib::Template;
 use serde_json::Value;
 
@@ -9,7 +8,7 @@ use super::super::super::{
     format::{Pager, Pagination},
     i18n::{self, Locale},
     orm::PooledConnection as Db,
-    result::Result,
+    result::{Error, Result},
 };
 use super::super::nut::application_layout;
 use super::models::{Book, Page};
@@ -34,13 +33,20 @@ fn index(db: Db, lng: Locale, pager: Option<Pager>) -> Result<Template> {
 }
 
 #[get("/books/<id>")]
-fn show(id: i32) -> Result<String> {
-    Ok(s!(""))
+fn show(db: Db, id: i32) -> Result<Page> {
+    let db = db.deref();
+    let page = Page::home(db, &id)?;
+    Ok(page)
 }
 
-#[get("/books/<uid>/<file..>")]
-fn page(uid: &RawStr, file: PathBuf) -> Result<Vec<u8>> {
-    println!("{:?} {:?}", uid, file);
-    let out = Vec::new();
-    Ok(out)
+#[get("/books/<id>/<file..>")]
+fn page(db: Db, id: i32, file: PathBuf) -> Result<Page> {
+    let db = db.deref();
+
+    let page = match file.to_str() {
+        Some(file) => Page::get(db, &id, &s!(file)),
+        None => Err(Error::WithDescription(format!("bad file path {:?}", file))),
+    }?;
+
+    Ok(page)
 }
