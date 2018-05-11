@@ -33,11 +33,12 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
 // https://en.wikipedia.org/wiki/Site_map
 // https://www.sitemaps.org/protocol.html
 #[get("/sitemap.xml")]
-fn sitemap<'a>(home: Home) -> Result<Xml<Vec<u8>>> {
+fn sitemap<'a>(home: Home, db: Db) -> Result<Xml<Vec<u8>>> {
+    let db = db.deref();
     let mut items = Vec::new();
     items.extend_from_slice(plugins::nut::sitemap().as_slice());
     items.extend_from_slice(plugins::blog::sitemap()?.as_slice());
-    items.extend_from_slice(plugins::cbeta::sitemap()?.as_slice());
+    items.extend_from_slice(plugins::cbeta::sitemap(db)?.as_slice());
 
     let Home(home) = home;
     let mut buf = Vec::new();

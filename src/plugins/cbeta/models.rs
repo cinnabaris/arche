@@ -16,7 +16,7 @@ use super::super::super::{
     schema::{cbeta_books, cbeta_notes, cbeta_pages},
 };
 
-#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+#[derive(Queryable, GraphQLObject, Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Book {
     pub id: i32,
@@ -231,7 +231,7 @@ impl<'r> Responder<'r> for Page {
     }
 }
 
-#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+#[derive(Queryable, GraphQLObject, Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Note {
     pub id: i32,
