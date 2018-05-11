@@ -4,40 +4,47 @@ require 'money'
 require 'gepub'
 require 'digest'
 
-desc 'parse epub books'
-task :books do
-  md5 = Digest::MD5.new
-  Dir.glob('../tmp/books/**/*.epub').each do |file|
-    puts "find book #{file}"
-    book = GEPUB::Book.parse File.new(file)
+namespace :epub do
+  desc 'parse epub file to json'
+  task :parse do
+    md5 = Digest::MD5.new
+    Dir.glob('../tmp/books/**/*.epub').each do |file|
+      puts "find book #{file}"
+      book = GEPUB::Book.parse File.new(file)
 
-    item = {
-      title: book.title.content,
-      identifier: book.identifier,
-      language: book.language.content,
-      creator: book.creator.content,
-      publisher: book.publisher.nil? ? nil : book.publisher.content,
-      subject: book.subject.nil? ? nil : book.subject.content,
-      description: book.description.nil? ? nil : book.description.content,
-      updated_at: book.lastmodified.nil? ? nil : book.lastmodified.content,
-      version: book.version,
-      items: book.items.map do |_k, v|
-        # 3.0 =>'toc', '2.0'=>'ncx'
-        puts "find page #{v.id} #{v.media_type}"
-        {
-          id: v.id,
-          href: v.href,
-          media_type: v.media_type,
-          content: v.content.nil? ? nil : v.content.bytes
-        }
+      item = {
+        title: book.title.content,
+        identifier: book.identifier,
+        language: book.language.content,
+        creator: book.creator.content,
+        publisher: book.publisher.nil? ? nil : book.publisher.content,
+        subject: book.subject.nil? ? nil : book.subject.content,
+        description: book.description.nil? ? nil : book.description.content,
+        updated_at: book.lastmodified.nil? ? nil : book.lastmodified.content,
+        version: book.version,
+        items: book.items.map do |_k, v|
+          # 3.0 =>'toc', '2.0'=>'ncx'
+          puts "find page #{v.id} #{v.media_type}"
+          {
+            id: v.id,
+            href: v.href,
+            media_type: v.media_type,
+            content: v.content.nil? ? nil : v.content.bytes
+          }
+        end
+      }
+
+      md5.reset
+      md5.update file
+      File.open("../tmp/cbeta/#{md5.hexdigest}.json", 'w') do |f|
+        f.write item.to_json
       end
-    }
-
-    md5.reset
-    md5.update file
-    File.open("../tmp/cbeta/#{md5.hexdigest}.json", 'w') do |f|
-      f.write item.to_json
     end
+  end
+
+  desc 'dump cbeta tables'
+  task :dump do
+    `pg_dump -U postgres -a -t cbeta_books -t cbeta_pages -f ../tmp/#{Time.now.strftime('%Y%m%d%H%M%S%L')}.sql arche`
   end
 end
 

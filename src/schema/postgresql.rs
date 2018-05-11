@@ -34,14 +34,15 @@ table! {
 table! {
     cbeta_books (id) {
         id -> Int4,
-        uid -> Varchar,
-        author -> Varchar,
-        publisher -> Varchar,
         title -> Varchar,
-        mime_type -> Varchar,
-        lang -> Varchar,
-        published_at -> Date,
-        home -> Text,
+        identifier -> Varchar,
+        language -> Varchar,
+        creator -> Varchar,
+        publisher -> Nullable<Varchar>,
+        subject -> Nullable<Varchar>,
+        description -> Nullable<Text>,
+        published_at -> Nullable<Timestamp>,
+        version -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -63,8 +64,9 @@ table! {
     cbeta_pages (id) {
         id -> Int4,
         book_id -> Int4,
+        name -> Varchar,
         href -> Varchar,
-        body -> Bytea,
+        body -> Nullable<Bytea>,
         media_type -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
