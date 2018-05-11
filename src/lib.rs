@@ -1,4 +1,4 @@
-#![feature(plugin, use_extern_macros, custom_attribute, proc_macro_path_invoc)]
+#![feature(plugin, use_extern_macros, custom_derive, custom_attribute, proc_macro_path_invoc)]
 #![recursion_limit = "128"] // https://github.com/diesel-rs/diesel/issues/1127
 #![plugin(rocket_codegen)]
 extern crate rocket;

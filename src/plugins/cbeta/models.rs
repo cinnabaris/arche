@@ -3,8 +3,9 @@ use diesel::prelude::*;
 use diesel::{delete, insert_into, update};
 
 use super::super::super::{
+    format::Pager,
     orm::Connection as Db,
-    result::Result,
+    result::{Error, Result},
     schema::{cbeta_books, cbeta_notes, cbeta_pages},
 };
 
@@ -26,10 +27,28 @@ pub struct Book {
 }
 
 impl Book {
+    pub fn list(db: &Db, pager: &Pager) -> Result<(i64, Vec<Self>)> {
+        let total = Self::count(db)?;
+        let (limit, offset) = pager.build(total);
+        let items = cbeta_books::dsl::cbeta_books
+            .offset(offset)
+            .limit(limit)
+            .order(cbeta_books::dsl::updated_at.desc())
+            .load(db)?;
+        Ok((total, items))
+    }
+    pub fn get(db: &Db, id: &i32) -> Result<Self> {
+        let it = cbeta_books::dsl::cbeta_books
+            .filter(cbeta_books::dsl::id.eq(id))
+            .first(db)?;
+        Ok(it)
+    }
+
     pub fn count(db: &Db) -> Result<i64> {
         let cnt: i64 = cbeta_books::dsl::cbeta_books.count().get_result(db)?;
         Ok(cnt)
     }
+
     pub fn set(
         db: &Db,
         title: &String,
@@ -101,6 +120,29 @@ pub struct Page {
 }
 
 impl Page {
+    pub fn home(db: &Db, book: &i32) -> Result<Self> {
+        let ver: String = cbeta_books::dsl::cbeta_books
+            .select(cbeta_books::dsl::version)
+            .filter(cbeta_books::dsl::id.eq(book))
+            .first(db)?;
+        let name = match &ver[..] {
+            "2.0" => Ok("ncx"),
+            "3.0" => Ok("toc"),
+            _ => Err(Error::WithDescription(format!("bad version {}", ver))),
+        }?;
+        let it = cbeta_pages::dsl::cbeta_pages
+            .filter(cbeta_pages::dsl::book_id.eq(book))
+            .filter(cbeta_pages::dsl::name.eq(name))
+            .first(db)?;
+        Ok(it)
+    }
+    pub fn get(db: &Db, book: &i32, href: &String) -> Result<Self> {
+        let it = cbeta_pages::dsl::cbeta_pages
+            .filter(cbeta_pages::dsl::book_id.eq(book))
+            .filter(cbeta_pages::dsl::href.eq(href))
+            .first(db)?;
+        Ok(it)
+    }
     pub fn count(db: &Db) -> Result<i64> {
         let cnt: i64 = cbeta_pages::dsl::cbeta_pages.count().get_result(db)?;
         Ok(cnt)

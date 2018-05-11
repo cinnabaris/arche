@@ -368,6 +368,11 @@ impl App {
 
         let cors = self.ctx.config.http.cors();
         thread::spawn(|| {
+            // Template::custom(|engines| {
+            //     engines
+            //         .handlebars
+            //         .register_global_function("eq", format::eq);
+            // })
             app.attach(Template::fairing())
                 .attach(cors)
                 .catch(router::catchers())
