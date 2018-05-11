@@ -44,7 +44,16 @@ namespace :epub do
 
   desc 'dump cbeta tables'
   task :dump do
-    `pg_dump -U postgres -a -t cbeta_books -t cbeta_pages -f ../tmp/#{Time.now.strftime('%Y%m%d%H%M%S%L')}.sql arche`
+    file = "../tmp/#{Time.now.strftime('%Y%m%d%H%M%S%L')}.gz"
+    puts "dump to #{file}"
+    `pg_dump -U postgres -a -t cbeta_books -t cbeta_pages arche | gzip > #{file}`
+  end
+
+  desc 'restore cbeta tables'
+  task :restore, [:version] do |_t, args|
+    file = "../tmp/#{args.fetch :version}.gz"
+    puts "restore from #{file}"
+    `gunzip < #{file} | psql -U postgres arche`
   end
 end
 
