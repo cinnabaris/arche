@@ -6,12 +6,10 @@ use log;
 use validator::Validate;
 
 use super::super::super::{
-    orm::Connection as Db,
-    result::{Error, Result},
+    orm::Connection as Db, result::{Error, Result},
 };
 use super::{
-    models::{Policy, Role, User},
-    schema::UsersSignUp,
+    models::{Policy, Role, User}, schema::users::FmSignUp,
 };
 
 pub fn administrator(db: &Db) -> Result<()> {
@@ -30,7 +28,7 @@ pub fn administrator(db: &Db) -> Result<()> {
         println!("password:");
         let mut password = String::new();
         stdin.lock().read_line(&mut password)?;
-        let form = UsersSignUp {
+        let form = FmSignUp {
             name: s!("Administrator"),
             email: s!(email.trim()),
             password: s!(password.trim()),

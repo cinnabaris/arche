@@ -18,6 +18,3 @@
 # vim
 .*.swp
 .*.un~
-
-# vscode
-/.vscode/

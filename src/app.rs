@@ -18,19 +18,8 @@ use sys_info;
 use toml;
 
 use super::{
-    cache::Cache,
-    context::Context,
-    env,
-    format::RFC822,
-    graphql,
-    i18n,
-    migrations,
-    orm::Connection as Db,
-    plugins,
-    queue::{self, Queue},
-    result::Result,
-    router,
-    security,
+    cache::Cache, context::Context, env, format::RFC822, graphql, i18n, migrations,
+    orm::Connection as Db, plugins, queue::{self, Queue}, result::Result, router, security,
 };
 
 pub struct App {
@@ -153,7 +142,7 @@ impl App {
                 theme: s!("bootstrap"),
                 limits: 1 << 25,
                 port: 8080,
-                origins: vec![s!("http://localhost:3000")],
+                origins: vec![s!("http://localhost:3000"), s!("http://localhost:8080")],
             },
             database: env::Database {
                 #[cfg(feature = "postgresql")]

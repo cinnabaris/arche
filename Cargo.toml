@@ -82,7 +82,7 @@ optional = true
 [dependencies.rocket_contrib]
 version = "0.3"
 default-features = false
-features = ["json", "uuid", "handlebars_templates", "tera_templates"]
+features = ["json", "uuid", "handlebars_templates"]
 
 [dependencies.uuid]
 version = "0.6"

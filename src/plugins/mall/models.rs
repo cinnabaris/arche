@@ -4,8 +4,7 @@ use diesel::prelude::*;
 use serde_json;
 
 use super::super::super::{
-    orm::Connection as Db,
-    result::Result,
+    orm::Connection as Db, result::Result,
     schema::{mall_countries, mall_currencies, mall_states, mall_zone_members, mall_zones},
 };
 

@@ -11,6 +11,9 @@ use rocket::{Route, State};
 
 use super::{i18n::Locale, orm::PooledConnection as Db};
 
+#[derive(Serialize, GraphQLObject, Deserialize, Debug)]
+pub struct H {}
+
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![("/", routes!(doc, get, post))]
 }

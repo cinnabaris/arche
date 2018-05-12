@@ -1,0 +1,11 @@
+{
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.colorTheme": "One Dark Pro",
+    "editor.fontFamily": "Fira Code",
+    "editor.fontSize": 28,
+    "editor.formatOnSave": true,
+    "files.autoSave": "onFocusChange",
+    "rust.unstable_features": true,
+    "ruby.format": "rubocop",
+}
