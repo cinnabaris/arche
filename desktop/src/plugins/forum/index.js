@@ -1,0 +1,1 @@
+export default {menus: [], routes: []}
