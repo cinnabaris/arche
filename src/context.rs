@@ -1,20 +1,14 @@
 use frank_jwt::Algorithm;
 
 use super::{
-    cache::{Connection as Cache, Pool as CachePool},
-    env,
-    jwt::Jwt,
-    orm::{Pool as DbPool, PooledConnection as Db},
-    queue::Client as Queue,
-    result::Result,
-    security::Encryptor,
+    cache::{self, Cache}, env, jwt::Jwt, orm::{Pool as DbPool, PooledConnection as Db},
+    queue::{self, Queue}, result::{Error, Result}, security::Encryptor,
 };
 
-#[derive(Clone)]
 pub struct Context {
-    pub db: DbPool,
-    pub cache: CachePool,
-    pub queue: Queue,
+    db: DbPool,
+    pub cache: Box<Cache>,
+    pub queue: Box<Queue>,
     pub encryptor: Encryptor,
     pub jwt: Jwt,
     pub config: env::Config,
@@ -25,7 +19,7 @@ impl Context {
         Ok(Self {
             db: Self::open_database(&cfg.database)?,
             cache: Self::open_cache(&cfg.cache)?,
-            queue: Self::open_queue(&cfg.queue),
+            queue: Self::open_queue(&cfg.queue)?,
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
             config: cfg.clone(),
@@ -35,22 +29,31 @@ impl Context {
     pub fn db(&self) -> Result<Db> {
         self.db.get()
     }
-    pub fn cache(&self) -> Result<Cache> {
-        self.cache.get()
-    }
 
-    #[cfg(feature = "postgresql")]
     fn open_database(cfg: &env::Database) -> Result<DbPool> {
-        Ok(DbPool::new(&cfg.postgresql.url())?)
+        if let Some(ref pg) = cfg.postgresql {
+            return Ok(DbPool::new(&pg.url())?);
+        }
+        Err(Error::WithDescription(s!("can't open database")))
     }
 
-    #[cfg(feature = "cache-redis")]
-    fn open_cache(cfg: &env::Cache) -> Result<CachePool> {
-        Ok(CachePool::new(cfg.namespace.clone(), cfg.redis.pool()?))
+    fn open_cache(cfg: &env::Cache) -> Result<Box<Cache>> {
+        if let Some(ref re) = cfg.redis {
+            return Ok(Box::new(cache::Redis::new(
+                cfg.namespace.clone(),
+                re.pool()?,
+            )));
+        }
+        Err(Error::WithDescription(s!("can't open cache")))
     }
 
-    #[cfg(feature = "rabbitmq")]
-    fn open_queue(cfg: &env::Queue) -> Queue {
-        Queue::new(cfg.name.clone(), cfg.rabbitmq.clone())
+    fn open_queue(cfg: &env::Queue) -> Result<Box<Queue>> {
+        if let Some(ref mq) = cfg.rabbitmq {
+            return Ok(Box::new(queue::RabbitMQ::new(
+                cfg.name.clone(),
+                mq.options(),
+            )));
+        }
+        Err(Error::WithDescription(s!("can't open messing queue")))
     }
 }

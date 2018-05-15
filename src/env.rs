@@ -1,13 +1,10 @@
 use std::default::Default;
 
-#[cfg(feature = "rabbitmq")]
 use amqp::Options as AmqpOptions;
 use base64;
 use hyper::header::{Authorization, Bearer, ContentType, Header};
 use r2d2::Pool;
-#[cfg(feature = "cache-redis")]
 use r2d2_redis::RedisConnectionManager;
-#[cfg(feature = "cache-redis")]
 use redis::{ConnectionAddr as RedisConnectionAddr, ConnectionInfo as RedisConnectionInfo};
 use rocket::config::{Environment, Limits};
 use rocket::http::Method;
@@ -107,12 +104,10 @@ impl Http {
         }
     }
 }
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Database {
-    #[cfg(feature = "postgresql")]
-    pub postgresql: PostgreSql,
-    #[cfg(feature = "mysql")]
-    pub mysql: MySql,
+    pub postgresql: Option<PostgreSql>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -131,7 +126,6 @@ impl PostgreSql {
     sudo gpasswd -a YOUR-NAME wheel
     journalctl -f -u postgresql
     */
-    #[cfg(feature = "postgresql")]
     pub fn url(&self) -> String {
         format!(
             "postgres://{user}:{password}@{host}:{port}/{name}",
@@ -145,33 +139,9 @@ impl PostgreSql {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct MySql {
-    pub host: String,
-    pub port: u16,
-    pub name: String,
-    pub user: String,
-    pub password: String,
-}
-
-impl MySql {
-    #[cfg(feature = "mysql")]
-    pub fn url(&self) -> String {
-        format!(
-            "mysql://{user}:{password}@{host}:{port}/{name}",
-            user = self.user,
-            password = self.password,
-            name = self.name,
-            host = self.host,
-            port = self.port
-        )
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Cache {
     pub namespace: String,
-    #[cfg(feature = "cache-redis")]
-    pub redis: Redis,
+    pub redis: Option<Redis>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -183,7 +153,6 @@ pub struct Redis {
 }
 
 impl Redis {
-    #[cfg(feature = "cache-redis")]
     pub fn pool(&self) -> Result<Pool<RedisConnectionManager>> {
         Ok(Pool::new(RedisConnectionManager::new(
             RedisConnectionInfo {
@@ -198,8 +167,7 @@ impl Redis {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Queue {
     pub name: String,
-    #[cfg(feature = "rabbitmq")]
-    pub rabbitmq: RabbitMQ,
+    pub rabbitmq: Option<RabbitMQ>,
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RabbitMQ {
@@ -212,18 +180,6 @@ pub struct RabbitMQ {
 }
 
 impl RabbitMQ {
-    // pub fn url(&self) -> String {
-    //     // amqp://username:password@host:port/virtual_host
-    //     format!(
-    //         "amqp://{user}:{password}@{host}:{port}/{virtual}",
-    //         user = self.user,
-    //         password = self.password,
-    //         virtual = self._virtual,
-    //         host = self.host,
-    //         port = self.port
-    //     )
-    // }
-    #[cfg(feature = "rabbitmq")]
     pub fn options(&self) -> AmqpOptions {
         AmqpOptions {
             host: self.host.clone(),

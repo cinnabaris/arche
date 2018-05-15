@@ -16,7 +16,6 @@ extern crate validator_derive;
 #[macro_use]
 extern crate juniper;
 
-#[cfg(feature = "rabbitmq")]
 extern crate amqp;
 extern crate base64;
 extern crate chrono;
@@ -39,28 +38,21 @@ extern crate maxminddb;
 extern crate md5;
 extern crate mime;
 extern crate r2d2;
-#[cfg(feature = "cache-redis")]
 extern crate r2d2_redis;
-#[cfg(feature = "cache-redis")]
 extern crate redis;
 extern crate regex;
 extern crate robots_txt;
 extern crate rocket_contrib;
 extern crate rocket_cors;
 extern crate rss;
-#[cfg(any(feature = "aws-s3", feature = "aws-sqs", feature = "aws-sqs"))]
 extern crate rusoto_core;
-#[cfg(feature = "aws-s3")]
 extern crate rusoto_s3;
-#[cfg(feature = "aws-sns")]
 extern crate rusoto_sns;
-#[cfg(feature = "aws-sqs")]
 extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
 extern crate sha2;
 extern crate sitemap;
-#[cfg(feature = "sodium")]
 extern crate sodiumoxide;
 extern crate stardict;
 extern crate sys_info;
@@ -72,20 +64,21 @@ extern crate validator;
 #[macro_use]
 pub mod macros;
 
-pub mod app;
+// pub mod app;
 pub mod cache;
 pub mod context;
 pub mod env;
-pub mod format;
-pub mod graphql;
+pub mod pagination;
+pub mod rfc;
+// pub mod graphql;
 pub mod i18n;
 pub mod jwt;
-pub mod migrations;
+// pub mod migrations;
 pub mod orm;
-pub mod plugins;
+// pub mod plugins;
 pub mod queue;
 pub mod result;
-pub mod router;
+// pub mod router;
 pub mod schema;
 pub mod security;
-pub mod settings;
+// pub mod settings;

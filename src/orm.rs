@@ -8,12 +8,9 @@ use rocket::{Outcome, Request, State};
 
 use super::result::Result;
 
-#[cfg(feature = "mysql")]
-pub type Connection = diesel::mysql::MysqlConnection;
 // Turn on the server log: log_statement = all
 // show log: journalctl -f -u postgresql
 // show database size: /l+
-#[cfg(feature = "postgresql")]
 pub type Connection = diesel::pg::PgConnection;
 
 #[derive(Clone)]

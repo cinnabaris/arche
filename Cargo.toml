@@ -9,17 +9,6 @@ license = "MIT"
 [profile.release]
 lto = true
 
-[features]
-default = ["postgresql", "cache-redis", "rabbitmq", "sodium"]
-cache-redis = ["redis", "r2d2_redis"]
-rabbitmq = ["amqp"]
-postgresql = ["diesel/postgres"]
-mysql = ["diesel/mysql"]
-sodium = ["sodiumoxide"]
-aws-s3 = ["rusoto_core", "rusoto_s3"]
-aws-sqs = ["rusoto_core", "rusoto_sqs"]
-aws-sns = ["rusoto_core", "rusoto_sns"]
-
 [dependencies]
 toml = "0.4"
 hyper = "0.11"
@@ -39,8 +28,8 @@ serde_derive = "1.0"
 serde_json = "1.0"
 serde-xml-rs = "0.2"
 r2d2 = "0.8"
-r2d2_redis = {version = "0.7", optional = true}
-redis = {version = "0.8", optional = true}
+r2d2_redis = "0.7"
+redis = "0.8"
 rust-ini = "0.10"
 hex = "0.3"
 regex = "0.2"
@@ -51,15 +40,15 @@ maxminddb = "0.9"
 lettre = "0.8"
 lettre_email = "0.8"
 mime = "0.3"
-rusoto_core = {version = "0.32", optional = true}
-rusoto_sqs = {version = "0.32", optional = true}
-rusoto_sns = {version = "0.32", optional = true}
-rusoto_s3 = {version = "0.32", optional = true}
+rusoto_core = "0.32"
+rusoto_sqs = "0.32"
+rusoto_sns = "0.32"
+rusoto_s3 = "0.32"
 validator = "0.6"
 validator_derive = "0.6"
 juniper = "0.9"
 juniper_rocket = "0.1"
-sodiumoxide = {version = "*", optional = true}
+sodiumoxide = "*"
 robots_txt = "0.5"
 sitemap = "0.2"
 rss = "1.5"
@@ -68,7 +57,7 @@ sys-info = "*"
 
 [dependencies.diesel]
 version = "1.2"
-features = ["chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "64-column-tables"]
+features = ["postgres", "mysql", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "64-column-tables"]
 
 [dependencies.chrono]
 version = "0.4"
@@ -77,7 +66,6 @@ features = ["serde"]
 [dependencies.amqp]
 version = "0.1"
 default-features = false
-optional = true
 
 [dependencies.rocket_contrib]
 version = "0.3"

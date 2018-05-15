@@ -1,11 +1,9 @@
-#[cfg(feature = "sodium")]
 use sodiumoxide::{self, crypto::secretbox, randombytes};
 
 use super::result::{Error, Result};
 
 //-----------------------------------------------------------------------------
 
-#[cfg(feature = "sodium")]
 pub fn random_bytes(l: usize) -> Vec<u8> {
     randombytes::randombytes(l)
 }
@@ -13,12 +11,11 @@ pub fn random_bytes(l: usize) -> Vec<u8> {
 //-----------------------------------------------------------------------------
 
 pub mod hash {
-    #[cfg(feature = "sodium")]
+
     use sodiumoxide::crypto::pwhash;
 
     use super::super::result::{Error, Result};
 
-    #[cfg(feature = "sodium")]
     pub fn sum(plain: &[u8]) -> Result<Vec<u8>> {
         match pwhash::pwhash(
             plain,
@@ -30,7 +27,6 @@ pub mod hash {
         }
     }
 
-    #[cfg(feature = "sodium")]
     pub fn verify(cipher: &[u8], plain: &[u8]) -> bool {
         match pwhash::HashedPassword::from_slice(cipher) {
             Some(cipher) => pwhash::pwhash_verify(&cipher, plain),
@@ -42,12 +38,10 @@ pub mod hash {
 //-----------------------------------------------------------------------------
 
 #[derive(Clone)]
-#[cfg(feature = "sodium")]
 pub struct Encryptor {
     key: secretbox::Key,
 }
 
-#[cfg(feature = "sodium")]
 impl Encryptor {
     pub fn new(key: &[u8]) -> Result<Self> {
         sodiumoxide::init();

@@ -32,41 +32,11 @@ table! {
 }
 
 table! {
-    cbeta_books (id) {
-        id -> Int4,
-        title -> Varchar,
-        identifier -> Varchar,
-        language -> Varchar,
-        creator -> Varchar,
-        publisher -> Nullable<Varchar>,
-        subject -> Nullable<Varchar>,
-        description -> Nullable<Text>,
-        published_at -> Nullable<Timestamp>,
-        version -> Varchar,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-    }
-}
-
-table! {
     cbeta_notes (id) {
         id -> Int4,
         user_id -> Int4,
-        book_id -> Int4,
+        book_id -> Varchar,
         body -> Text,
-        media_type -> Varchar,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-    }
-}
-
-table! {
-    cbeta_pages (id) {
-        id -> Int4,
-        book_id -> Int4,
-        name -> Varchar,
-        href -> Varchar,
-        body -> Nullable<Bytea>,
         media_type -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -561,9 +531,7 @@ table! {
 allow_tables_to_appear_in_same_query!(
     attachments,
     cards,
-    cbeta_books,
     cbeta_notes,
-    cbeta_pages,
     donate_payments,
     donate_projects,
     forum_categories,
