@@ -8,6 +8,7 @@ cargo +nightly install --force clippy
 cargo install diesel_cli --force --no-default-features --features postgres,mysql
 cargo update
 cargo build
+cargo check
 cargo doc
 cargo build --release
 

@@ -26,7 +26,6 @@ pub trait Consumer: Send + Sync {
 
 //-----------------------------------------------------------------------------
 
-#[derive(Clone)]
 pub struct Worker {
     ctx: Arc<Context>,
     consumers: Arc<HashMap<String, Box<Consumer>>>,
@@ -95,7 +94,7 @@ pub trait Provider {
         priority: u8,
         payload: &[u8],
     ) -> Result<()>;
-    fn consume(&self, name: String, worker: Worker) -> Result<()>;
+    fn consume(&self, name: String, worker: Arc<Worker>) -> Result<()>;
 }
 
 //-----------------------------------------------------------------------------
@@ -134,8 +133,6 @@ impl RabbitMQ {
         F: Fn(&mut amqp::Channel) -> Result<()>,
     {
         let cfg = Arc::clone(&self.cfg);
-
-        // let s1 = amqp::Session::new(*cfg)?;
 
         match Arc::try_unwrap(cfg) {
             Ok(cfg) => {
@@ -193,21 +190,27 @@ impl Provider for RabbitMQ {
         })
     }
 
-    fn consume(&self, name: String, worker: Worker) -> Result<()> {
+    fn consume(&self, name: String, worker: Arc<Worker>) -> Result<()> {
         self.open(|ch| {
-            let it = ch.basic_consume(
-                worker.clone(),
-                self.name.clone(),
-                name.clone(), // consumer_tag
-                false,        // no_local
-                false,        // no_ack
-                false,        // exclusive
-                false,        // nowait
-                amqp::Table::new(),
-            )?;
-            log::info!("Starting consumer {:?}", it);
-            ch.start_consuming();
-            Ok(())
+            let worker = Arc::clone(&worker);
+            match Arc::try_unwrap(worker) {
+                Ok(worker) => {
+                    let it = ch.basic_consume(
+                        worker,
+                        self.name.clone(),
+                        name.clone(), // consumer_tag
+                        false,        // no_local
+                        false,        // no_ack
+                        false,        // exclusive
+                        false,        // nowait
+                        amqp::Table::new(),
+                    )?;
+                    log::info!("Starting consumer {:?}", it);
+                    ch.start_consuming();
+                    Ok(())
+                }
+                Err(_) => Err(Error::WithDescription(s!("can't get worker"))),
+            }
         })
     }
 }
