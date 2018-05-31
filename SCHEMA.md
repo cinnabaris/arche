@@ -107,9 +107,12 @@ bundle exec rake spree_sample:load
 bundle exec rails s # http://localhost:3000
 ```
 
--   export tables
+## export database tables
 
 ```bash
-pg_dump -O -x -s -U postgres discourse_development > discourse.sql
-pg_dump -O -x -s -U postgres solidus_development > solidus.sql
+pg_dump -O -x -s -N ar_internal_metadata -N schema_migrations -U postgres discourse_development > discourse.sql
+pg_dump -O -x -s -N ar_internal_metadata -N schema_migrations -U postgres solidus_development > solidus.sql
 ```
+
+-   remove public tablespace
+-   remove table: ar_internal_metadata/schema_migrations
