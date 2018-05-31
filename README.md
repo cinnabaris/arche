@@ -2,7 +2,8 @@
 
 A complete open source e-commerce solution built with Rust and React(STILL IN DEVELOPMENT).
 
-Inspired by [Spree](https://github.com/spree/spree) and [NodeBB](https://github.com/NodeBB/NodeBB).
+Inspired by [Solidus](https://github.com/solidusio/solidus) and [Discourse
+](https://github.com/discourse/discourse).
 
 ## Install
 

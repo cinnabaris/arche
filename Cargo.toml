@@ -60,7 +60,7 @@ features=["query_encoding"]
 
 [dependencies.diesel]
 version = "~1.2"
-features = ["postgres", "mysql", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "64-column-tables"]
+features = ["postgres", "mysql", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
 
 [dependencies.chrono]
 version = "0.4"

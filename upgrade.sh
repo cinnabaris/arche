@@ -5,7 +5,7 @@ rustup component add rls-preview rust-analysis rust-src
 cargo install --force racer
 cargo install --force rustfmt-nightly
 cargo +nightly install --force clippy
-cargo install diesel_cli --force --no-default-features --features postgres,mysql
+cargo install diesel_cli --force
 cargo update
 cargo build
 cargo check
