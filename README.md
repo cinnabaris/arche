@@ -7,21 +7,22 @@ Inspired by [Solidus](https://github.com/solidusio/solidus) and [Discourse
 
 ## Install
 
+-   install rustup
+
+```bash
+curl https://sh.rustup.rs -sSf | sh
+```
+
 -   add to your .zshrc
 
 ```bash
-export PATH="$HOME/.cargo/bin:$PATH"
-export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+source $HOME/.cargo/env
 ```
 
 -   install rust
 
 ```bash
-curl https://sh.rustup.rs -sSf | sh
 rustup default nightly
-cargo install rustfmt-nightly
-cargo install racer
-racer complete std::io::B
 rustup component add rls-preview rust-analysis rust-src
 ```
 
@@ -55,6 +56,16 @@ diesel database reset
 cargo run
 python -m unittest -v
 ```
+
+## Editor
+
+### atom plugins
+
+-   autosave: enable
+-   platformio-ide-terminal
+-   file-icons
+-   atom-beautify: enable beautify on save
+-   ide-rust: disable toolchain update checking
 
 ## Notes
 
