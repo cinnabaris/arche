@@ -10,7 +10,7 @@ CREATE TABLE library_books (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_library_books_uid ON library_books (uid);
+CREATE UNIQUE INDEX uk_library_books_uid ON library_books (uid);
 
 CREATE INDEX idx_library_books_title ON library_books (title);
 

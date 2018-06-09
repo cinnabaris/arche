@@ -13,7 +13,7 @@ CREATE TABLE cbeta_books (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_cbeta_books_identifier ON cbeta_books (identifier);
+CREATE UNIQUE INDEX uk_cbeta_books_identifier ON cbeta_books (identifier);
 CREATE INDEX idx_cbeta_books_creator ON cbeta_books (creator);
 CREATE INDEX idx_cbeta_books_version ON cbeta_books (version);
 CREATE INDEX idx_cbeta_books_language ON cbeta_books (language);
@@ -31,7 +31,7 @@ CREATE TABLE cbeta_pages (
 
 CREATE INDEX idx_cbeta_pages_media_type ON cbeta_pages (media_type);
 CREATE INDEX idx_cbeta_pages_href_book ON cbeta_pages (href, book_id);
-CREATE UNIQUE INDEX idx_cbeta_pages_name_book ON cbeta_pages (name, book_id);
+CREATE UNIQUE INDEX uk_cbeta_pages_name_book ON cbeta_pages (name, book_id);
 
 CREATE TABLE cbeta_notes (
   id SERIAL PRIMARY KEY,

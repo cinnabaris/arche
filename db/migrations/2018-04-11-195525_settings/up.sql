@@ -7,4 +7,4 @@ CREATE TABLE settings (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_settings_key ON settings (KEY);
+CREATE UNIQUE INDEX uk_settings_key ON settings (KEY);

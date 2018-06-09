@@ -14,7 +14,7 @@ CREATE TABLE survey_forms (
 
 CREATE INDEX idx_survey_forms_type ON survey_forms (type);
 
-CREATE UNIQUE INDEX idx_survey_forms_uid ON survey_forms (uid);
+CREATE UNIQUE INDEX uk_survey_forms_uid ON survey_forms (uid);
 
 CREATE TABLE survey_fields (
   id SERIAL PRIMARY KEY,
@@ -30,7 +30,7 @@ CREATE TABLE survey_fields (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_survey_fields_name_form_id ON survey_fields (name, form_id);
+CREATE UNIQUE INDEX uk_survey_fields_name_form_id ON survey_fields (name, form_id);
 
 CREATE TABLE survey_records (
   id SERIAL PRIMARY KEY,

@@ -115,3 +115,4 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [Ant Design Pro](https://pro.ant.design/docs/getting-started)
 -   [Bootstrap](http://getbootstrap.com/)
 -   [GraphQL](https://graphql.org/learn/)
+-   [Alibaba Java Coding Guidelines](https://github.com/alibaba/p3c)

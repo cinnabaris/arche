@@ -2,31 +2,13 @@ CREATE TABLE votes (
   id SERIAL PRIMARY KEY,
   resource_type VARCHAR(255) NOT NULL,
   resource_id INT NOT NULL,
-  point INT NOT NULL DEFAULT 0,
+  "point" INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE NOT NULL);
 
-CREATE UNIQUE INDEX idx_votes_resources ON votes (resource_type, resource_id);
+CREATE UNIQUE INDEX uk_votes_resources ON votes (resource_type, resource_id);
 
 CREATE INDEX idx_votes_resource_type ON votes (resource_type);
 
-CREATE TABLE attachments (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  url VARCHAR(255) NOT NULL,
-  length INT NOT NULL,
-  media_type VARCHAR(32) NOT NULL,
-  resource_type VARCHAR(255) NOT NULL,
-  resource_id INT NOT NULL,
-  user_id INT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE NOT NULL);
-
-CREATE UNIQUE INDEX idx_attachments_url ON attachments (url);
-
-CREATE INDEX idx_attachments_title ON attachments (title);
-
-CREATE INDEX idx_attachments_resource_type ON attachments (resource_type);
-
-CREATE INDEX idx_attachments_media_type ON attachments (media_type);
 
 CREATE TABLE leave_words (
   id SERIAL PRIMARY KEY,

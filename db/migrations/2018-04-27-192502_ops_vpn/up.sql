@@ -12,7 +12,7 @@ CREATE TABLE vpn_users (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_vpn_users_email ON vpn_users (email);
+CREATE UNIQUE INDEX uk_vpn_users_email ON vpn_users (email);
 
 CREATE INDEX idx_vpn_users_full_name ON vpn_users (full_name);
 
@@ -25,6 +25,6 @@ CREATE TABLE vpn_logs (
   remote_port SMALLINT,
   start_up TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   shut_down TIMESTAMP WITHOUT TIME ZONE,
-  received FLOAT NOT NULL DEFAULT '0.0',
-  send FLOAT NOT NULL DEFAULT '0.0'
+  received DECIMAL NOT NULL DEFAULT '0.0',
+  send DECIMAL NOT NULL DEFAULT '0.0'
 );

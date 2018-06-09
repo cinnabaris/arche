@@ -1,0 +1,9 @@
+DROP TABLE attachments;
+DROP TABLE permalinks;
+DROP TABLE notifications;
+DROP TABLE topics_badges;
+DROP TABLE categories_badges;
+DROP TABLE badges;
+DROP TABLE topics;
+DROP TABLE posts;
+DROP TABLE categories;

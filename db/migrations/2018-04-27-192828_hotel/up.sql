@@ -11,7 +11,7 @@ CREATE TABLE hotel_rooms (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_hotel_rooms_uid ON hotel_rooms (uid);
+CREATE UNIQUE INDEX uk_hotel_rooms_uid ON hotel_rooms (uid);
 
 CREATE INDEX idx_hotel_rooms_loc ON hotel_rooms (loc);
 

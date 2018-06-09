@@ -5,7 +5,7 @@ CREATE TABLE mail_domains (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_mail_domains_name ON mail_domains (name);
+CREATE UNIQUE INDEX uk_mail_domains_name ON mail_domains (name);
 
 CREATE TABLE mail_users (
   id SERIAL PRIMARY KEY,
@@ -19,7 +19,7 @@ CREATE TABLE mail_users (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_mail_users_email ON mail_users (email);
+CREATE UNIQUE INDEX uk_mail_users_email ON mail_users (email);
 
 CREATE INDEX idx_mail_users_full_name ON mail_users (full_name);
 
@@ -32,6 +32,6 @@ CREATE TABLE mail_aliases (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_mail_aliases_source ON mail_aliases (source);
+CREATE UNIQUE INDEX uk_mail_aliases_source ON mail_aliases (source);
 
 CREATE INDEX idx_mail_aliases_destination ON mail_aliases (destination);

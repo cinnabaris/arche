@@ -10,7 +10,7 @@ CREATE TABLE members (
   updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_members_email ON members (email);
+CREATE UNIQUE INDEX uk_members_email ON members (email);
 
 CREATE INDEX idx_members_name ON members (name);
 
