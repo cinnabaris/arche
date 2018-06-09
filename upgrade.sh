@@ -1,10 +1,12 @@
 #!/bin/sh
 
+set -e
+
 rustup update
 rustup component add rls-preview rust-analysis rust-src
 cargo install --force rustfmt-nightly
 cargo install --force clippy
-cargo install diesel_cli --force
+cargo install --force diesel_cli
 cargo update
 cargo build
 cargo check

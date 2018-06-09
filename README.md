@@ -19,35 +19,19 @@ curl https://sh.rustup.rs -sSf | sh
 source $HOME/.cargo/env
 ```
 
--   install rust
+-   then re-login at first
 
-```bash
-rustup default nightly
-rustup component add rls-preview rust-analysis rust-src
-```
-
-## Usage
-
--   get source code
+-   install rust-nightly
 
 ```bash
 git clone https://github.com/cinnabaris/arche.git
 cd arche
-cargo install diesel_cli --no-default-features --features postgres,mysql
-```
-
--   using postgresql(default)
-
-```bash
+rustup override set nightly
 make clean
 make
 ```
 
--   using mysql(test on Percona Server for MySQL)
-
-```bash
-cargo build  --no-default-features  --features "mysql"
-```
+## Usage
 
 -   testing
 
