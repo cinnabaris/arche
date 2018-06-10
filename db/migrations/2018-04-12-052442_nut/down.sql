@@ -6,6 +6,6 @@ DROP TABLE links;
 
 DROP TABLE leave_words;
 
-DROP TABLE attachments;
-
 DROP TABLE votes;
+
+DROP TABLE attachments;

@@ -1,9 +1,8 @@
-DROP TABLE attachments;
-DROP TABLE permalinks;
-DROP TABLE notifications;
-DROP TABLE topics_badges;
-DROP TABLE categories_badges;
-DROP TABLE badges;
-DROP TABLE topics;
-DROP TABLE posts;
-DROP TABLE categories;
+DROP TABLE forum_permalinks;
+DROP TABLE forum_notifications;
+DROP TABLE forum_topics_badges;
+DROP TABLE forum_categories_badges;
+DROP TABLE forum_badges;
+DROP TABLE forum_topics;
+DROP TABLE forum_posts;
+DROP TABLE forum_categories;

@@ -54,3 +54,18 @@ CREATE TABLE friend_links (
   logo VARCHAR(255) NOT NULL,
   sort INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(), updated_at TIMESTAMP WITH TIME ZONE NOT NULL);
+
+  CREATE TABLE attachments (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      name varchar(255) NOT NULL,
+      size bigint NOT NULL,
+      type varchar(64) NOT NULL,
+      url varchar(255) NOT NULL,
+      created_at timestamp without time zone NOT NULL,
+      updated_at timestamp without time zone NOT NULL
+  );
+
+  CREATE UNIQUE INDEX uk_attachments_url ON attachments(url);
+  CREATE INDEX idx_attachments_name ON attachments(name);
+  CREATE INDEX idx_attachments_type ON attachments(type);

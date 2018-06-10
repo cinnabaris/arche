@@ -130,7 +130,7 @@ CREATE TABLE mall_cartons (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
-CREATE UNIQUE INDEX idx_mall_cartons_stock_location on mall_cartons(stock, location);
+CREATE UNIQUE INDEX idx_mall_cartons_stock_location on mall_cartons(stock_id, location);
 
 CREATE TABLE mall_inventory_units (
     id SERIAL PRIMARY KEY,
@@ -173,7 +173,7 @@ CREATE TABLE mall_line_items (
 CREATE TABLE mall_log_entries (
     id SERIAL PRIMARY KEY,
     resource_type varchar(255) NOT NULL,
-    resource_id integer(255) NOT NULL,
+    resource_id integer NOT NULL,
     details text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -191,7 +191,7 @@ CREATE TABLE mall_option_type_prototypes (
     updated_at timestamp without time zone NOT NULL
 );
 
-CREATE UNIQUE INDEX uk_mall_option_type_prototypes on mall_option_type_prototypes(property_id, option_type_id);
+CREATE UNIQUE INDEX uk_mall_option_type_prototypes on mall_option_type_prototypes(prototype_id, option_type_id);
 
 
 CREATE TABLE mall_option_types (
@@ -373,16 +373,16 @@ CREATE TABLE mall_product_properties (
     value varchar(1024) NOT NULL,
     product_id integer NOT NULL,
     property_id integer NOT NULL,
-    "position" integer DEFAULT 0,
+    "position" integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
-CREATE UNIQUE INDEX uk_mall_product_properties ON(product_id, property_id);
+CREATE UNIQUE INDEX uk_mall_product_properties ON mall_product_properties(product_id, property_id);
 
 
 CREATE TABLE mall_products (
     id SERIAL PRIMARY KEY,
-    name NOT NULL,
+    name varchar(255) NOT NULL,
     description text NOT NULL,
     available_on timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
@@ -472,7 +472,7 @@ CREATE TABLE mall_promotion_codes (
     updated_at timestamp without time zone NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_mall_promotion_codes ON mall_promotion_codes(product_id, value);
+CREATE UNIQUE INDEX idx_mall_promotion_codes ON mall_promotion_codes(promotion_id, value);
 
 
 
@@ -629,7 +629,7 @@ CREATE TABLE mall_reimbursements (
     updated_at timestamp without time zone NOT NULL
 );
 
-CREATE UNIQUE INDEX uk_mall_reimbursements on mall_reimbursements("number");
+CREATE UNIQUE INDEX uk_mall_reimbursements_number on mall_reimbursements("number");
 CREATE UNIQUE INDEX uk_mall_reimbursements on mall_reimbursements(customer_return_id, order_id);
 
 CREATE TABLE mall_relation_types (
@@ -734,7 +734,7 @@ CREATE TABLE mall_shipping_method_stock_locations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
-create unique index uk_mall_shipping_method_stock_locations on (shipping_method_id,stock_location_id);
+create unique index uk_mall_shipping_method_stock_locations on mall_shipping_method_stock_locations(shipping_method_id,stock_location_id);
 
 
 CREATE TABLE mall_shipping_method_zones (
@@ -825,7 +825,7 @@ CREATE TABLE mall_stock_items (
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone NOT NULL
 );
-create unique index uk_mall_stock_items(variant_id,stock_location_id);
+create unique index uk_mall_stock_items on mall_stock_items(variant_id, stock_location_id);
 
 
 CREATE TABLE mall_stock_locations (
@@ -868,7 +868,7 @@ CREATE TABLE mall_store_credit_events (
     authorization_code varchar NOT NULL,
     deleted_at timestamp without time zone NOT NULL,
     originator_type varchar(255) NOT NULL,
-    originator_id integer(255) NOT NULL,
+    originator_id integer NOT NULL,
     update_reason_id integer NOT NULL,
     amount_remaining numeric(8,2) NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -941,7 +941,7 @@ CREATE TABLE mall_tax_rates (
     starts_at timestamp without time zone NOT NULL,
     expires_at timestamp without time zone NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 CREATE INDEX idx_mall_tax_rates_name on mall_tax_rates(name);
 
