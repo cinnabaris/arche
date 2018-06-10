@@ -53,6 +53,10 @@ sitemap = "0.2"
 rss = "1.5"
 frank_jwt = "*"
 sys-info = "*"
+csv = "1"
+byteorder = "1"
+tokio-core = "0.1"
+futures = "0.2"
 
 [dependencies.url]
 version = "1.7"

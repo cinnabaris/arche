@@ -1,6 +1,6 @@
 use std::str;
 
-use futures::{Future, Stream};
+use futures::future::Future;
 use hyper::header::{Authorization, Bearer, ContentLength, ContentType};
 use hyper::{Body, Chunk, Client, Method, Request, StatusCode};
 use serde::ser::Serialize;

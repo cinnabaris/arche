@@ -5,6 +5,7 @@ use amqp;
 use base64;
 use chrono;
 use clap;
+use csv;
 use diesel;
 use epub;
 use frank_jwt;
@@ -52,6 +53,7 @@ pub enum Error {
     Amqp(amqp::AMQPError),
     Base64Decode(base64::DecodeError),
     StringFromUtf8(string::FromUtf8Error),
+    StringFromUtf16(string::FromUtf16Error),
     SerdeXml(serde_xml_rs::Error),
     Log4rs(log4rs::Error),
     UrlParse(url::ParseError),
@@ -68,6 +70,7 @@ pub enum Error {
     ChronoParse(chrono::ParseError),
     Rss(rss::Error),
     PathStripPrefixError(path::StripPrefixError),
+    Csv(csv::Error),
     WithDescription(String),
 }
 
@@ -92,6 +95,7 @@ impl fmt::Display for Error {
             Error::Amqp(ref err) => err.fmt(f),
             Error::Base64Decode(ref err) => err.fmt(f),
             Error::StringFromUtf8(ref err) => err.fmt(f),
+            Error::StringFromUtf16(ref err) => err.fmt(f),
             Error::SerdeXml(ref err) => err.fmt(f),
             Error::Log4rs(ref err) => err.fmt(f),
             Error::UrlParse(ref err) => err.fmt(f),
@@ -109,6 +113,7 @@ impl fmt::Display for Error {
             Error::ChronoParse(ref err) => err.fmt(f),
             Error::Rss(ref err) => err.fmt(f),
             Error::PathStripPrefixError(ref err) => err.fmt(f),
+            Error::Csv(ref err) => err.fmt(f),
             Error::WithDescription(ref desc) => write!(f, "{}", desc),
         }
     }
@@ -135,6 +140,7 @@ impl StdError for Error {
             Error::Amqp(ref err) => err.description(),
             Error::Base64Decode(ref err) => err.description(),
             Error::StringFromUtf8(ref err) => err.description(),
+            Error::StringFromUtf16(ref err) => err.description(),
             Error::SerdeXml(ref err) => err.description(),
             Error::Log4rs(ref err) => err.description(),
             Error::UrlParse(ref err) => err.description(),
@@ -152,6 +158,7 @@ impl StdError for Error {
             Error::ChronoParse(ref err) => err.description(),
             Error::Rss(ref err) => err.description(),
             Error::PathStripPrefixError(ref err) => err.description(),
+            Error::Csv(ref err) => err.description(),
             Error::WithDescription(ref desc) => &desc,
         }
     }
@@ -175,6 +182,7 @@ impl StdError for Error {
             Error::Amqp(ref err) => Some(err),
             Error::Base64Decode(ref err) => Some(err),
             Error::StringFromUtf8(ref err) => Some(err),
+            Error::StringFromUtf16(ref err) => Some(err),
             Error::SerdeXml(ref err) => Some(err),
             Error::Log4rs(ref err) => Some(err),
             Error::UrlParse(ref err) => Some(err),
@@ -191,7 +199,10 @@ impl StdError for Error {
             Error::Validation(ref err) => Some(err),
             Error::ChronoParse(ref err) => Some(err),
             Error::PathStripPrefixError(ref err) => Some(err),
-            _ => None,
+            Error::Csv(ref err) => Some(err),
+            Error::Rss(ref err) => Some(err),
+            Error::FrankJwt(ref _err) => None,
+            Error::WithDescription(ref _err) => None,
         }
     }
 }
@@ -313,6 +324,12 @@ impl From<string::FromUtf8Error> for Error {
     }
 }
 
+impl From<string::FromUtf16Error> for Error {
+    fn from(err: string::FromUtf16Error) -> Error {
+        Error::StringFromUtf16(err)
+    }
+}
+
 impl From<serde_xml_rs::Error> for Error {
     fn from(err: serde_xml_rs::Error) -> Error {
         Error::SerdeXml(err)
@@ -430,5 +447,11 @@ impl From<rss::Error> for Error {
 impl From<path::StripPrefixError> for Error {
     fn from(err: path::StripPrefixError) -> Error {
         Error::PathStripPrefixError(err)
+    }
+}
+
+impl From<csv::Error> for Error {
+    fn from(err: csv::Error) -> Error {
+        Error::Csv(err)
     }
 }
