@@ -1,9 +1,13 @@
+pub mod nav;
+
 use std::{fs::OpenOptions, io::BufReader, path::PathBuf};
 
 use csv;
 
 use super::super::super::result::{Error, Result};
 use super::{read_utf16_file, trim};
+
+//-----------------------------------------------------------------------------
 
 #[derive(GraphQLObject, Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -48,6 +52,8 @@ impl Series {
     }
 }
 
+//-----------------------------------------------------------------------------
+
 #[derive(GraphQLObject, Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Spine {
@@ -76,6 +82,8 @@ impl Spine {
         Ok(items)
     }
 }
+
+//-----------------------------------------------------------------------------
 
 // https://www.cbeta.org/format/linehead.php
 
@@ -123,50 +131,4 @@ impl Catalog {
     }
 }
 
-#[derive(GraphQLObject, Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct BookNav {}
-
-impl BookNav {
-    pub fn load(root: &PathBuf) -> Result<Vec<Self>> {
-        let fd = OpenOptions::new()
-            .read(true)
-            .open(&root.join("book_nav.xhtml"))?;
-
-        let mut items = Vec::new();
-        // TODO
-        Ok(items)
-    }
-}
-
-#[derive(GraphQLObject, Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct CatalogNav {}
-
-impl CatalogNav {
-    pub fn load(root: &PathBuf) -> Result<Vec<Self>> {
-        let fd = OpenOptions::new()
-            .read(true)
-            .open(&root.join("bulei_nav.xhtml"))?;
-
-        let mut items = Vec::new();
-        // TODO
-        Ok(items)
-    }
-}
-
-#[derive(GraphQLObject, Serialize, Deserialize, Debug, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Book {}
-
-impl Book {
-    pub fn load(root: &PathBuf, href: &String) -> Result<Vec<Self>> {
-        let fd = OpenOptions::new()
-            .read(true)
-            .open(&root.join("XML").join(href))?;
-
-        let mut items = Vec::new();
-        // TODO
-        Ok(items)
-    }
-}
+//-----------------------------------------------------------------------------
