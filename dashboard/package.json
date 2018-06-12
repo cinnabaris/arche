@@ -1,8 +1,10 @@
 {
-  "name": "dashboard",
+  "name": "arche",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/my",
   "dependencies": {
+    "ant-design-pro": "^2.0.0-beta.1",
     "antd": "^3.6.2",
     "emoji-mart": "^2.6.1",
     "graphql-request": "^1.6.0",
