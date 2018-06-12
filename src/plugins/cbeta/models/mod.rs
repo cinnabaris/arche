@@ -1,4 +1,5 @@
 pub mod nav;
+pub mod tei;
 
 use std::{fs::OpenOptions, io::BufReader, path::PathBuf};
 

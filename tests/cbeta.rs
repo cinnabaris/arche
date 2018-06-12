@@ -7,8 +7,14 @@ use std::path::{Path, PathBuf};
 fn nav() {
     let root = root();
     for it in vec!["book_nav.xhtml", "bulei_nav.xhtml", "toc/A/A1066.xml"] {
-        let nav = arche::plugins::cbeta::models::nav::Html::load(&root.join(it)).unwrap();
-        println!("=== nav {} ===", nav.head.title.text);
+        let it = arche::plugins::cbeta::models::nav::Html::load(&root.join(it)).unwrap();
+        println!("=== nav {} ===", it.head.title.text);
+        // println!("{:?}", nav);
+    }
+
+    for it in vec!["XML/Y/Y01/Y01n0001_001.xml"] {
+        let it = arche::plugins::cbeta::models::tei::Tei::load(&root.join(it)).unwrap();
+        println!("=== tei {} ===", it.id);
         // println!("{:?}", nav);
     }
 }
