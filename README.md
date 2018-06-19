@@ -52,6 +52,12 @@ python -m unittest -v
 -   ide-rust: disable toolchain update checking
 -   language-babel:
 
+### vscode plugins
+
+-   vscode-icons
+-   markdownlint
+-   rust(rls)
+
 ## Notes
 
 -   Generate a random key
@@ -117,3 +123,4 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [Bootstrap](http://getbootstrap.com/)
 -   [GraphQL](https://graphql.org/learn/)
 -   [Alibaba Java Coding Guidelines](https://github.com/alibaba/p3c)
+-   [An emoji guide for your commit messages](https://gitmoji.carloscuesta.me/)

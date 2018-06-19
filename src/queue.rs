@@ -2,8 +2,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub type Queue = RabbitMQ;
-
 use amqp::{self, Basic as AmqpBasic};
 use log;
 use serde::ser::Serialize;
@@ -86,7 +84,7 @@ impl amqp::Consumer for Worker {
 
 //-----------------------------------------------------------------------------
 
-pub trait Provider {
+pub trait Queue: Send + Sync {
     fn publish(
         &self,
         _type: &String,
@@ -99,7 +97,7 @@ pub trait Provider {
 
 //-----------------------------------------------------------------------------
 
-pub fn put<T: Serialize, Q: Provider>(
+pub fn put<T: Serialize, Q: Queue>(
     qu: &Q,
     _type: &String,
     content_type: &String,
@@ -160,7 +158,7 @@ impl RabbitMQ {
     }
 }
 
-impl Provider for RabbitMQ {
+impl Queue for RabbitMQ {
     fn publish(
         &self,
         _type: &String,
