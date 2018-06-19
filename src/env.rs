@@ -1,16 +1,14 @@
 use std::default::Default;
 
-use amqp::Options as AmqpOptions;
 use base64;
 use hyper::header::{Authorization, Bearer, ContentType, Header};
-use r2d2::Pool;
-use r2d2_redis::RedisConnectionManager;
-use redis::{ConnectionAddr as RedisConnectionAddr, ConnectionInfo as RedisConnectionInfo};
 use rocket::config::{Environment, Limits};
 use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 
-use super::result::{Error, Result};
+use super::{
+    cache, queue, result::{Error, Result},
+};
 
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 pub const NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -35,13 +33,17 @@ pub struct Config {
     #[serde(rename = "secretkey")]
     pub secret_key: String, // 32-bits base64 encode string
     pub workers: u16,
-    pub database: Database,
+    #[cfg(feature = "postgresql")]
+    pub database: dao::postgresql::Config,
+    #[cfg(feature = "mysql")]
+    pub database: dao::mysql::Config,
     pub http: Http,
     pub cache: Cache,
     pub queue: Queue,
     pub storage: Storage,
     pub elasticsearch: ElasticSearch,
-    pub aws: Option<Aws>,
+    #[cfg(any(feature = "mq-aws", feature = "st-aws"))]
+    pub aws: Aws,
 }
 
 impl Config {
@@ -106,92 +108,20 @@ impl Http {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Database {
-    pub postgresql: Option<PostgreSql>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct PostgreSql {
-    pub host: String,
-    pub port: u16,
-    pub name: String,
-    pub user: String,
-    pub password: String,
-}
-
-impl PostgreSql {
-    /*
-    logging:
-    edit "/var/lib/postgres/data/postgresql.conf", change "log_statement = 'all'"
-    sudo gpasswd -a YOUR-NAME wheel
-    journalctl -f -u postgresql
-    */
-    pub fn url(&self) -> String {
-        format!(
-            "postgres://{user}:{password}@{host}:{port}/{name}",
-            user = self.user,
-            password = self.password,
-            name = self.name,
-            host = self.host,
-            port = self.port,
-        )
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Cache {
     pub namespace: String,
-    pub redis: Option<Redis>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Redis {
-    pub host: String,
-    pub port: u16,
-    pub db: i64,
-    pub password: Option<String>,
-}
-
-impl Redis {
-    pub fn pool(&self) -> Result<Pool<RedisConnectionManager>> {
-        Ok(Pool::new(RedisConnectionManager::new(
-            RedisConnectionInfo {
-                addr: Box::new(RedisConnectionAddr::Tcp(self.host.clone(), self.port)),
-                db: self.db,
-                passwd: self.password.clone(),
-            },
-        )?)?)
-    }
+    #[cfg(feature = "ch-redis")]
+    pub redis: cache::redis::Config,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Queue {
     pub name: String,
-    pub rabbitmq: Option<RabbitMQ>,
-}
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct RabbitMQ {
-    pub host: String,
-    pub port: u16,
-    pub user: String,
-    pub password: String,
-    #[serde(rename = "virtual")]
-    pub _virtual: String,
+    #[cfg(feature = "mq-rabbit")]
+    pub rabbitmq: queue::rabbitmq::Config,
 }
 
-impl RabbitMQ {
-    pub fn options(&self) -> AmqpOptions {
-        AmqpOptions {
-            host: self.host.clone(),
-            port: self.port,
-            login: self.user.clone(),
-            password: self.password.clone(),
-            vhost: self._virtual.clone(),
-            ..Default::default()
-        }
-    }
-}
-
+#[cfg(any(feature = "mq-aws", feature = "st-aws"))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Aws {
     #[serde(rename = "accesskeyid")]
@@ -207,18 +137,21 @@ pub struct ElasticSearch {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Storage {
-    pub local: Option<Local>,
-    pub s3: Option<S3>,
+    #[cfg(feature = "st-nfs")]
+    pub nfs: Nfs,
+    #[cfg(feature = "st-s3")]
+    pub s3: S3,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Local {
+pub struct Nfs {
     #[serde(rename = "endpoint")]
     pub end_point: String,
     #[serde(rename = "localroot")]
     pub local_root: String,
 }
 
+#[cfg(feature = "st-s3")]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct S3 {
     pub bucket: String,

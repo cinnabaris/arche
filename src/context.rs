@@ -1,14 +1,18 @@
 use frank_jwt::Algorithm;
 
 use super::{
-    cache::{self, Cache}, env, jwt::Jwt, orm::{Pool as DbPool, PooledConnection as Db},
-    queue::{self, Queue}, result::{Error, Result}, security::Encryptor,
+    dao, env, jwt::Jwt, result::{Error, Result}, security::Encryptor,
 };
+
+#[cfg(feature = "ch-redis")]
+use super::cache::redis::Cache;
+#[cfg(feature = "mq-rabbit")]
+use super::queue::rabbitmq::Queue;
 
 pub struct Context {
     db: DbPool,
-    pub cache: Box<Cache>,
-    pub queue: Box<Queue>,
+    pub cache: Cache,
+    pub queue: Queue,
     pub encryptor: Encryptor,
     pub jwt: Jwt,
     pub config: env::Config,
@@ -37,23 +41,12 @@ impl Context {
         Err(Error::WithDescription(s!("can't open database")))
     }
 
-    fn open_cache(cfg: &env::Cache) -> Result<Box<Cache>> {
-        if let Some(ref re) = cfg.redis {
-            return Ok(Box::new(cache::Redis::new(
-                cfg.namespace.clone(),
-                re.pool()?,
-            )));
-        }
-        Err(Error::WithDescription(s!("can't open cache")))
+    #[cfg(feature = "ch-redis")]
+    fn open_cache(cfg: &env::Cache) -> Result<Cache> {
+        Ok(Cache::new(cfg.namespace.clone(), cfg.redis.pool()?))
     }
-
-    fn open_queue(cfg: &env::Queue) -> Result<Box<Queue>> {
-        if let Some(ref mq) = cfg.rabbitmq {
-            return Ok(Box::new(queue::RabbitMQ::new(
-                cfg.name.clone(),
-                mq.options(),
-            )));
-        }
-        Err(Error::WithDescription(s!("can't open messing queue")))
+    #[cfg(feature = "mq-rabbit")]
+    fn open_queue(cfg: &env::Queue) -> Result<Queue> {
+        Ok(Queue::new(cfg.name.clone(), cfg.rabbitmq.options()))
     }
 }

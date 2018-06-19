@@ -1,4 +1,7 @@
-#![feature(plugin, use_extern_macros, custom_derive, custom_attribute, proc_macro_path_invoc)]
+#![feature(
+    plugin, use_extern_macros, custom_derive, custom_attribute, proc_macro_path_invoc,
+    extern_prelude
+)]
 #![recursion_limit = "512"] // https://github.com/diesel-rs/diesel/issues/1127
 #![plugin(rocket_codegen)]
 extern crate rocket;
@@ -16,6 +19,7 @@ extern crate validator_derive;
 #[macro_use]
 extern crate juniper;
 
+#[cfg(feature = "mq-rabbit")]
 extern crate amqp;
 extern crate base64;
 extern crate byteorder;
@@ -40,16 +44,22 @@ extern crate maxminddb;
 extern crate md5;
 extern crate mime;
 extern crate r2d2;
+#[cfg(feature = "ch-redis")]
 extern crate r2d2_redis;
+#[cfg(feature = "ch-redis")]
 extern crate redis;
 extern crate regex;
 extern crate robots_txt;
 extern crate rocket_contrib;
 extern crate rocket_cors;
 extern crate rss;
+#[cfg(any(feature = "mq-aws", feature = "st-aws"))]
 extern crate rusoto_core;
+#[cfg(feature = "st-aws")]
 extern crate rusoto_s3;
+#[cfg(feature = "mq-aws")]
 extern crate rusoto_sns;
+#[cfg(feature = "mq-aws")]
 extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
@@ -69,14 +79,14 @@ pub mod macros;
 // pub mod app;
 pub mod cache;
 pub mod context;
+pub mod dao;
 pub mod env;
 pub mod pagination;
 pub mod rfc;
 // pub mod graphql;
-pub mod i18n;
+// pub mod i18n;
 pub mod jwt;
 // pub mod migrations;
-pub mod orm;
 pub mod plugins;
 pub mod queue;
 pub mod result;

@@ -9,6 +9,16 @@ license = "MIT"
 [profile.release]
 lto = true
 
+[features]
+default = ["ch-redis", "mq-rabbit", "st-nfs", "postgresql"]
+ch-redis = ["redis", "r2d2_redis"]
+mq-rabbit = ["amqp"]
+mq-aws = ["rusoto_core", "rusoto_sqs", "rusoto_sns"]
+st-aws = ["rusoto_core", "rusoto_s3"]
+st-nfs = []
+postgresql = ["diesel/postgres"]
+mysql = ["diesel/mysql"]
+
 [dependencies]
 toml = "0.4"
 hyper = "0.11"
@@ -27,8 +37,8 @@ serde_derive = "1.0"
 serde_json = "1.0"
 serde-xml-rs = "0.2"
 r2d2 = "0.8"
-r2d2_redis = "0.7"
-redis = "0.8"
+r2d2_redis = {version = "0.7", optional = true}
+redis = {version = "0.8", optional = true}
 rust-ini = "0.10"
 hex = "0.3"
 regex = "0.2"
@@ -39,10 +49,10 @@ maxminddb = "0.9"
 lettre = "0.8"
 lettre_email = "0.8"
 mime = "0.3"
-rusoto_core = "0.32"
-rusoto_sqs = "0.32"
-rusoto_sns = "0.32"
-rusoto_s3 = "0.32"
+rusoto_core = {version = "0.32", optional = true}
+rusoto_sqs = {version = "0.32", optional = true}
+rusoto_sns = {version = "0.32", optional = true}
+rusoto_s3 = {version = "0.32", optional = true}
 validator = "0.6"
 validator_derive = "0.6"
 juniper = "0.9"
@@ -64,7 +74,7 @@ features=["query_encoding"]
 
 [dependencies.diesel]
 version = "1.3"
-features = ["postgres", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
+features = ["chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
 
 [dependencies.chrono]
 version = "0.4"
@@ -73,6 +83,7 @@ features = ["serde"]
 [dependencies.amqp]
 version = "0.1"
 default-features = false
+optional = true
 
 [dependencies.rocket_contrib]
 version = "0.3"

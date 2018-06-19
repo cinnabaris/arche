@@ -3,52 +3,34 @@ use std::ops::Deref;
 use chrono::Duration;
 use r2d2::Pool;
 use r2d2_redis::RedisConnectionManager;
-use redis::cmd;
-use serde::de::DeserializeOwned;
-use serde::ser::Serialize;
-use serde_json;
+use redis::{cmd, ConnectionAddr, ConnectionInfo};
 
-use super::result::Result;
+use super::super::result::Result;
 
-pub fn get<C, K, V, F>(ch: &C, key: &String, days: i64, fun: F) -> Result<V>
-where
-    F: FnOnce() -> Result<V>,
-    K: Serialize,
-    V: DeserializeOwned + Serialize,
-    C: Cache,
-{
-    if let Ok(buf) = ch.get(key) {
-        if let Ok(val) = serde_json::from_slice(buf.as_slice()) {
-            return Ok(val);
-        }
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Config {
+    pub host: String,
+    pub port: u16,
+    pub db: i64,
+    pub password: Option<String>,
+}
+
+impl Config {
+    pub fn pool(&self) -> Result<Pool<RedisConnectionManager>> {
+        Ok(Pool::new(RedisConnectionManager::new(ConnectionInfo {
+            addr: Box::new(ConnectionAddr::Tcp(self.host.clone(), self.port)),
+            db: self.db,
+            passwd: self.password.clone(),
+        })?)?)
     }
-
-    let val = fun()?;
-    ch.set(
-        key,
-        serde_json::to_vec(&val)?.as_slice(),
-        &Duration::days(days),
-    )?;
-    Ok(val)
 }
 
-//------------------------------------------------------------------------------
-
-pub trait Cache: Send + Sync {
-    fn keys(&self) -> Result<Vec<(String, isize)>>;
-    fn get(&self, k: &String) -> Result<Vec<u8>>;
-    fn set(&self, k: &String, v: &[u8], t: &Duration) -> Result<()>;
-    fn clear(&self) -> Result<isize>;
-}
-
-//------------------------------------------------------------------------------
-
-pub struct Redis {
+pub struct Cache {
     namespace: String,
     pool: Pool<RedisConnectionManager>,
 }
 
-impl Redis {
+impl Cache {
     pub fn new(ns: String, pool: Pool<RedisConnectionManager>) -> Self {
         Self {
             namespace: ns,
@@ -61,7 +43,7 @@ impl Redis {
     }
 }
 
-impl Cache for Redis {
+impl super::Cache for Cache {
     fn keys(&self) -> Result<Vec<(String, isize)>> {
         let con = self.pool.get()?;
         let con = con.deref();

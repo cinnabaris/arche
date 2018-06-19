@@ -1,6 +1,7 @@
 use std::error::Error as StdError;
 use std::{env, error, fmt, io, num, path, result, string, time};
 
+#[cfg(feature = "mq-amqp")]
 use amqp;
 use base64;
 use chrono;
@@ -17,6 +18,7 @@ use lettre_email;
 use log;
 use log4rs;
 use r2d2;
+#[cfg(feature = "ch-redis")]
 use redis;
 use regex;
 use rocket;
@@ -37,6 +39,7 @@ pub enum Error {
     Io(io::Error),
     EnvVar(env::VarError),
     NumParseInt(num::ParseIntError),
+    #[cfg(feature = "ch-redis")]
     Redis(redis::RedisError),
     R2d2(r2d2::Error),
     HandlebarsTemplateRender(handlebars::TemplateRenderError),
@@ -50,6 +53,7 @@ pub enum Error {
     SystemTime(time::SystemTimeError),
     FrankJwt(frank_jwt::Error),
     SerdeJson(serde_json::Error),
+    #[cfg(feature = "mq-rabbit")]
     Amqp(amqp::AMQPError),
     Base64Decode(base64::DecodeError),
     StringFromUtf8(string::FromUtf8Error),
@@ -80,6 +84,7 @@ impl fmt::Display for Error {
             Error::FrankJwt(ref err) => write!(f, "{:?}", err),
             Error::Io(ref err) => err.fmt(f),
             Error::NumParseInt(ref err) => err.fmt(f),
+            #[cfg(feature = "ch-redis")]
             Error::Redis(ref err) => err.fmt(f),
             Error::R2d2(ref err) => err.fmt(f),
             Error::HandlebarsTemplateRender(ref err) => err.fmt(f),
@@ -92,6 +97,7 @@ impl fmt::Display for Error {
             Error::StarDict(ref err) => err.fmt(f),
             Error::SystemTime(ref err) => err.fmt(f),
             Error::SerdeJson(ref err) => err.fmt(f),
+            #[cfg(feature = "mq-rabbit")]
             Error::Amqp(ref err) => err.fmt(f),
             Error::Base64Decode(ref err) => err.fmt(f),
             Error::StringFromUtf8(ref err) => err.fmt(f),
@@ -125,6 +131,7 @@ impl StdError for Error {
             Error::FrankJwt(ref _err) => "bad jwt token",
             Error::Io(ref err) => err.description(),
             Error::NumParseInt(ref err) => err.description(),
+            #[cfg(feature = "ch-redis")]
             Error::Redis(ref err) => err.description(),
             Error::R2d2(ref err) => err.description(),
             Error::HandlebarsTemplateRender(ref err) => err.description(),
@@ -137,6 +144,7 @@ impl StdError for Error {
             Error::StarDict(ref err) => err.description(),
             Error::SystemTime(ref err) => err.description(),
             Error::SerdeJson(ref err) => err.description(),
+            #[cfg(feature = "mq-rabbit")]
             Error::Amqp(ref err) => err.description(),
             Error::Base64Decode(ref err) => err.description(),
             Error::StringFromUtf8(ref err) => err.description(),
@@ -166,6 +174,7 @@ impl StdError for Error {
     fn cause(&self) -> Option<&error::Error> {
         match *self {
             Error::Io(ref err) => Some(err),
+            #[cfg(feature = "ch-redis")]
             Error::Redis(ref err) => Some(err),
             Error::R2d2(ref err) => Some(err),
             Error::NumParseInt(ref err) => Some(err),
@@ -179,6 +188,7 @@ impl StdError for Error {
             Error::StarDict(ref err) => Some(err),
             Error::SystemTime(ref err) => Some(err),
             Error::SerdeJson(ref err) => Some(err),
+            #[cfg(feature = "mq-rabbit")]
             Error::Amqp(ref err) => Some(err),
             Error::Base64Decode(ref err) => Some(err),
             Error::StringFromUtf8(ref err) => Some(err),
@@ -228,6 +238,7 @@ impl From<io::Error> for Error {
     }
 }
 
+#[cfg(feature = "ch-redis")]
 impl From<redis::RedisError> for Error {
     fn from(err: redis::RedisError) -> Error {
         Error::Redis(err)
@@ -305,7 +316,7 @@ impl From<serde_json::Error> for Error {
         Error::SerdeJson(err)
     }
 }
-
+#[cfg(feature = "mq-rabbit")]
 impl From<amqp::AMQPError> for Error {
     fn from(err: amqp::AMQPError) -> Error {
         Error::Amqp(err)

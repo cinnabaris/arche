@@ -1,61 +1,36 @@
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use amqp::{self, Basic as AmqpBasic};
+use amqp::{self, Basic, Options};
 use log;
-use serde::ser::Serialize;
-use serde_json;
 use uuid::Uuid;
 
-use super::{
-    context::Context, result::{Error, Result},
-};
+use super::super::result::{Error, Result};
 
-pub trait Consumer: Send + Sync {
-    fn run(
-        &self,
-        ctx: Arc<Context>,
-        id: &String,
-        content_type: &String,
-        payload: &[u8],
-    ) -> Result<()>;
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Config {
+    pub host: String,
+    pub port: u16,
+    pub user: String,
+    pub password: String,
+    #[serde(rename = "virtual")]
+    pub _virtual: String,
 }
 
-//-----------------------------------------------------------------------------
-
-pub struct Worker {
-    ctx: Arc<Context>,
-    consumers: Arc<HashMap<String, Box<Consumer>>>,
-}
-
-impl Worker {
-    pub fn new(ctx: Arc<Context>, consumers: HashMap<String, Box<Consumer>>) -> Self {
-        Self {
-            ctx: ctx,
-            consumers: Arc::new(consumers),
-        }
-    }
-    pub fn handle(
-        &self,
-        _type: &String,
-        id: &String,
-        content_type: &String,
-        payload: &[u8],
-    ) -> Result<()> {
-        let consumers = Arc::clone(&self.consumers);
-
-        match consumers.get(_type) {
-            Some(consumer) => consumer.run(self.ctx.clone(), id, content_type, payload),
-            None => Err(Error::WithDescription(format!(
-                "can't fine consumer for {:?}",
-                _type
-            ))),
+impl Config {
+    pub fn options(&self) -> Options {
+        Options {
+            host: self.host.clone(),
+            port: self.port,
+            login: self.user.clone(),
+            password: self.password.clone(),
+            vhost: self._virtual.clone(),
+            ..Default::default()
         }
     }
 }
 
-impl amqp::Consumer for Worker {
+impl amqp::Consumer for super::Worker {
     fn handle_delivery(
         &mut self,
         channel: &mut amqp::Channel,
@@ -82,44 +57,12 @@ impl amqp::Consumer for Worker {
     }
 }
 
-//-----------------------------------------------------------------------------
-
-pub trait Queue: Send + Sync {
-    fn publish(
-        &self,
-        _type: &String,
-        content_type: &String,
-        priority: u8,
-        payload: &[u8],
-    ) -> Result<()>;
-    fn consume(&self, name: String, worker: Arc<Worker>) -> Result<()>;
-}
-
-//-----------------------------------------------------------------------------
-
-pub fn put<T: Serialize, Q: Queue>(
-    qu: &Q,
-    _type: &String,
-    content_type: &String,
-    priority: u8,
-    task: &T,
-) -> Result<()> {
-    qu.publish(
-        _type,
-        content_type,
-        priority,
-        serde_json::to_vec(task)?.as_slice(),
-    )
-}
-
-//-----------------------------------------------------------------------------
-
-pub struct RabbitMQ {
+pub struct Queue {
     name: String,
     cfg: Arc<amqp::Options>,
 }
 
-impl RabbitMQ {
+impl Queue {
     pub fn new(name: String, cfg: amqp::Options) -> Self {
         Self {
             name: name,
@@ -158,7 +101,7 @@ impl RabbitMQ {
     }
 }
 
-impl Queue for RabbitMQ {
+impl super::Queue for Queue {
     fn publish(
         &self,
         _type: &String,
@@ -188,7 +131,7 @@ impl Queue for RabbitMQ {
         })
     }
 
-    fn consume(&self, name: String, worker: Arc<Worker>) -> Result<()> {
+    fn consume(&self, name: String, worker: Arc<super::Worker>) -> Result<()> {
         self.open(|ch| {
             let worker = Arc::clone(&worker);
             match Arc::try_unwrap(worker) {
