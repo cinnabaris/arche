@@ -36,13 +36,13 @@ pub trait Dao {
 }
 
 #[cfg(feature = "postgresql")]
-impl Dao for postgresql::Dao {
+impl<'a> Dao for postgresql::Dao<'a> {
     fn get_locale(&self, lang: &String, code: &String) -> Result<String> {
         let msg = locales::dsl::locales
             .select(locales::dsl::message)
             .filter(locales::dsl::lang.eq(lang))
             .filter(locales::dsl::code.eq(code))
-            .first::<String>(&self.db)?;
+            .first::<String>(self.db)?;
         Ok(msg)
     }
     fn set_locale(
@@ -57,7 +57,7 @@ impl Dao for postgresql::Dao {
             .select(locales::dsl::id)
             .filter(locales::dsl::lang.eq(lang))
             .filter(locales::dsl::code.eq(code))
-            .first::<i32>(&self.db)
+            .first::<i32>(self.db)
         {
             Ok(id) => {
                 if !override_ {
@@ -69,7 +69,7 @@ impl Dao for postgresql::Dao {
                         locales::dsl::message.eq(message),
                         locales::dsl::updated_at.eq(&now),
                     ))
-                    .execute(&self.db)?;
+                    .execute(self.db)?;
                 Ok(Some(id))
             }
             Err(_) => {
@@ -81,7 +81,7 @@ impl Dao for postgresql::Dao {
                         locales::dsl::updated_at.eq(&now),
                     ))
                     .returning(locales::dsl::id)
-                    .get_result::<i32>(&self.db)?;
+                    .get_result::<i32>(self.db)?;
                 Ok(Some(id))
             }
         }
@@ -92,7 +92,7 @@ impl Dao for postgresql::Dao {
             .select((locales::dsl::code, locales::dsl::message))
             .order(locales::dsl::code.asc())
             .filter(locales::dsl::lang.eq(lang))
-            .load::<(String, String)>(&self.db)?
+            .load::<(String, String)>(self.db)?
         {
             items.insert(code, message);
         }

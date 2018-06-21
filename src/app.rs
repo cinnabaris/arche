@@ -14,12 +14,15 @@ use log;
 use rocket;
 use rocket::config::{Config, Environment, LoggingLevel};
 use rocket_contrib::Template;
+#[cfg(feature = "sodium")]
+use sodiumoxide;
 use sys_info;
 use toml;
 
 use super::{
-    cache::Cache, context::Context, env, format::RFC822, graphql, i18n, migrations,
-    orm::Connection as Db, plugins, queue::{self, Queue}, result::Result, router, security,
+    cache::{self, Cache}, context::Context, dao::{self, Dao, Migration}, env, graphql,
+    i18n::{self, Dao as LocaleDao}, plugins, queue::{self, Queue}, result::Result, rfc::RFC822,
+    router, security,
 };
 
 pub struct App {
@@ -28,6 +31,9 @@ pub struct App {
 
 impl App {
     pub fn main() -> Result<()> {
+        if cfg!(feature = "sodium") {
+            sodiumoxide::init();
+        }
         let generate_nginx =
             clap::SubCommand::with_name("generate:nginx").about("Generate nginx.conf");
         let generate_config =
@@ -112,7 +118,7 @@ impl App {
             }
         }
 
-        return app.server();
+        app.server()
     }
 }
 
@@ -146,7 +152,7 @@ impl App {
             },
             database: env::Database {
                 #[cfg(feature = "postgresql")]
-                postgresql: env::PostgreSql {
+                postgresql: dao::postgresql::Config {
                     host: s!(localhost),
                     port: 5432,
                     name: s!(env::NAME),
@@ -154,7 +160,7 @@ impl App {
                     password: s!(""),
                 },
                 #[cfg(feature = "mysql")]
-                mysql: env::MySql {
+                mysql: dao::mysql::Config {
                     host: s!(localhost),
                     port: 3306,
                     name: s!(env::NAME),
@@ -164,8 +170,8 @@ impl App {
             },
             cache: env::Cache {
                 namespace: s!("www.change-me.com"),
-                #[cfg(feature = "cache-redis")]
-                redis: env::Redis {
+                #[cfg(feature = "ch-redis")]
+                redis: cache::redis::Config {
                     host: s!(localhost),
                     port: 6379,
                     db: 6,
@@ -174,8 +180,8 @@ impl App {
             },
             queue: env::Queue {
                 name: s!("tasks"),
-                #[cfg(feature = "rabbitmq")]
-                rabbitmq: env::RabbitMQ {
+                #[cfg(feature = "mq-rabbit")]
+                rabbitmq: queue::rabbitmq::Config {
                     host: s!(localhost),
                     port: 5672,
                     _virtual: s!(env::NAME),
@@ -183,22 +189,25 @@ impl App {
                     password: s!("guest"),
                 },
             },
-            aws: Some(env::Aws {
+            #[cfg(any(feature = "mq-aws", feature = "st-aws"))]
+            aws: env::Aws {
                 access_key_id: s!("change-me"),
                 secret_access_key: s!("change-me"),
-            }),
+            },
             elasticsearch: env::ElasticSearch {
                 hosts: vec![s!("http://localhost:9200")],
             },
             storage: env::Storage {
-                local: Some(env::Local {
+                #[cfg(feature = "st-nfs")]
+                nfs: env::Nfs {
                     end_point: s!("/upload"),
                     local_root: s!("tmp/upload"),
-                }),
-                s3: Some(env::S3 {
+                },
+                #[cfg(feature = "st-s3")]
+                s3: env::S3 {
                     region: s!("us-west-2"),
                     bucket: s!("www.change-me.com"),
-                }),
+                },
             },
         };
         let buf = toml::to_vec(&cfg)?;
@@ -261,48 +270,48 @@ impl App {
         Ok(())
     }
     fn db_migrate(&self) -> Result<()> {
-        let db = self.ctx.db()?;
-        let db = db.deref();
-        migrations::migrate(db)
+        let db = self.ctx.db.get()?;
+        let db = Dao::new(db.deref());
+        db.migrate()
     }
     fn db_rollback(&self) -> Result<()> {
-        let db = self.ctx.db()?;
-        let db = db.deref();
-        migrations::rollback(db)
+        let db = self.ctx.db.get()?;
+        let db = Dao::new(db.deref());
+        db.rollback()
     }
     fn db_seed(&self) -> Result<()> {
         let root = Path::new("db").join("seed");
-        let db = self.ctx.db()?;
-        let db = db.deref();
-        self.load_locales(db, &root)?;
-        plugins::mall::seed::load(db, &root)?;
-        plugins::cbeta::seed::load(db)?;
-        plugins::nut::seed::administrator(db)?;
+        let db = self.ctx.db.get()?;
+        let db = Dao::new(db.deref());
+        self.load_locales(&db, &root)?;
+        // TODO
+        // plugins::mall::seed::load(db, &root)?;
+        // plugins::cbeta::seed::load(db)?;
+        // plugins::nut::seed::administrator(db)?;
         log::info!("Done!!!");
         Ok(())
     }
     fn db_dump(&self) -> Result<()> {
-        let db = self.ctx.db()?;
-        let db = db.deref();
-        migrations::dump(db)
+        let db = self.ctx.db.get()?;
+        let db = Dao::new(db.deref());
+        db.dump()
     }
     fn db_version(&self) -> Result<()> {
-        let db = self.ctx.db()?;
-        let db = db.deref();
+        let db = self.ctx.db.get()?;
+        let db = Dao::new(db.deref());
         println!("{:16} {}", "VERSION", "RUN ON");
-        for it in migrations::versions(db)? {
-            println!("{:16} {}", it.version, it.run_on.to_rfc822());
+        for (v, r) in db.versions()? {
+            println!("{:16} {}", v, r.to_rfc822());
         }
         Ok(())
     }
     fn db_restore(&self, _name: &String) -> Result<()> {
-        let db = self.ctx.db()?;
-        let db = db.deref();
-        migrations::restore(db)
+        let db = self.ctx.db.get()?;
+        let db = Dao::new(db.deref());
+        db.restore()
     }
     fn cache_list(&self) -> Result<()> {
-        let con = self.ctx.cache.get()?;
-        let items = con.keys()?;
+        let items = self.ctx.cache.keys()?;
         println!("{:64} {}", "KEY", "TTL");
         for (key, ttl) in items {
             println!("{:64} {}", key, ttl);
@@ -310,8 +319,7 @@ impl App {
         Ok(())
     }
     fn cache_clear(&self) -> Result<()> {
-        let con = self.ctx.cache.get()?;
-        let cnt = con.clear()?;
+        let cnt = self.ctx.cache.clear()?;
         log::info!("remove {} items from cache", cnt);
         Ok(())
     }
@@ -339,7 +347,7 @@ impl App {
             false,
         ).manage(self.ctx.db.clone())
             .manage(self.ctx.cache.clone())
-            .manage(self.ctx.encryptor.clone())
+            .manage(self.ctx.secret_box.clone())
             .manage(self.ctx.queue.clone())
             .manage(graphql::schema::Schema::new(
                 graphql::query::Query {},
@@ -370,22 +378,25 @@ impl App {
 
         // worker
         loop {
-            let mut consumers: HashMap<String, Box<queue::Consumer>> = HashMap::new();
-            consumers.insert(
-                s!(plugins::nut::consumers::SEND_EMAIL),
-                Box::new(plugins::nut::consumers::SendEmail {}),
-            );
-            let name = sys_info::hostname()?;
-            log::info!("Starting worker thread {}", name);
-            match self.ctx
-                .queue
-                .consume(name, queue::Worker::new(self.ctx.clone(), consumers))
-            {
-                Ok(_) => log::info!("exiting worker"),
-                Err(e) => log::error!("{:?}", e),
-            };
+            // let mut consumers: HashMap<String, Box<queue::Consumer>> = HashMap::new();
+            // consumers.insert(
+            //     s!(plugins::nut::consumers::SEND_EMAIL),
+            //     Box::new(plugins::nut::consumers::SendEmail {}),
+            // );
+            // let name = sys_info::hostname()?;
+            // log::info!("Starting worker thread {}", name);
+            // match self
+            //     .ctx
+            //     .queue
+            //     .consume(name, queue::Worker::new(self.ctx.clone(), consumers))
+            // {
+            //     Ok(_) => log::info!("exiting worker"),
+            //     Err(e) => log::error!("{:?}", e),
+            // };
             thread::sleep(Duration::from_secs(10));
         }
+
+        Ok(())
     }
 }
 
@@ -394,10 +405,10 @@ impl App {
         return "config.toml";
     }
 
-    fn load_locales(&self, db: &Db, root: &PathBuf) -> Result<()> {
+    fn load_locales<D: LocaleDao>(&self, db: &D, root: &PathBuf) -> Result<()> {
         let dir = root.join("locales");
         log::info!("load locales");
-        let (total, inserted) = i18n::sync(&db, dir)?;
+        let (total, inserted) = i18n::sync(db, dir)?;
         log::info!("total {}, inserted {}", total, inserted);
         Ok(())
     }

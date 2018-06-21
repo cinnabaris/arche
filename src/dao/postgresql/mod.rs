@@ -1,12 +1,16 @@
 pub mod migration;
 pub mod schema;
 
+use std::ops::Deref;
+
 use diesel::{pg::PgConnection, r2d2::ConnectionManager};
-use r2d2::{Pool, PooledConnection};
+use r2d2::{self, PooledConnection};
+use rocket::{
+    http::Status, request::{self, FromRequest}, Outcome, Request, State,
+};
 
 use super::super::result::Result;
 
-#[cfg(feature = "postgresql")]
 pub const DRIVER: &'static str = "postgresql";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -26,7 +30,7 @@ impl Config {
     journalctl -f -u postgresql
     show database size: /l+
     */
-    pub fn open(&self) -> Result<Pool<ConnectionManager<PgConnection>>> {
+    pub fn open(&self) -> Result<Pool> {
         let url = format!(
             "postgres://{user}:{password}@{host}:{port}/{name}",
             user = self.user,
@@ -35,16 +39,42 @@ impl Config {
             host = self.host,
             port = self.port,
         );
-        Ok(Pool::new(ConnectionManager::<PgConnection>::new(&url[..]))?)
+        Ok(r2d2::Pool::new(ConnectionManager::<PgConnection>::new(
+            &url[..],
+        ))?)
     }
 }
 
-pub struct Dao {
-    pub db: PooledConnection<ConnectionManager<PgConnection>>,
+pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+
+pub struct Connection(pub PooledConnection<ConnectionManager<PgConnection>>);
+
+impl<'a, 'r> FromRequest<'a, 'r> for Connection {
+    type Error = ();
+
+    fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let pool = request.guard::<State<Pool>>()?;
+        match pool.get() {
+            Ok(c) => Outcome::Success(Connection(c)),
+            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ())),
+        }
+    }
 }
 
-impl Dao {
-    pub fn new(pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Self> {
-        Ok(Self { db: pool.get()? })
+impl Deref for Connection {
+    type Target = PgConnection;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+pub struct Dao<'a> {
+    pub db: &'a PgConnection,
+}
+
+impl<'a> Dao<'a> {
+    pub fn new(db: &'a PgConnection) -> Self {
+        Self { db: db }
     }
 }

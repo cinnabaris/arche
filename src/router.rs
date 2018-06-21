@@ -11,7 +11,9 @@ use serde_json::Value;
 use sitemap::structs::UrlEntry;
 use sitemap::writer::SiteMapWriter;
 
-use super::{env, graphql, i18n, jwt::Home, plugins, result::Result};
+use super::{
+    dao::{Connection, Dao}, env, graphql, i18n, jwt::Home, plugins, result::Result,
+};
 
 pub fn catchers() -> Vec<Catcher> {
     errors![not_found, bad_request, forbidden, internal_server]
@@ -20,9 +22,9 @@ pub fn catchers() -> Vec<Catcher> {
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();
     items.push(("/", routes!(sitemap, robots, rss)));
-    items.extend_from_slice(plugins::nut::routes().as_slice());
-    items.extend_from_slice(plugins::blog::routes().as_slice());
-    items.extend_from_slice(plugins::cbeta::routes().as_slice());
+    // items.extend_from_slice(plugins::nut::routes().as_slice());
+    // items.extend_from_slice(plugins::blog::routes().as_slice());
+    // items.extend_from_slice(plugins::cbeta::routes().as_slice());
     items.extend_from_slice(graphql::routes().as_slice());
 
     items
@@ -33,12 +35,9 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
 // https://en.wikipedia.org/wiki/Site_map
 // https://www.sitemaps.org/protocol.html
 #[get("/sitemap.xml")]
-fn sitemap<'a>(home: Home, db: Db) -> Result<Xml<Vec<u8>>> {
-    let db = db.deref();
+fn sitemap<'a>(home: Home) -> Result<Xml<Vec<u8>>> {
     let mut items = Vec::new();
     items.extend_from_slice(plugins::nut::sitemap().as_slice());
-    items.extend_from_slice(plugins::blog::sitemap()?.as_slice());
-    items.extend_from_slice(plugins::cbeta::sitemap(db)?.as_slice());
 
     let Home(home) = home;
     let mut buf = Vec::new();
@@ -80,13 +79,14 @@ fn robots(home: Home) -> Result<String> {
 }
 
 #[get("/rss/<lang>")]
-fn rss(db: Db, home: Home, lang: &RawStr) -> Result<Xml<Vec<u8>>> {
+fn rss(db: Connection, home: Home, lang: &RawStr) -> Result<Xml<Vec<u8>>> {
     let Home(home) = home;
     let lang = s!(lang);
     let db = db.deref();
+    let db = Dao::new(db);
 
     let mut items = Vec::new();
-    items.extend_from_slice(plugins::blog::rss(&lang).as_slice());
+    items.extend_from_slice(plugins::nut::rss(&lang).as_slice());
 
     let mut fields = Vec::new();
     for (url, title, desc, last) in items {
@@ -105,9 +105,9 @@ fn rss(db: Db, home: Home, lang: &RawStr) -> Result<Xml<Vec<u8>>> {
         .link(home.clone())
         .language(lang.clone())
         .pub_date(Utc::now().to_rfc3339())
-        .title(i18n::t(db, &lang, &s!("site.title"), None::<Value>))
-        .description(i18n::t(db, &lang, &s!("site.description"), None::<Value>))
-        .copyright(i18n::t(db, &lang, &s!("site.copyright"), None::<Value>))
+        .title(i18n::t(&db, &lang, &s!("site.title"), None::<Value>))
+        .description(i18n::t(&db, &lang, &s!("site.description"), None::<Value>))
+        .copyright(i18n::t(&db, &lang, &s!("site.copyright"), None::<Value>))
         .items(fields)
         .build()?;
 

@@ -24,7 +24,7 @@ pub struct Model {
     pub run_on: NaiveDateTime,
 }
 
-impl super::super::Migration for super::Dao {
+impl<'a> super::super::Migration for super::Dao<'a> {
     fn migrate(&self) -> Result<()> {
         let files = migrations_list()?;
         let mut script = String::new();
@@ -33,7 +33,7 @@ impl super::super::Migration for super::Dao {
             let items = sql_query(format!(
                 "SELECT version, run_on FROM {} WHERE version = '{}' LIMIT 1",
                 TABLE_NAME, v
-            )).load::<Model>(&self.db)?;
+            )).load::<Model>(self.db)?;
             let act = if items.is_empty() {
                 let mut fd = File::open(p.join("up.sql"))?;
                 let mut buf = String::new();
@@ -61,7 +61,7 @@ impl super::super::Migration for super::Dao {
         let items = sql_query(format!(
             "SELECT version, run_on FROM {} ORDER BY version DESC LIMIT 1",
             TABLE_NAME
-        )).load::<Model>(&self.db)?;
+        )).load::<Model>(self.db)?;
         if let Some(it) = items.first() {
             if let Some(down) = files.get(&it.version) {
                 let mut fd = File::open(down.join("down.sql"))?;
@@ -73,7 +73,7 @@ impl super::super::Migration for super::Dao {
                 sql_query(format!(
                     "DELETE FROM {} WHERE version = '{}'",
                     TABLE_NAME, it.version,
-                )).execute(&self.db)?;
+                )).execute(self.db)?;
                 log::info!("Done!!!");
             }
         }
@@ -85,7 +85,7 @@ impl super::super::Migration for super::Dao {
         for it in sql_query(format!(
             "SELECT version, run_on FROM {} ORDER BY version ASC",
             TABLE_NAME
-        )).load::<Model>(&self.db)?
+        )).load::<Model>(self.db)?
         {
             items.push((it.version, it.run_on));
         }

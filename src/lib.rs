@@ -77,7 +77,7 @@ extern crate validator;
 #[macro_use]
 pub mod macros;
 
-// pub mod app;
+pub mod app;
 pub mod cache;
 pub mod context;
 pub mod dao;
@@ -90,6 +90,6 @@ pub mod plugins;
 pub mod queue;
 pub mod result;
 pub mod rfc;
-// pub mod router;
+pub mod router;
 pub mod security;
 pub mod settings;

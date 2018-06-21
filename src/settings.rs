@@ -15,12 +15,12 @@ pub trait Dao {
 }
 
 #[cfg(feature = "postgresql")]
-impl Dao for postgresql::Dao {
+impl<'a> Dao for postgresql::Dao<'a> {
     fn get(&self, key: &String) -> Result<(Vec<u8>, Option<Vec<u8>>)> {
         Ok(settings::dsl::settings
             .select((settings::dsl::value, settings::dsl::salt))
             .filter(settings::dsl::key.eq(&key))
-            .first::<(Vec<u8>, Option<Vec<u8>>)>(&self.db)?)
+            .first::<(Vec<u8>, Option<Vec<u8>>)>(self.db)?)
     }
 
     fn set(&self, key: &String, val: &Vec<u8>, salt: &Option<Vec<u8>>) -> Result<i32> {
@@ -29,7 +29,7 @@ impl Dao for postgresql::Dao {
         match settings::dsl::settings
             .select(settings::dsl::id)
             .filter(settings::dsl::key.eq(key))
-            .first::<i32>(&self.db)
+            .first::<i32>(self.db)
         {
             Ok(id) => {
                 let it = settings::dsl::settings.filter(settings::dsl::id.eq(&id));
@@ -39,7 +39,7 @@ impl Dao for postgresql::Dao {
                         settings::dsl::salt.eq(salt),
                         settings::dsl::updated_at.eq(&now),
                     ))
-                    .execute(&self.db)?;
+                    .execute(self.db)?;
                 Ok(id)
             }
             Err(_) => Ok(insert_into(settings::dsl::settings)
@@ -50,7 +50,7 @@ impl Dao for postgresql::Dao {
                     settings::dsl::updated_at.eq(&now),
                 ))
                 .returning(settings::dsl::id)
-                .get_result::<i32>(&self.db)?),
+                .get_result::<i32>(self.db)?),
         }
     }
 }

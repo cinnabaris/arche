@@ -6,16 +6,10 @@ pub mod seed;
 
 use std::collections::HashMap;
 
-use chrono::{NaiveDateTime, Utc};
 use rocket::Route;
 use serde_json::Value;
-use sitemap::structs::ChangeFreq;
 
 use super::super::{i18n, orm::Connection as Db, result::Result};
-
-pub fn sitemap() -> Vec<(String, f32, ChangeFreq, NaiveDateTime)> {
-    vec![(s!("/"), 0.1, ChangeFreq::Daily, Utc::now().naive_utc())]
-}
 
 pub fn application_layout(
     db: &Db,

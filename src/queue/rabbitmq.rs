@@ -57,6 +57,7 @@ impl amqp::Consumer for super::Worker {
     }
 }
 
+#[derive(Clone)]
 pub struct Queue {
     name: String,
     cfg: Arc<amqp::Options>,

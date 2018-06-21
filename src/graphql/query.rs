@@ -1,8 +1,6 @@
-use juniper::{self, FieldResult};
+// use juniper::{self, FieldResult};
 
-use super::super::{
-    env, plugins::{cbeta, nut},
-};
+use super::super::env;
 use super::context::Context;
 
 pub struct Query;

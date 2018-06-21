@@ -25,6 +25,7 @@ impl Config {
     }
 }
 
+#[derive(Clone)]
 pub struct Cache {
     namespace: String,
     pool: Pool<RedisConnectionManager>,

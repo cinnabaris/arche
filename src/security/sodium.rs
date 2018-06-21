@@ -6,30 +6,29 @@ use super::super::result::{Error, Result};
 
 pub struct HashBox {}
 
-impl super::HashBox for HashBox {
-    fn random_bytes(&self, l: usize) -> Vec<u8> {
-        randombytes::randombytes(l)
-    }
+pub fn random_bytes(l: usize) -> Vec<u8> {
+    randombytes::randombytes(l)
+}
 
-    fn sum(&self, plain: &[u8]) -> Result<Vec<u8>> {
-        match pwhash::pwhash(
-            plain,
-            pwhash::OPSLIMIT_INTERACTIVE,
-            pwhash::MEMLIMIT_INTERACTIVE,
-        ) {
-            Ok(cip) => Ok(cip[..].to_vec()),
-            Err(e) => Err(Error::WithDescription(format!("{:?}", e))),
-        }
-    }
-
-    fn verify(&self, cipher: &[u8], plain: &[u8]) -> bool {
-        match pwhash::HashedPassword::from_slice(cipher) {
-            Some(cipher) => pwhash::pwhash_verify(&cipher, plain),
-            None => false,
-        }
+pub fn sum(plain: &[u8]) -> Result<Vec<u8>> {
+    match pwhash::pwhash(
+        plain,
+        pwhash::OPSLIMIT_INTERACTIVE,
+        pwhash::MEMLIMIT_INTERACTIVE,
+    ) {
+        Ok(cip) => Ok(cip[..].to_vec()),
+        Err(e) => Err(Error::WithDescription(format!("{:?}", e))),
     }
 }
 
+pub fn verify(cipher: &[u8], plain: &[u8]) -> bool {
+    match pwhash::HashedPassword::from_slice(cipher) {
+        Some(cipher) => pwhash::pwhash_verify(&cipher, plain),
+        None => false,
+    }
+}
+
+#[derive(Clone)]
 pub struct SecretBox {
     key: secretbox::Key,
 }

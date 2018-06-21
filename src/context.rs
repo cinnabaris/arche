@@ -1,30 +1,19 @@
-#[cfg(feature = "mysql")]
-use diesel::mysql::MysqlConnection;
-#[cfg(feature = "postgresql")]
-use diesel::pg::PgConnection;
-use diesel::r2d2::ConnectionManager;
 use frank_jwt::Algorithm;
-use r2d2::Pool;
-
-use super::{env, jwt::Jwt, result::Result};
-
-#[cfg(feature = "sodium")]
-use super::security::sodium::{HashBox, SecretBox};
 
 #[cfg(feature = "ch-redis")]
 use super::cache::redis::Cache;
 #[cfg(feature = "mq-rabbit")]
 use super::queue::rabbitmq::Queue;
+#[cfg(feature = "sodium")]
+use super::security::sodium::SecretBox;
+use super::{dao::Pool as Database, env, jwt::Jwt, result::Result};
 
+#[derive(Clone)]
 pub struct Context {
-    #[cfg(feature = "postgresql")]
-    pub db: Pool<ConnectionManager<PgConnection>>,
-    #[cfg(feature = "mysql")]
-    pub db: Pool<ConnectionManager<MysqlConnection>>,
+    pub db: Database,
     pub cache: Cache,
     pub queue: Queue,
     pub secret_box: SecretBox,
-    pub hash_box: HashBox,
     pub jwt: Jwt,
     pub config: env::Config,
 }
@@ -35,7 +24,6 @@ impl Context {
             db: Self::open_dao(&cfg.database)?,
             cache: Self::open_cache(&cfg.cache)?,
             queue: Self::open_queue(&cfg.queue)?,
-            hash_box: HashBox {},
             secret_box: SecretBox::new(cfg.secret_key()?.as_slice())?,
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
             config: cfg.clone(),
@@ -43,12 +31,12 @@ impl Context {
     }
 
     #[cfg(feature = "postgresql")]
-    fn open_dao(cfg: &env::Database) -> Result<Pool<ConnectionManager<PgConnection>>> {
+    fn open_dao(cfg: &env::Database) -> Result<Database> {
         cfg.postgresql.open()
     }
 
     #[cfg(feature = "mysql")]
-    fn open_dao(cfg: &env::Database) -> Result<Pool<ConnectionManager<MysqlConnection>>> {
+    fn open_dao(cfg: &env::Database) -> Result<Database> {
         cfg.mysql.open()
     }
 
