@@ -1,16 +1,18 @@
 use frank_jwt::Algorithm;
 
-use super::{
-    dao, env, jwt::Jwt, result::{Error, Result}, security::Encryptor,
-};
+use super::{env, jwt::Jwt, result::Result, security::Encryptor};
 
 #[cfg(feature = "ch-redis")]
 use super::cache::redis::Cache;
+#[cfg(feature = "mysql")]
+use super::dao::mysql::{Config, Dao};
+#[cfg(feature = "postgresql")]
+use super::dao::postgresql::Dao;
 #[cfg(feature = "mq-rabbit")]
 use super::queue::rabbitmq::Queue;
 
 pub struct Context {
-    db: DbPool,
+    pub dao: Dao,
     pub cache: Cache,
     pub queue: Queue,
     pub encryptor: Encryptor,
@@ -21,7 +23,7 @@ pub struct Context {
 impl Context {
     pub fn new(cfg: &env::Config) -> Result<Self> {
         Ok(Self {
-            db: Self::open_database(&cfg.database)?,
+            dao: Self::open_dao(&cfg.database)?,
             cache: Self::open_cache(&cfg.cache)?,
             queue: Self::open_queue(&cfg.queue)?,
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
@@ -30,15 +32,14 @@ impl Context {
         })
     }
 
-    pub fn db(&self) -> Result<Db> {
-        self.db.get()
+    #[cfg(feature = "postgresql")]
+    fn open_dao(cfg: &env::Database) -> Result<Dao> {
+        Dao::new(&cfg.postgresql.url())
     }
 
-    fn open_database(cfg: &env::Database) -> Result<DbPool> {
-        if let Some(ref pg) = cfg.postgresql {
-            return Ok(DbPool::new(&pg.url())?);
-        }
-        Err(Error::WithDescription(s!("can't open database")))
+    #[cfg(feature = "mysql")]
+    fn open_dao(cfg: &env::Database) -> Result<Dao> {
+        Dao::new(&cfg.mysql.url())
     }
 
     #[cfg(feature = "ch-redis")]

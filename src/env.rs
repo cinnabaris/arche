@@ -7,7 +7,7 @@ use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 
 use super::{
-    cache, queue, result::{Error, Result},
+    cache, dao, queue, result::{Error, Result},
 };
 
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -33,11 +33,8 @@ pub struct Config {
     #[serde(rename = "secretkey")]
     pub secret_key: String, // 32-bits base64 encode string
     pub workers: u16,
-    #[cfg(feature = "postgresql")]
-    pub database: dao::postgresql::Config,
-    #[cfg(feature = "mysql")]
-    pub database: dao::mysql::Config,
     pub http: Http,
+    pub database: Database,
     pub cache: Cache,
     pub queue: Queue,
     pub storage: Storage,
@@ -107,6 +104,13 @@ impl Http {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Database {
+    #[cfg(feature = "postgresql")]
+    pub postgresql: dao::postgresql::Config,
+    #[cfg(feature = "mysql")]
+    pub mysql: dao::mysql::Config,
+}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Cache {
     pub namespace: String,

@@ -38,8 +38,8 @@ pub struct Dao {
 
 impl Dao {
     pub fn new(url: &String) -> Result<Self> {
-        Ok(r2d2::Pool::new(ConnectionManager::<PgConnection>::new(
-            &url[..],
-        ))?)
+        Ok(Self {
+            pool: Pool::new(ConnectionManager::<PgConnection>::new(&url[..]))?,
+        })
     }
 }
