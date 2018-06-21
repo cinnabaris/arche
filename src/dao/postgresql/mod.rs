@@ -1,9 +1,13 @@
+pub mod migration;
 pub mod schema;
 
 use diesel::{pg::PgConnection, r2d2::ConnectionManager};
 use r2d2::{Pool, PooledConnection};
 
 use super::super::result::Result;
+
+#[cfg(feature = "postgresql")]
+pub const DRIVER: &'static str = "postgresql";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {

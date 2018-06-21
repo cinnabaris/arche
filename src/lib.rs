@@ -87,7 +87,6 @@ pub mod rfc;
 // pub mod graphql;
 pub mod i18n;
 pub mod jwt;
-// pub mod migrations;
 pub mod plugins;
 pub mod queue;
 pub mod result;
