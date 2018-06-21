@@ -5,7 +5,10 @@ use amqp::{self, Basic, Options};
 use log;
 use uuid::Uuid;
 
-use super::super::result::{Error, Result};
+use super::super::{
+    context::Context, result::{Error, Result},
+};
+use super::worker::Worker;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
@@ -30,7 +33,7 @@ impl Config {
     }
 }
 
-impl amqp::Consumer for super::Worker {
+impl amqp::Consumer for Context {
     fn handle_delivery(
         &mut self,
         channel: &mut amqp::Channel,
@@ -132,7 +135,7 @@ impl super::Queue for Queue {
         })
     }
 
-    fn consume(&self, name: String, worker: Arc<super::Worker>) -> Result<()> {
+    fn consume(&self, name: String, worker: Arc<Context>) -> Result<()> {
         self.open(|ch| {
             let worker = Arc::clone(&worker);
             match Arc::try_unwrap(worker) {

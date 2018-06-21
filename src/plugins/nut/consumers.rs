@@ -11,9 +11,7 @@ use mime;
 use serde_json;
 use sys_info;
 
-use super::super::super::{context::Context, queue::Consumer, result::Result, settings};
-
-pub const SEND_EMAIL: &'static str = "send-email";
+use super::super::super::{context::Context, dao::Dao, result::Result, settings};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Smtp {
@@ -31,23 +29,22 @@ pub struct Email {
     pub attachments: BTreeMap<PathBuf, String>,
 }
 
-pub struct SendEmail {}
+pub const SEND_EMAIL: &'static str = "send-email";
 
-impl Consumer for SendEmail {
-    fn run(
-        &self,
-        ctx: &Context,
-        _id: &String,
-        _content_type: &String,
-        payload: &[u8],
-    ) -> Result<()> {
+pub trait SendEmail {
+    fn send_email(&self, &[u8]) -> Result<()>;
+}
+
+impl SendEmail for Context {
+    fn send_email(&self, payload: &[u8]) -> Result<()> {
         let it: Email = serde_json::from_slice(payload)?;
-        if !ctx.config.is_prod() {
+        if !self.config.is_prod() {
             log::debug!("send email to {}: {}\n{}", it.to, it.subject, it.body);
             return Ok(());
         }
-        let db = ctx.db.get()?;
-        let smtp: Smtp = settings::get(db.deref(), &ctx.encryptor, &s!("site.smtp"))?;
+        let db = self.db.get()?;
+        let db = Dao::new(db.deref());
+        let smtp: Smtp = settings::get(&db, &self.secret_box, &s!("site.smtp"))?;
 
         let mut email = EmailBuilder::new()
             .to(it.to)

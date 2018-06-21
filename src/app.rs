@@ -1,9 +1,9 @@
-use std::collections::HashMap;
 use std::env::current_dir;
 use std::io::{Read, Write};
 use std::ops::Deref;
 use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Duration;
 use std::{fs, thread};
 
@@ -378,25 +378,14 @@ impl App {
 
         // worker
         loop {
-            // let mut consumers: HashMap<String, Box<queue::Consumer>> = HashMap::new();
-            // consumers.insert(
-            //     s!(plugins::nut::consumers::SEND_EMAIL),
-            //     Box::new(plugins::nut::consumers::SendEmail {}),
-            // );
-            // let name = sys_info::hostname()?;
-            // log::info!("Starting worker thread {}", name);
-            // match self
-            //     .ctx
-            //     .queue
-            //     .consume(name, queue::Worker::new(self.ctx.clone(), consumers))
-            // {
-            //     Ok(_) => log::info!("exiting worker"),
-            //     Err(e) => log::error!("{:?}", e),
-            // };
+            let name = sys_info::hostname()?;
+            log::info!("starting worker thread {}", name);
+            match self.ctx.queue.consume(name, Arc::new(self.ctx.clone())) {
+                Ok(_) => log::info!("exiting worker"),
+                Err(e) => log::error!("{:?}", e),
+            };
             thread::sleep(Duration::from_secs(10));
         }
-
-        Ok(())
     }
 }
 
