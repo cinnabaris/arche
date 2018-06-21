@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
+use std::ops::Deref;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::{ffi, fs};
@@ -17,65 +18,93 @@ use serde::ser::Serialize;
 use url::Url;
 
 use super::{
-    env,
-    orm::Connection as Db,
-    result::{Error, Result},
-    schema::locales,
+    env, result::{Error, Result},
 };
 
-pub fn get(db: &Db, lang: &String, code: &String) -> Result<String> {
-    let msg = locales::dsl::locales
-        .select(locales::dsl::message)
-        .filter(locales::dsl::lang.eq(lang))
-        .filter(locales::dsl::code.eq(code))
-        .first::<String>(db)?;
-    Ok(msg)
+#[cfg(feature = "postgresql")]
+use super::dao::postgresql::{self, schema::locales};
+
+pub trait Dao {
+    fn get_locale(&self, lang: &String, code: &String) -> Result<String>;
+    fn set_locale(
+        &self,
+        lang: &String,
+        code: &String,
+        message: &String,
+        override_: bool,
+    ) -> Result<Option<i32>>;
+    fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>>;
 }
 
-pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<i32> {
-    let now = Utc::now().naive_utc();
-    match locales::dsl::locales
-        .select(locales::dsl::id)
-        .filter(locales::dsl::lang.eq(lang))
-        .filter(locales::dsl::code.eq(code))
-        .first::<i32>(db)
-    {
-        Ok(id) => {
-            let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
-            update(it)
-                .set((
-                    locales::dsl::message.eq(message),
-                    locales::dsl::updated_at.eq(&now),
-                ))
-                .execute(db)?;
-            Ok(id)
-        }
-        Err(_) => {
-            let id = insert_into(locales::dsl::locales)
-                .values((
-                    locales::dsl::lang.eq(lang),
-                    locales::dsl::code.eq(code),
-                    locales::dsl::message.eq(message),
-                    locales::dsl::updated_at.eq(&now),
-                ))
-                .returning(locales::dsl::id)
-                .get_result::<i32>(db)?;
-            Ok(id)
+#[cfg(feature = "postgresql")]
+impl Dao for postgresql::Dao {
+    fn get_locale(&self, lang: &String, code: &String) -> Result<String> {
+        let db = self.pool.get()?;
+        let db = db.deref();
+        let msg = locales::dsl::locales
+            .select(locales::dsl::message)
+            .filter(locales::dsl::lang.eq(lang))
+            .filter(locales::dsl::code.eq(code))
+            .first::<String>(db)?;
+        Ok(msg)
+    }
+    fn set_locale(
+        &self,
+        lang: &String,
+        code: &String,
+        message: &String,
+        override_: bool,
+    ) -> Result<Option<i32>> {
+        let db = self.pool.get()?;
+        let db = db.deref();
+        let now = Utc::now().naive_utc();
+        match locales::dsl::locales
+            .select(locales::dsl::id)
+            .filter(locales::dsl::lang.eq(lang))
+            .filter(locales::dsl::code.eq(code))
+            .first::<i32>(db)
+        {
+            Ok(id) => {
+                if !override_ {
+                    return Ok(None);
+                }
+                let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
+                update(it)
+                    .set((
+                        locales::dsl::message.eq(message),
+                        locales::dsl::updated_at.eq(&now),
+                    ))
+                    .execute(db)?;
+                Ok(Some(id))
+            }
+            Err(_) => {
+                let id = insert_into(locales::dsl::locales)
+                    .values((
+                        locales::dsl::lang.eq(lang),
+                        locales::dsl::code.eq(code),
+                        locales::dsl::message.eq(message),
+                        locales::dsl::updated_at.eq(&now),
+                    ))
+                    .returning(locales::dsl::id)
+                    .get_result::<i32>(db)?;
+                Ok(Some(id))
+            }
         }
     }
-}
-
-pub fn all(db: &Db, lang: &String) -> Result<BTreeMap<String, String>> {
-    let mut items = BTreeMap::new();
-    for (code, message) in locales::dsl::locales
-        .select((locales::dsl::code, locales::dsl::message))
-        .order(locales::dsl::code.asc())
-        .filter(locales::dsl::lang.eq(lang))
-        .load::<(String, String)>(db)?
-    {
-        items.insert(code, message);
+    fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>> {
+        let db = self.pool.get()?;
+        let db = db.deref();
+        let mut items = BTreeMap::new();
+        for (code, message) in locales::dsl::locales
+            .select((locales::dsl::code, locales::dsl::message))
+            .order(locales::dsl::code.asc())
+            .filter(locales::dsl::lang.eq(lang))
+            .load::<(String, String)>(db)?
+        {
+            items.insert(code, message);
+        }
+        Ok(items)
     }
-    Ok(items)
 }
 
 //-----------------------------------------------------------------------------
@@ -156,12 +185,12 @@ impl<'a, 'r> FromRequest<'a, 'r> for Locale {
 
 //-----------------------------------------------------------------------------
 
-pub fn e<T: Serialize>(db: &Db, lang: &String, code: &String, args: Option<T>) -> Error {
+pub fn e<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Option<S>) -> Error {
     Error::WithDescription(t(db, lang, code, args))
 }
 
-pub fn t<T: Serialize>(db: &Db, lang: &String, code: &String, args: Option<T>) -> String {
-    if let Ok(msg) = get(db, lang, code) {
+pub fn t<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Option<S>) -> String {
+    if let Ok(msg) = db.get_locale(lang, code) {
         if let Some(args) = args {
             if let Ok(msg) = Handlebars::new().render_template(&msg, &args) {
                 return msg;
@@ -173,33 +202,18 @@ pub fn t<T: Serialize>(db: &Db, lang: &String, code: &String, args: Option<T>) -
     return format!("{}.{}", lang, code);
 }
 
-pub fn sync(db: &Db, dir: PathBuf) -> Result<(usize, usize)> {
-    db.transaction::<_, Error, _>(|| {
-        let mut total = 0;
-        let mut inserted = 0;
-        for (lang, items) in load_from_files(dir)? {
-            for (code, message) in items {
-                total = total + 1;
-                let cnt: i64 = locales::dsl::locales
-                    .filter(locales::dsl::lang.eq(&lang))
-                    .filter(locales::dsl::code.eq(&code))
-                    .count()
-                    .get_result(db)?;
-                if cnt == 0 {
-                    inserted = inserted + 1;
-                    insert_into(locales::dsl::locales)
-                        .values((
-                            locales::dsl::lang.eq(&lang),
-                            locales::dsl::code.eq(&code),
-                            locales::dsl::message.eq(&message),
-                            locales::dsl::updated_at.eq(Utc::now().naive_utc()),
-                        ))
-                        .execute(db)?;
-                }
+pub fn sync<D: Dao>(db: &D, dir: PathBuf) -> Result<(usize, usize)> {
+    let mut total = 0;
+    let mut inserted = 0;
+    for (lang, items) in load_from_files(dir)? {
+        for (code, message) in items {
+            total = total + 1;
+            if let Some(_id) = db.set_locale(&lang, &code, &message, false)? {
+                inserted = inserted + 1;
             }
         }
-        Ok((total, inserted))
-    })
+    }
+    Ok((total, inserted))
 }
 
 fn load_from_files(dir: PathBuf) -> Result<(BTreeMap<String, BTreeMap<String, String>>)> {

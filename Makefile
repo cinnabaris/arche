@@ -14,7 +14,7 @@ www:
 	-cp -r dashboard/build $(dist)/dashboard
 
 schema:
-	diesel print-schema > src/schema/postgresql.rs
+	diesel print-schema > src/dao/postgresql/schema.rs
 
 clean:
 	cargo clean
