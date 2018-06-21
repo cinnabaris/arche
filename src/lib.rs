@@ -65,6 +65,7 @@ extern crate serde;
 extern crate serde_xml_rs;
 extern crate sha2;
 extern crate sitemap;
+#[cfg(feature = "sodium")]
 extern crate sodiumoxide;
 extern crate stardict;
 extern crate sys_info;
@@ -92,4 +93,4 @@ pub mod queue;
 pub mod result;
 // pub mod router;
 pub mod security;
-// pub mod settings;
+pub mod settings;
