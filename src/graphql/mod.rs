@@ -9,13 +9,13 @@ use juniper_rocket::{graphiql_source, GraphQLRequest, GraphQLResponse};
 use rocket::response::content::Html;
 use rocket::{Route, State};
 
-use super::{i18n::Locale, orm::PooledConnection as Db};
+use super::i18n::Locale;
 
 #[derive(Serialize, GraphQLObject, Deserialize, Debug)]
 pub struct H {}
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
-    vec![("/", routes!(doc, get, post))]
+    vec![("/", routes!(doc, get))]
 }
 
 #[get("/doc")]
@@ -25,7 +25,6 @@ fn doc() -> Html<String> {
 
 #[get("/graphql?<request>")]
 fn get(
-    db: Db,
     locale: Locale,
     remote: SocketAddr,
     request: GraphQLRequest,
@@ -36,25 +35,6 @@ fn get(
         &context::Context {
             locale: locale.name,
             remote: remote,
-            db: db,
-        },
-    )
-}
-
-#[post("/graphql", data = "<request>")]
-fn post(
-    db: Db,
-    locale: Locale,
-    remote: SocketAddr,
-    request: GraphQLRequest,
-    schema: State<schema::Schema>,
-) -> GraphQLResponse {
-    request.execute(
-        &schema,
-        &context::Context {
-            locale: locale.name,
-            remote: remote,
-            db: db,
         },
     )
 }
