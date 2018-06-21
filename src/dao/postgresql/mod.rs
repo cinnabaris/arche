@@ -1,7 +1,7 @@
 pub mod schema;
 
 use diesel::{pg::PgConnection, r2d2::ConnectionManager};
-use r2d2::Pool;
+use r2d2::{Pool, PooledConnection};
 
 use super::super::result::Result;
 
@@ -22,26 +22,25 @@ impl Config {
     journalctl -f -u postgresql
     show database size: /l+
     */
-    pub fn url(&self) -> String {
-        format!(
+    pub fn open(&self) -> Result<Pool<ConnectionManager<PgConnection>>> {
+        let url = format!(
             "postgres://{user}:{password}@{host}:{port}/{name}",
             user = self.user,
             password = self.password,
             name = self.name,
             host = self.host,
             port = self.port,
-        )
+        );
+        Ok(Pool::new(ConnectionManager::<PgConnection>::new(&url[..]))?)
     }
 }
 
 pub struct Dao {
-    pub pool: Pool<ConnectionManager<PgConnection>>,
+    pub db: PooledConnection<ConnectionManager<PgConnection>>,
 }
 
 impl Dao {
-    pub fn new(url: &String) -> Result<Self> {
-        Ok(Self {
-            pool: Pool::new(ConnectionManager::<PgConnection>::new(&url[..]))?,
-        })
+    pub fn new(pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Self> {
+        Ok(Self { db: pool.get()? })
     }
 }

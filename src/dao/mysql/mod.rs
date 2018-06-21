@@ -1,7 +1,7 @@
 pub mod schema;
 
 use diesel::{mysql::MysqlConnection, r2d2::ConnectionManager};
-use r2d2::Pool;
+use r2d2::{Pool, PooledConnection};
 
 use super::super::result::Result;
 
@@ -15,26 +15,27 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn url(&self) -> String {
-        format!(
+    pub fn open(&self) -> Result<Pool<ConnectionManager<MysqlConnection>>> {
+        let url = format!(
             "mysql://{user}:{password}@{host}:{port}/{name}",
             user = self.user,
             password = self.password,
             name = self.name,
             host = self.host,
             port = self.port,
-        )
+        );
+        Ok(Pool::new(ConnectionManager::<MysqlConnection>::new(
+            &url[..],
+        ))?)
     }
 }
 
 pub struct Dao {
-    pub pool: Pool<ConnectionManager<MysqlConnection>>,
+    pub db: PooledConnection<ConnectionManager<MysqlConnection>>,
 }
 
 impl Dao {
-    pub fn new(url: &String) -> Result<Self> {
-        Ok(Self {
-            pool: Pool::new(ConnectionManager::<MysqlConnection>::new(&url[..]))?,
-        })
+    pub fn new(pool: Pool<ConnectionManager<MysqlConnection>>) -> Result<Self> {
+        Ok(Self { db: pool.get()? })
     }
 }
