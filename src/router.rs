@@ -11,7 +11,7 @@ use serde_json::Value;
 use sitemap::structs::UrlEntry;
 use sitemap::writer::SiteMapWriter;
 
-use super::{env, graphql, i18n, jwt::Home, orm::PooledConnection as Db, plugins, result::Result};
+use super::{env, graphql, i18n, jwt::Home, plugins, result::Result};
 
 pub fn catchers() -> Vec<Catcher> {
     errors![not_found, bad_request, forbidden, internal_server]
@@ -90,12 +90,14 @@ fn rss(db: Db, home: Home, lang: &RawStr) -> Result<Xml<Vec<u8>>> {
 
     let mut fields = Vec::new();
     for (url, title, desc, last) in items {
-        fields.push(ItemBuilder::default()
-            .link(format!("{}{}", home, url))
-            .title(title)
-            .description(desc)
-            .pub_date(DateTime::<Utc>::from_utc(last, Utc).to_rfc3339())
-            .build()?);
+        fields.push(
+            ItemBuilder::default()
+                .link(format!("{}{}", home, url))
+                .title(title)
+                .description(desc)
+                .pub_date(DateTime::<Utc>::from_utc(last, Utc).to_rfc3339())
+                .build()?,
+        );
     }
 
     let mut buf = Vec::new();
