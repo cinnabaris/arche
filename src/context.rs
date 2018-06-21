@@ -1,21 +1,30 @@
+#[cfg(feature = "mysql")]
+use diesel::mysql::MysqlConnection;
+#[cfg(feature = "postgresql")]
+use diesel::pg::PgConnection;
+use diesel::r2d2::ConnectionManager;
 use frank_jwt::Algorithm;
+use r2d2::Pool;
 
-use super::{env, jwt::Jwt, result::Result, security::Encryptor};
+use super::{env, jwt::Jwt, result::Result};
+
+#[cfg(feature = "sodium")]
+use super::security::sodium::{HashBox, SecretBox};
 
 #[cfg(feature = "ch-redis")]
 use super::cache::redis::Cache;
-#[cfg(feature = "mysql")]
-use super::dao::mysql::{Config, Dao};
-#[cfg(feature = "postgresql")]
-use super::dao::postgresql::Dao;
 #[cfg(feature = "mq-rabbit")]
 use super::queue::rabbitmq::Queue;
 
 pub struct Context {
-    pub dao: Dao,
+    #[cfg(feature = "postgresql")]
+    pub db: Pool<ConnectionManager<PgConnection>>,
+    #[cfg(feature = "mysql")]
+    pub db: Pool<ConnectionManager<MysqlConnection>>,
     pub cache: Cache,
     pub queue: Queue,
-    pub encryptor: Encryptor,
+    pub secret_box: SecretBox,
+    pub hash_box: HashBox,
     pub jwt: Jwt,
     pub config: env::Config,
 }
@@ -23,23 +32,24 @@ pub struct Context {
 impl Context {
     pub fn new(cfg: &env::Config) -> Result<Self> {
         Ok(Self {
-            dao: Self::open_dao(&cfg.database)?,
+            db: Self::open_dao(&cfg.database)?,
             cache: Self::open_cache(&cfg.cache)?,
             queue: Self::open_queue(&cfg.queue)?,
-            encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
+            hash_box: HashBox {},
+            secret_box: SecretBox::new(cfg.secret_key()?.as_slice())?,
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
             config: cfg.clone(),
         })
     }
 
     #[cfg(feature = "postgresql")]
-    fn open_dao(cfg: &env::Database) -> Result<Dao> {
-        Dao::new(&cfg.postgresql.url())
+    fn open_dao(cfg: &env::Database) -> Result<Pool<ConnectionManager<PgConnection>>> {
+        cfg.postgresql.open()
     }
 
     #[cfg(feature = "mysql")]
-    fn open_dao(cfg: &env::Database) -> Result<Dao> {
-        Dao::new(&cfg.mysql.url())
+    fn open_dao(cfg: &env::Database) -> Result<Pool<ConnectionManager<MysqlConnection>>> {
+        cfg.mysql.open()
     }
 
     #[cfg(feature = "ch-redis")]

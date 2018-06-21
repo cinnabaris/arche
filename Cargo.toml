@@ -10,12 +10,13 @@ license = "MIT"
 lto = true
 
 [features]
-default = ["ch-redis", "mq-rabbit", "st-nfs", "postgresql"]
+default = ["ch-redis", "sodium", "mq-rabbit", "st-nfs", "postgresql"]
 ch-redis = ["redis", "r2d2_redis"]
 mq-rabbit = ["amqp"]
 mq-aws = ["rusoto_core", "rusoto_sqs", "rusoto_sns"]
 st-aws = ["rusoto_core", "rusoto_s3"]
 st-nfs = []
+sodium = ["sodiumoxide"]
 postgresql = ["diesel/postgres"]
 mysql = ["diesel/mysql"]
 
@@ -57,7 +58,7 @@ validator = "0.6"
 validator_derive = "0.6"
 juniper = "0.9"
 juniper_rocket = "0.1"
-sodiumoxide = "*"
+sodiumoxide = {version = "*", optional = true}
 robots_txt = "0.5"
 sitemap = "0.2"
 rss = "1.5"
