@@ -46,6 +46,6 @@ impl Context {
     }
     #[cfg(feature = "mq-rabbit")]
     fn open_queue(cfg: &env::Queue) -> Result<Queue> {
-        Ok(Queue::new(cfg.name.clone(), cfg.rabbitmq.options()))
+        Ok(Queue::new(cfg.name.clone(), cfg.rabbitmq.clone()))
     }
 }

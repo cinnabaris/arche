@@ -63,45 +63,62 @@ impl amqp::Consumer for Context {
 #[derive(Clone)]
 pub struct Queue {
     name: String,
-    cfg: Arc<amqp::Options>,
+    cfg: Config,
 }
 
 impl Queue {
-    pub fn new(name: String, cfg: amqp::Options) -> Self {
+    pub fn new(name: String, cfg: Config) -> Self {
         Self {
             name: name,
-            cfg: Arc::new(cfg),
+            cfg: cfg,
         }
     }
     fn open<F>(&self, f: F) -> Result<()>
     where
         F: Fn(&mut amqp::Channel) -> Result<()>,
     {
-        let cfg = Arc::clone(&self.cfg);
+        let mut ss = amqp::Session::new(self.cfg.options())?;
+        let mut ch = ss.open_channel(1)?;
+        ch.queue_declare(
+            &self.name[..],
+            false, // passive,
+            true,  // durable
+            false, // exclusive
+            false, // auto_delete
+            false, // nowait
+            amqp::Table::new(),
+        )?;
 
-        match Arc::try_unwrap(cfg) {
-            Ok(cfg) => {
-                let mut ss = amqp::Session::new(cfg)?;
-                let mut ch = ss.open_channel(1)?;
-                ch.queue_declare(
-                    &self.name[..],
-                    false, // passive,
-                    true,  // durable
-                    false, // exclusive
-                    false, // auto_delete
-                    false, // nowait
-                    amqp::Table::new(),
-                )?;
+        f(&mut ch)?;
 
-                f(&mut ch)?;
+        ch.close(200, "Bye")?;
+        ss.close(200, "Good Bye");
 
-                ch.close(200, "Bye")?;
-                ss.close(200, "Good Bye");
+        Ok(())
 
-                Ok(())
-            }
-            Err(_) => Err(Error::WithDescription(s!("can't get rabbitmq options"))),
-        }
+        // match Arc::try_unwrap(cfg) {
+        //     Ok(cfg) => {
+        //         let mut ss = amqp::Session::new(cfg)?;
+        //         let mut ch = ss.open_channel(1)?;
+        //         ch.queue_declare(
+        //             &self.name[..],
+        //             false, // passive,
+        //             true,  // durable
+        //             false, // exclusive
+        //             false, // auto_delete
+        //             false, // nowait
+        //             amqp::Table::new(),
+        //         )?;
+        //
+        //         f(&mut ch)?;
+        //
+        //         ch.close(200, "Bye")?;
+        //         ss.close(200, "Good Bye");
+        //
+        //         Ok(())
+        //     }
+        //     Err(_) => Err(Error::WithDescription(s!("can't get rabbitmq options"))),
+        // }
     }
 }
 
