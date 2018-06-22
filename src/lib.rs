@@ -93,3 +93,4 @@ pub mod rfc;
 pub mod router;
 pub mod security;
 pub mod settings;
+pub mod themes;
