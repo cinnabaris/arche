@@ -28,4 +28,8 @@
 #include <amqp.h>
 #include <amqp_tcp_socket.h>
 
+#include "env.h"
+
+namespace arche {}
+
 #endif
