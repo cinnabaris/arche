@@ -1,0 +1,4 @@
+#ifndef ARCHE_PLUGINS_FORUM_H_
+#define ARCHE_PLUGINS_FORUM_H_
+
+#endif

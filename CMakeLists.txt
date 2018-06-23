@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 3.11)
 project(arche)
+
 set(ARCHE_VERSION_MAJOR 1)
 set(ARCHE_VERSION_MINOR 0)
 set(ARCHE_VERSION_PATCH 0)
+
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -DNDEBUG")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+include_directories(${CMAKE_CURRENT_LIST_DIR}/src)
+aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src DIR_SRC)
+aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src/plugins DIR_SRC_PLUGINS)
+aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src/plugins/ops DIR_SRC_PLUGINS_OPS)
 
-aux_source_directory(src DIR_SRCS)
-add_executable(arche ${DIR_SRCS})
-target_link_libraries(arche pq)
+add_executable(${PROJECT_NAME} ${DIR_SRC} ${DIR_SRC_PLUGINS} ${DIR_SRC_PLUGINS_OPS})
+target_link_libraries(${PROJECT_NAME} pq)

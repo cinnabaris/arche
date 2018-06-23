@@ -1,0 +1,4 @@
+#ifndef ARCHE_PLUGINS_CBETA_H_
+#define ARCHE_PLUGINS_CBETA_H_
+
+#endif

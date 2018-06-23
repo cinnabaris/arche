@@ -1,0 +1,4 @@
+#ifndef ARCHE_PLUGINS_DONATE_H_
+#define ARCHE_PLUGINS_DONATE_H_
+
+#endif

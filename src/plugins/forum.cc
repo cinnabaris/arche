@@ -1,0 +1,1 @@
+#include "plugins/forum.h"

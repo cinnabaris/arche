@@ -1,0 +1,4 @@
+#ifndef ARCHE_PLUGINS_OPS_MAIL_H_
+#define ARCHE_PLUGINS_OPS_MAIL_H_
+
+#endif

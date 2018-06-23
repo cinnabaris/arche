@@ -1,0 +1,4 @@
+#ifndef ARCHE_PLUGINS_OPS_VPN_H_
+#define ARCHE_PLUGINS_OPS_VPN_H_
+
+#endif
