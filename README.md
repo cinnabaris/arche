@@ -10,10 +10,8 @@ Inspired by [Solidus](https://github.com/solidusio/solidus) and [Discourse
 ```bash
 git clone https://github.com/cinnabaris/arche.git
 cd arche
-mkdir build
-cd build
-cmake ..
-make -j
+./build.sh
+ls dist
 ```
 
 ## Editor
