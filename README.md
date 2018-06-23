@@ -8,6 +8,7 @@ Inspired by [Solidus](https://github.com/solidusio/solidus) and [Discourse
 ## Usage
 
 ```bash
+sudo pacman -S unixodbc libpqxx librabbitmq-c poco
 git clone https://github.com/cinnabaris/arche.git
 cd arche
 ./build.sh
@@ -80,6 +81,7 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [smver](http://semver.org/)
 -   [banner.txt](http://patorjk.com/software/taag/)
 -   [msmtp](https://wiki.archlinux.org/index.php/msmtp)
+-   [POCO C++ Libraries](https://pocoproject.org/docs/index.html)
 -   [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 -   [Alibaba Java Coding Guidelines](https://github.com/alibaba/p3c)
 -   [An emoji guide for your commit messages](https://gitmoji.carloscuesta.me/)

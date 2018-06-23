@@ -14,4 +14,9 @@ aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src/plugins DIR_SRC_PLUGINS)
 aux_source_directory(${CMAKE_CURRENT_LIST_DIR}/src/plugins/ops DIR_SRC_PLUGINS_OPS)
 
 add_executable(${PROJECT_NAME} ${DIR_SRC} ${DIR_SRC_PLUGINS} ${DIR_SRC_PLUGINS_OPS})
-target_link_libraries(${PROJECT_NAME} pq)
+target_link_libraries(
+  ${PROJECT_NAME}
+  pq odbc odbccr odbcinst
+  rabbitmq
+  PocoCrypto PocoData PocoDataODBC PocoEncodings PocoFoundation PocoJSON PocoNet PocoRedis PocoUtil PocoXML PocoZip
+)
