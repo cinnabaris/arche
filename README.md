@@ -124,3 +124,6 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [GraphQL](https://graphql.org/learn/)
 -   [Alibaba Java Coding Guidelines](https://github.com/alibaba/p3c)
 -   [An emoji guide for your commit messages](https://gitmoji.carloscuesta.me/)
+-   [Let’s Encrypt](https://letsencrypt.org/)
+-   [Certbot](https://certbot.eff.org/)
+-   [SSL Server Test](https://www.ssllabs.com/ssltest/index.html)

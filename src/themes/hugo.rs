@@ -36,7 +36,7 @@ impl super::Template for Template {
         ]
     }
 
-    fn generate_config(&self, dst: &PathBuf, db: &Dao) -> Result<()> {
+    fn generate_config(&self, dst: &PathBuf, _db: &Dao) -> Result<()> {
         let cfg = Config { name: s!("") };
         let buf = toml::to_vec(&cfg)?;
 

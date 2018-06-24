@@ -5,10 +5,8 @@ use amqp::{self, Basic, Options};
 use log;
 use uuid::Uuid;
 
-use super::super::{
-    context::Context, result::{Error, Result},
-};
-use super::worker::Worker;
+use super::super::{context::Context, result::Result};
+use super::consumer::Consumer;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
@@ -33,7 +31,7 @@ impl Config {
     }
 }
 
-impl amqp::Consumer for Context {
+impl amqp::Consumer for Consumer {
     fn handle_delivery(
         &mut self,
         channel: &mut amqp::Channel,
@@ -44,15 +42,17 @@ impl amqp::Consumer for Context {
         if let Some(ref _type) = headers._type {
             if let Some(ref content_type) = headers.content_type {
                 if let Some(ref id) = headers.message_id {
-                    log::info!("receive message: {}@{}", id, _type);
-                    match self.handle(&_type, &id, &content_type, body.as_slice()) {
-                        Ok(_) => match channel.basic_ack(deliver.delivery_tag, true) {
-                            Ok(_) => {}
+                    if let Some(priority) = headers.priority {
+                        log::info!("receive message: {}@{}", id, _type);
+                        match self.consume(&id, &_type, &content_type, priority, body.as_slice()) {
+                            Ok(_) => match channel.basic_ack(deliver.delivery_tag, true) {
+                                Ok(_) => {}
+                                Err(e) => log::error!("{:?}", e),
+                            },
                             Err(e) => log::error!("{:?}", e),
-                        },
-                        Err(e) => log::error!("{:?}", e),
-                    };
-                    return;
+                        };
+                        return;
+                    }
                 }
             }
         }
@@ -62,14 +62,14 @@ impl amqp::Consumer for Context {
 
 #[derive(Clone)]
 pub struct Queue {
-    name: String,
+    queue: String,
     cfg: Config,
 }
 
 impl Queue {
-    pub fn new(name: String, cfg: Config) -> Self {
+    pub fn new(queue: String, cfg: Config) -> Self {
         Self {
-            name: name,
+            queue: queue,
             cfg: cfg,
         }
     }
@@ -80,7 +80,7 @@ impl Queue {
         let mut ss = amqp::Session::new(self.cfg.options())?;
         let mut ch = ss.open_channel(1)?;
         ch.queue_declare(
-            &self.name[..],
+            &self.queue[..],
             false, // passive,
             true,  // durable
             false, // exclusive
@@ -95,30 +95,6 @@ impl Queue {
         ss.close(200, "Good Bye");
 
         Ok(())
-
-        // match Arc::try_unwrap(cfg) {
-        //     Ok(cfg) => {
-        //         let mut ss = amqp::Session::new(cfg)?;
-        //         let mut ch = ss.open_channel(1)?;
-        //         ch.queue_declare(
-        //             &self.name[..],
-        //             false, // passive,
-        //             true,  // durable
-        //             false, // exclusive
-        //             false, // auto_delete
-        //             false, // nowait
-        //             amqp::Table::new(),
-        //         )?;
-        //
-        //         f(&mut ch)?;
-        //
-        //         ch.close(200, "Bye")?;
-        //         ss.close(200, "Good Bye");
-        //
-        //         Ok(())
-        //     }
-        //     Err(_) => Err(Error::WithDescription(s!("can't get rabbitmq options"))),
-        // }
     }
 }
 
@@ -131,11 +107,11 @@ impl super::Queue for Queue {
         payload: &[u8],
     ) -> Result<()> {
         let id = Uuid::new_v4().to_string();
-        log::info!("push task into queue {}@{}", id, self.name);
+        log::info!("push task into queue {}@{}", id, self.queue);
         self.open(|ch| {
             ch.basic_publish(
                 "",
-                &self.name[..],
+                &self.queue[..],
                 true,
                 false,
                 amqp::protocol::basic::BasicProperties {
@@ -152,27 +128,23 @@ impl super::Queue for Queue {
         })
     }
 
-    fn consume(&self, name: String, worker: Arc<Context>) -> Result<()> {
+    fn consume(&self, name: String, ctx: &Arc<Context>) -> Result<()> {
         self.open(|ch| {
-            let worker = Arc::clone(&worker);
-            match Arc::try_unwrap(worker) {
-                Ok(worker) => {
-                    let it = ch.basic_consume(
-                        worker,
-                        self.name.clone(),
-                        name.clone(), // consumer_tag
-                        false,        // no_local
-                        false,        // no_ack
-                        false,        // exclusive
-                        false,        // nowait
-                        amqp::Table::new(),
-                    )?;
-                    log::info!("Starting consumer {:?}", it);
-                    ch.start_consuming();
-                    Ok(())
-                }
-                Err(_) => Err(Error::WithDescription(s!("can't get worker"))),
-            }
+            let worker = super::worker::new(&Arc::clone(ctx));
+
+            let it = ch.basic_consume(
+                worker,
+                self.queue.clone(),
+                name.clone(), // consumer_tag
+                false,        // no_local
+                false,        // no_ack
+                false,        // exclusive
+                false,        // nowait
+                amqp::Table::new(),
+            )?;
+            log::info!("Starting consumer {:?}", it);
+            ch.start_consuming();
+            Ok(())
         })
     }
 }

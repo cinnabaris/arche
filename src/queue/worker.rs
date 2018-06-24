@@ -1,31 +1,12 @@
+use std::sync::Arc;
+
 use super::super::{
-    context::Context, plugins::nut::consumers::{SendEmail, SEND_EMAIL}, result::{Error, Result},
+    context::Context, plugins::nut::consumers::{SendMail, SEND_MAIL},
 };
+use super::consumer::Consumer;
 
-pub trait Worker {
-    fn handle(
-        &self,
-        type_: &String,
-        id: &String,
-        content_type: &String,
-        payload: &[u8],
-    ) -> Result<()>;
-}
-
-impl Worker for Context {
-    fn handle(
-        &self,
-        type_: &String,
-        _id: &String,
-        _content_type: &String,
-        payload: &[u8],
-    ) -> Result<()> {
-        match &type_[..] {
-            SEND_EMAIL => self.send_email(payload),
-            _ => Err(Error::WithDescription(format!(
-                "can't find consumer for {:?}",
-                type_
-            ))),
-        }
-    }
+pub fn new(ctx: &Arc<Context>) -> Consumer {
+    let mut it = Consumer::new();
+    it.register(s!(SEND_MAIL), Box::new(SendMail::new(Arc::clone(ctx))));
+    it
 }

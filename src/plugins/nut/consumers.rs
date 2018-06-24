@@ -1,17 +1,21 @@
 use std::collections::BTreeMap;
 use std::ops::Deref;
 use std::path::PathBuf;
+use std::sync::Arc;
 
-use lettre::smtp::authentication::{Credentials, Mechanism};
-use lettre::smtp::extension::ClientId;
-use lettre::{EmailTransport, SmtpTransport};
+use lettre::{
+    smtp::{
+        authentication::{Credentials, Mechanism}, extension::ClientId,
+    },
+    EmailTransport, SmtpTransport,
+};
 use lettre_email::EmailBuilder;
 use log;
 use mime;
 use serde_json;
 use sys_info;
 
-use super::super::super::{context::Context, dao::Dao, result::Result, settings};
+use super::super::super::{context::Context, dao::Dao, queue, result::Result, settings};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Smtp {
@@ -29,22 +33,35 @@ pub struct Email {
     pub attachments: BTreeMap<PathBuf, String>,
 }
 
-pub const SEND_EMAIL: &'static str = "send-email";
+pub const SEND_MAIL: &'static str = "send-mail";
 
-pub trait SendEmail {
-    fn send_email(&self, &[u8]) -> Result<()>;
+pub struct SendMail {
+    ctx: Arc<Context>,
 }
 
-impl SendEmail for Context {
-    fn send_email(&self, payload: &[u8]) -> Result<()> {
+impl SendMail {
+    pub fn new(ctx: Arc<Context>) -> Self {
+        Self { ctx: ctx }
+    }
+}
+
+impl queue::consumer::Handler for SendMail {
+    fn handle(
+        &self,
+        _id: &String,
+        _type: &String,
+        _content_type: &String,
+        _priority: u8,
+        payload: &[u8],
+    ) -> Result<()> {
         let it: Email = serde_json::from_slice(payload)?;
-        if !self.config.is_prod() {
+        if !self.ctx.config.is_prod() {
             log::debug!("send email to {}: {}\n{}", it.to, it.subject, it.body);
             return Ok(());
         }
-        let db = self.db.get()?;
+        let db = self.ctx.db.get()?;
         let db = Dao::new(db.deref());
-        let smtp: Smtp = settings::get(&db, &self.secret_box, &s!("site.smtp"))?;
+        let smtp: Smtp = settings::get(&db, &self.ctx.secret_box, &s!("site.smtp"))?;
 
         let mut email = EmailBuilder::new()
             .to(it.to)

@@ -380,7 +380,7 @@ impl App {
         loop {
             let name = sys_info::hostname()?;
             log::info!("starting worker thread {}", name);
-            match self.ctx.queue.consume(name, Arc::new(self.ctx.clone())) {
+            match self.ctx.queue.consume(name, &Arc::new(self.ctx.clone())) {
                 Ok(_) => log::info!("exiting worker"),
                 Err(e) => log::error!("{:?}", e),
             };

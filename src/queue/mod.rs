@@ -1,3 +1,4 @@
+pub mod consumer;
 #[cfg(feature = "mq-rabbit")]
 pub mod rabbitmq;
 pub mod worker;
@@ -9,6 +10,8 @@ use serde_json;
 
 use super::{context::Context, result::Result};
 
+//-----------------------------------------------------------------------------
+
 pub trait Queue: Send + Sync {
     fn publish(
         &self,
@@ -17,10 +20,9 @@ pub trait Queue: Send + Sync {
         priority: u8,
         payload: &[u8],
     ) -> Result<()>;
-    fn consume(&self, name: String, worker: Arc<Context>) -> Result<()>;
-}
 
-//-----------------------------------------------------------------------------
+    fn consume(&self, name: String, worker: &Arc<Context>) -> Result<()>;
+}
 
 pub fn put<T: Serialize, Q: Queue>(
     qu: &Q,
@@ -36,5 +38,3 @@ pub fn put<T: Serialize, Q: Queue>(
         serde_json::to_vec(task)?.as_slice(),
     )
 }
-
-//-----------------------------------------------------------------------------
