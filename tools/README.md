@@ -25,6 +25,7 @@ git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-b
 git clone https://github.com/rbenv/rbenv-vars.git $(rbenv root)/plugins/rbenv-vars
 rbenv install 2.5.1
 gem install bundler
+gem install rubocop
 gem install rails
 ```
 

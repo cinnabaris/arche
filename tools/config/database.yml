@@ -81,9 +81,9 @@ test:
 #
 production:
   <<:                  *default
-  database:            arche_production
-  # username:          postgres
-  adapter:             mysql2
-  encoding:            utf8
-  username:            root
-  password:            test
+  database:            arche
+  username:            postgres
+  # adapter:           mysql2
+  # encoding:          utf8
+  # username:          root
+  # password:          test
