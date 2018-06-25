@@ -1,8 +1,8 @@
 class CreateLocales < ActiveRecord::Migration[5.2]
   def change
     create_table :locales do |t|
-      t.string :lang, null: false
-      t.string :code, null: false
+      t.string :lang, null: false, limit: 8
+      t.string :code, null: false, limit: 255
       t.text :message, null: false
       t.timestamps
     end
