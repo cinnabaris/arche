@@ -12,7 +12,7 @@ appenders:
       roller:
         kind:    fixed_window
         base:    1
-        count:   5
+        count:   10
         pattern: "tmp/logs/www.{}.log"
 
 root:
