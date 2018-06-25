@@ -4,8 +4,8 @@ class CreateUsers < ActiveRecord::Migration[5.2]
       t.string :name, null: false, limit: 32
       t.string :email, null: false, limit: 255
       t.string :uid, null: false, limit: 36
-      t.string :provider_id, null: false, limit: 255
       t.string :provider_type, null: false, limit: 16
+      t.string :provider_id, null: false, limit: 255
       t.string :logo, null: false, limit: 255
       t.integer :sign_in_count, null: false, limit: 8
       t.datetime :current_sign_in_at

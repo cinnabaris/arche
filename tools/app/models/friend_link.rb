@@ -1,0 +1,2 @@
+class FriendLink < ApplicationRecord
+end
