@@ -69,5 +69,8 @@ extern crate validator;
 
 pub mod cache;
 pub mod errors;
+pub mod jwt;
 pub mod orm;
+pub mod pagination;
+pub mod rfc;
 pub mod security;
