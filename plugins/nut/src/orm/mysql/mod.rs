@@ -18,6 +18,10 @@ pub struct Config {
 }
 
 impl Config {
+    /*
+    use arche
+    desc xxx
+    */
     pub fn open(&self) -> Result<Pool<ConnectionManager<MysqlConnection>>> {
         let url = format!(
             "mysql://{user}:{password}@{host}:{port}/{name}",
