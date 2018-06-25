@@ -66,7 +66,7 @@ impl Queue {
     }
 }
 
-impl super::Provider for Queue {
+impl super::Queue for Queue {
     fn publish(
         &self,
         _type: &String,

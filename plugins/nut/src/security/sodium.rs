@@ -5,6 +5,28 @@ use sodiumoxide::{
 
 use super::super::errors::Result;
 
+pub fn random_bytes(l: usize) -> Vec<u8> {
+    randombytes::randombytes(l)
+}
+
+pub fn sum(plain: &[u8]) -> Result<Vec<u8>> {
+    match pwhash::pwhash(
+        plain,
+        pwhash::OPSLIMIT_INTERACTIVE,
+        pwhash::MEMLIMIT_INTERACTIVE,
+    ) {
+        Ok(cip) => Ok(cip[..].to_vec()),
+        Err(_) => Err("build password failed".into()),
+    }
+}
+
+pub fn verify(cipher: &[u8], plain: &[u8]) -> bool {
+    match pwhash::HashedPassword::from_slice(cipher) {
+        Some(cipher) => pwhash::pwhash_verify(&cipher, plain),
+        None => false,
+    }
+}
+
 pub struct Encryptor {
     key: secretbox::Key,
 }
@@ -18,28 +40,7 @@ impl Encryptor {
     }
 }
 
-impl super::Encryptor for Encryptor {
-    fn random_bytes(l: usize) -> Vec<u8> {
-        randombytes::randombytes(l)
-    }
-
-    fn password(plain: &[u8]) -> Result<Vec<u8>> {
-        match pwhash::pwhash(
-            plain,
-            pwhash::OPSLIMIT_INTERACTIVE,
-            pwhash::MEMLIMIT_INTERACTIVE,
-        ) {
-            Ok(cip) => Ok(cip[..].to_vec()),
-            Err(_) => Err("build password failed".into()),
-        }
-    }
-
-    fn verify(cipher: &[u8], plain: &[u8]) -> bool {
-        match pwhash::HashedPassword::from_slice(cipher) {
-            Some(cipher) => pwhash::pwhash_verify(&cipher, plain),
-            None => false,
-        }
-    }
+impl super::Provider for Encryptor {
     fn encrypt(&self, plain: &[u8]) -> (Vec<u8>, Vec<u8>) {
         let nonce = secretbox::gen_nonce();
         let cipher = secretbox::seal(&plain, &nonce, &self.key);

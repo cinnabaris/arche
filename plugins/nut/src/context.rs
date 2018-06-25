@@ -1,14 +1,11 @@
 use frank_jwt::Algorithm;
 
-use super::{
-    cache::Cache, env::Config, errors::Result, jwt::Jwt, orm::Pool as Database, queue::Queue,
-    security::sodium::Encryptor,
-};
+use super::{cache, env::Config, errors::Result, jwt::Jwt, orm, queue, security::Encryptor};
 
 pub struct Context {
-    pub db: Database,
-    pub cache: Cache,
-    pub queue: Queue,
+    pub db: orm::Pool,
+    pub cache: Box<cache::Cache>,
+    pub queue: Box<queue::Queue>,
     pub encryptor: Encryptor,
     pub jwt: Jwt,
     pub config: Config,
@@ -17,9 +14,12 @@ pub struct Context {
 impl Context {
     pub fn new(cfg: &Config) -> Result<Self> {
         Ok(Self {
-            db: Database::new(&cfg.database)?,
-            cache: Cache::new(&cfg.cache)?,
-            queue: Queue::new(&cfg.queue)?,
+            #[cfg(feature = "postgresql")]
+            db: cfg.database.postgresql.open()?,
+            #[cfg(feature = "mysql")]
+            db: cfg.database.mysql.open()?,
+            cache: cfg.cache.open()?,
+            queue: cfg.queue.open()?,
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
             config: cfg.clone(),

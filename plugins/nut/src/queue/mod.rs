@@ -12,25 +12,21 @@ pub struct Config {
     pub rabbitmq: Option<rabbitmq::Config>,
 }
 
-pub enum Queue {
-    RabbitMq(rabbitmq::Queue),
-}
-
-impl Queue {
-    pub fn new(cfg: &Config) -> Result<Self> {
-        if let Some(ref c) = cfg.rabbitmq {
-            return Ok(Queue::RabbitMq(rabbitmq::Queue::new(
-                cfg.name.clone(),
-                c.clone(),
+impl Config {
+    pub fn open(&self) -> Result<Box<Queue>> {
+        if let Some(ref cfg) = self.rabbitmq {
+            return Ok(Box::new(rabbitmq::Queue::new(
+                self.name.clone(),
+                cfg.clone(),
             )));
         }
-        Err("bad messing queue provider".into())
+        Err("bad messaging queue provider".into())
     }
 }
 
 //-----------------------------------------------------------------------------
 
-pub trait Provider: Send + Sync {
+pub trait Queue: Send + Sync {
     fn publish(
         &self,
         _type: &String,
@@ -40,7 +36,7 @@ pub trait Provider: Send + Sync {
     ) -> Result<()>;
 }
 
-pub fn put<T: Serialize, Q: Provider>(
+pub fn put<T: Serialize, Q: Queue>(
     qu: &Q,
     _type: &String,
     content_type: &String,

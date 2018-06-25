@@ -43,7 +43,7 @@ impl Cache {
     }
 }
 
-impl super::Provider for Cache {
+impl super::Cache for Cache {
     fn keys(&self) -> Result<Vec<(String, isize)>> {
         let con = self.pool.get()?;
         let con = con.deref();

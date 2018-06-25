@@ -13,47 +13,40 @@ pub struct Config {
     pub redis: Option<redis::Config>,
 }
 
-pub enum Cache {
-    Redis(redis::Cache),
-}
-
-impl Cache {
-    pub fn new(cfg: &Config) -> Result<Self> {
-        if let Some(ref c) = cfg.redis {
-            return Ok(Cache::Redis(redis::Cache::new(
-                cfg.namespace.clone(),
-                c.open()?,
+impl Config {
+    pub fn open(&self) -> Result<Box<Cache>> {
+        if let Some(ref cfg) = self.redis {
+            return Ok(Box::new(redis::Cache::new(
+                self.namespace.clone(),
+                cfg.open()?,
             )));
         }
         Err("bad cache provider".into())
     }
-
-    pub fn get<K, V, F>(&self, key: &String, days: i64, fun: F) -> Result<V>
-    where
-        F: FnOnce() -> Result<V>,
-        K: Serialize,
-        V: DeserializeOwned + Serialize,
-    {
-        match self {
-            Cache::Redis(ch) => {
-                if let Ok(buf) = ch.get(key) {
-                    if let Ok(val) = serde_json::from_slice(buf.as_slice()) {
-                        return Ok(val);
-                    }
-                }
-                let val = fun()?;
-                ch.set(
-                    key,
-                    serde_json::to_vec(&val)?.as_slice(),
-                    &Duration::days(days),
-                )?;
-                Ok(val)
-            }
-        }
-    }
 }
 
-pub trait Provider: Send + Sync {
+pub fn get<C, K, V, F>(ch: &C, key: &String, days: i64, fun: F) -> Result<V>
+where
+    C: Cache,
+    F: FnOnce() -> Result<V>,
+    K: Serialize,
+    V: DeserializeOwned + Serialize,
+{
+    if let Ok(buf) = ch.get(key) {
+        if let Ok(val) = serde_json::from_slice(buf.as_slice()) {
+            return Ok(val);
+        }
+    }
+    let val = fun()?;
+    ch.set(
+        key,
+        serde_json::to_vec(&val)?.as_slice(),
+        &Duration::days(days),
+    )?;
+    Ok(val)
+}
+
+pub trait Cache: Send + Sync {
     fn keys(&self) -> Result<Vec<(String, isize)>>;
     fn get(&self, k: &String) -> Result<Vec<u8>>;
     fn set(&self, k: &String, v: &[u8], t: &Duration) -> Result<()>;
