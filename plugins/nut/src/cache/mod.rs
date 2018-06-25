@@ -1,4 +1,3 @@
-#[cfg(feature = "ch-redis")]
 pub mod redis;
 
 use chrono::Duration;
@@ -6,7 +5,7 @@ use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 use serde_json;
 
-use super::result::Result;
+use super::errors::Result;
 
 pub fn get<C, K, V, F>(ch: &C, key: &String, days: i64, fun: F) -> Result<V>
 where

@@ -5,7 +5,7 @@ use r2d2::Pool;
 use r2d2_redis::RedisConnectionManager;
 use redis::{cmd, ConnectionAddr, ConnectionInfo};
 
-use super::super::result::Result;
+use super::super::errors::Result;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
@@ -49,7 +49,7 @@ impl super::Cache for Cache {
         let con = self.pool.get()?;
         let con = con.deref();
         let mut items = Vec::new();
-        let k = self.key(&s!("*"));
+        let k = self.key(&String::from("*"));
         let keys: Vec<String> = cmd("keys").arg(k).query(con)?;
         for it in keys {
             let ttl: isize = cmd("ttl").arg(it.clone()).query(con)?;
@@ -81,7 +81,7 @@ impl super::Cache for Cache {
     fn clear(&self) -> Result<isize> {
         let con = self.pool.get()?;
         let con = con.deref();
-        let keys: Vec<String> = cmd("keys").arg(self.key(&s!("*"))).query(con)?;
+        let keys: Vec<String> = cmd("keys").arg(self.key(&String::from("*"))).query(con)?;
 
         let len = keys.len();
         if len > 0 {
