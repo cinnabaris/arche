@@ -21,7 +21,7 @@ use super::{
     errors::{Error, Result},
 };
 
-use super::dao::postgresql;
+use super::orm::{self, schema::locales};
 
 pub trait Dao {
     fn get_locale(&self, lang: &String, code: &String) -> Result<String>;
@@ -31,13 +31,12 @@ pub trait Dao {
         code: &String,
         message: &String,
         override_: bool,
-    ) -> Result<Option<i32>>;
+    ) -> Result<Option<i64>>;
     fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>>;
 }
 
-impl<'a> Dao for postgresql::Dao<'a> {
+impl<'a> Dao for orm::Dao<'a> {
     fn get_locale(&self, lang: &String, code: &String) -> Result<String> {
-        use super::dao::postgresql::schema::locales;
         let msg = locales::dsl::locales
             .select(locales::dsl::message)
             .filter(locales::dsl::lang.eq(lang))
@@ -51,14 +50,13 @@ impl<'a> Dao for postgresql::Dao<'a> {
         code: &String,
         message: &String,
         override_: bool,
-    ) -> Result<Option<i32>> {
-        use super::dao::postgresql::schema::locales;
+    ) -> Result<Option<i64>> {
         let now = Utc::now().naive_utc();
         match locales::dsl::locales
             .select(locales::dsl::id)
             .filter(locales::dsl::lang.eq(lang))
             .filter(locales::dsl::code.eq(code))
-            .first::<i32>(self.db)
+            .first::<i64>(self.db)
         {
             Ok(id) => {
                 if !override_ {
@@ -82,14 +80,12 @@ impl<'a> Dao for postgresql::Dao<'a> {
                         locales::dsl::updated_at.eq(&now),
                     ))
                     .returning(locales::dsl::id)
-                    .get_result::<i32>(self.db)?;
+                    .get_result::<i64>(self.db)?;
                 Ok(Some(id))
             }
         }
     }
     fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>> {
-        use super::dao::postgresql::schema::locales;
-
         let mut items = BTreeMap::new();
         for (code, message) in locales::dsl::locales
             .select((locales::dsl::code, locales::dsl::message))
@@ -223,7 +219,7 @@ fn load_from_files(dir: PathBuf) -> Result<(BTreeMap<String, BTreeMap<String, St
                         if let Some(name) = name.to_str() {
                             let lang = &name[..name.len() - 4];
                             log::info!("find locale {}", lang);
-                            items.insert(s!(lang), load_from_ini(&it)?);
+                            items.insert(String::from(lang), load_from_ini(&it)?);
                         }
                     }
                 }

@@ -4,21 +4,15 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use lettre::{
-    smtp::{
-        authentication::{Credentials, Mechanism},
-        extension::ClientId,
-    },
+    smtp::authentication::{Credentials, Mechanism},
     EmailTransport, SmtpTransport,
 };
 use lettre_email::EmailBuilder;
 use log;
 use mime;
 use serde_json;
-use sys_info;
 
-use super::super::super::super::{
-    context::Context, errors::Result, orm::postgresql, queue, settings,
-};
+use super::super::{context::Context, errors::Result, orm::Dao, queue, settings};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Config {
@@ -64,7 +58,7 @@ impl queue::consumer::Handler for Consumer {
         }
         let db = self.ctx.db.get()?;
         let db = Dao::new(db.deref());
-        let cfg: Config = settings::get(&db, &self.ctx.secret_box, &String::from("site.smtp"))?;
+        let cfg: Config = settings::get(&db, &self.ctx.encryptor, &String::from("site.smtp"))?;
 
         let mut email = EmailBuilder::new()
             .to(it.to)
@@ -77,7 +71,7 @@ impl queue::consumer::Handler for Consumer {
         let email = email.build()?;
 
         let mut mailer = SmtpTransport::simple_builder(&cfg.host)?
-            .hello_name(ClientId::Domain(sys_info::hostname()?))
+            // .hello_name(ClientId::Domain(sys_info::hostname()?))
             .credentials(Credentials::new(cfg.user, cfg.password))
             .smtp_utf8(true)
             .authentication_mechanism(Mechanism::Plain)

@@ -12,12 +12,12 @@ use sitemap::structs::UrlEntry;
 use sitemap::writer::SiteMapWriter;
 
 use super::{
-    dao::{Connection, Dao}, env, graphql, i18n, jwt::Home, plugins, result::Result,
+    dao::{Connection, Dao},
+    env, graphql, i18n,
+    jwt::Home,
+    plugins,
+    result::Result,
 };
-
-pub fn catchers() -> Vec<Catcher> {
-    errors![not_found, bad_request, forbidden, internal_server]
-}
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();
@@ -62,22 +62,6 @@ fn sitemap<'a>(home: Home) -> Result<Xml<Vec<u8>>> {
     Ok(Xml(buf))
 }
 
-// https://en.wikipedia.org/wiki/Robots_exclusion_standard
-#[get("/robots.txt")]
-fn robots(home: Home) -> Result<String> {
-    let Home(home) = home;
-    Ok(format!(
-        "{}",
-        Robots::start_build()
-            .host(home.clone())
-            .start_section_for("*")
-            .disallow("/my/")
-            .sitemap((home + "/sitemap.xml").parse()?)
-            .end_section()
-            .finalize()
-    ))
-}
-
 #[get("/rss/<lang>")]
 fn rss(db: Connection, home: Home, lang: &RawStr) -> Result<Xml<Vec<u8>>> {
     let Home(home) = home;
@@ -114,34 +98,4 @@ fn rss(db: Connection, home: Home, lang: &RawStr) -> Result<Xml<Vec<u8>>> {
     ch.write_to(&mut buf)?;
 
     Ok(Xml(buf))
-}
-
-#[get("/assets/<file..>")]
-pub fn get_assets(cfg: State<env::Config>, file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(
-        Path::new("themes")
-            .join(&cfg.http.theme)
-            .join("assets")
-            .join(file),
-    ).ok()
-}
-
-#[error(404)]
-fn not_found() -> &'static str {
-    Status::NotFound.reason
-}
-
-#[error(400)]
-fn bad_request() -> &'static str {
-    Status::BadRequest.reason
-}
-
-#[error(403)]
-fn forbidden() -> &'static str {
-    Status::Forbidden.reason
-}
-
-#[error(500)]
-fn internal_server() -> &'static str {
-    Status::InternalServerError.reason
 }

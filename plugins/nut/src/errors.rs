@@ -10,5 +10,10 @@ error_chain!{
         Diesel(diesel::result::Error);
         Base64Decode(base64::DecodeError);
         Amqp(amqp::AMQPError);
+        Ini(ini::ini::Error);
+        LanguageTags(language_tags::Error);
+        LettreEmail(lettre_email::error::Error);
+        LettreSmtp(lettre::smtp::error::Error);
+        UrlParse(url::ParseError);
     }
 }

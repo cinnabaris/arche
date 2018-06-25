@@ -71,17 +71,23 @@ extern crate validator;
 pub mod macros;
 
 pub mod cache;
-// pub mod consumers;
+pub mod consumers;
 pub mod context;
 pub mod env;
 pub mod errors;
-// pub mod i18n;
+pub mod i18n;
 pub mod jwt;
 pub mod orm;
 pub mod pagination;
 pub mod queue;
 pub mod rfc;
-// pub mod routes;
+pub mod router;
 pub mod security;
-// pub mod settings;
+pub mod settings;
 pub mod storage;
+
+use chrono::NaiveDateTime;
+use sitemap::structs::ChangeFreq;
+
+pub type SitemapItem = (String, f32, ChangeFreq, NaiveDateTime);
+pub type RssItem = (String, String, String, NaiveDateTime);
