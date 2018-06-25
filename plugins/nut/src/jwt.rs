@@ -2,10 +2,12 @@ use std::ops::Add;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use frank_jwt::{decode, encode, Algorithm};
-use hyper::header::HOST;
-use rocket::http::Status;
-use rocket::request::{self, FromRequest};
-use rocket::{Outcome, Request};
+use hyper::header::{Header, Host};
+use rocket::{
+    http::Status,
+    request::{self, FromRequest},
+    Outcome, Request,
+};
 use serde_json::Value;
 
 use super::errors::Result;
@@ -18,7 +20,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Home {
 
     fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, ()> {
         let scheme = req.headers().get_one("X-Forwarded-Proto").unwrap_or("http");
-        if let Some(host) = req.headers().get_one(HOST.as_str()) {
+        if let Some(host) = req.headers().get_one(Host::header_name()) {
             return Outcome::Success(Home(format!("{}://{}", scheme, host)));
         }
         return Outcome::Failure((Status::BadRequest, ()));
@@ -30,7 +32,6 @@ impl<'a, 'r> FromRequest<'a, 'r> for Home {
 // https://www.ibm.com/support/knowledgecenter/zh/SSEQTP_8.5.5/com.ibm.websphere.wlp.doc/ae/cwlp_jwttoken.html
 // https://jwt.io/
 // https://tools.ietf.org/html/rfc7519
-#[derive(Clone)]
 pub struct Jwt {
     key: String,
     alg: Algorithm,

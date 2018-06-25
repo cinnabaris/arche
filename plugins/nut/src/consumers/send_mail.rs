@@ -5,7 +5,8 @@ use std::sync::Arc;
 
 use lettre::{
     smtp::{
-        authentication::{Credentials, Mechanism}, extension::ClientId,
+        authentication::{Credentials, Mechanism},
+        extension::ClientId,
     },
     EmailTransport, SmtpTransport,
 };
@@ -15,10 +16,12 @@ use mime;
 use serde_json;
 use sys_info;
 
-use super::super::super::{context::Context, dao::Dao, queue, result::Result, settings};
+use super::super::super::super::{
+    context::Context, errors::Result, orm::postgresql, queue, settings,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
-pub struct Smtp {
+pub struct Config {
     pub host: String,
     pub port: u16,
     pub user: String,
@@ -26,26 +29,26 @@ pub struct Smtp {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Email {
+pub struct Mail {
     pub to: String,
     pub subject: String,
     pub body: String,
     pub attachments: BTreeMap<PathBuf, String>,
 }
 
-pub const SEND_MAIL: &'static str = "send-mail";
+pub const NAME: &'static str = "send-mail";
 
-pub struct SendMail {
+pub struct Consumer {
     ctx: Arc<Context>,
 }
 
-impl SendMail {
+impl Consumer {
     pub fn new(ctx: Arc<Context>) -> Self {
         Self { ctx: ctx }
     }
 }
 
-impl queue::consumer::Handler for SendMail {
+impl queue::consumer::Handler for Consumer {
     fn handle(
         &self,
         _id: &String,
@@ -54,18 +57,18 @@ impl queue::consumer::Handler for SendMail {
         _priority: u8,
         payload: &[u8],
     ) -> Result<()> {
-        let it: Email = serde_json::from_slice(payload)?;
+        let it: Mail = serde_json::from_slice(payload)?;
         if !self.ctx.config.is_prod() {
             log::debug!("send email to {}: {}\n{}", it.to, it.subject, it.body);
             return Ok(());
         }
         let db = self.ctx.db.get()?;
         let db = Dao::new(db.deref());
-        let smtp: Smtp = settings::get(&db, &self.ctx.secret_box, &s!("site.smtp"))?;
+        let cfg: Config = settings::get(&db, &self.ctx.secret_box, &String::from("site.smtp"))?;
 
         let mut email = EmailBuilder::new()
             .to(it.to)
-            .from(&smtp.user[..])
+            .from(&cfg.user[..])
             .subject(it.subject)
             .html(it.body);
         for (file, name) in it.attachments {
@@ -73,9 +76,9 @@ impl queue::consumer::Handler for SendMail {
         }
         let email = email.build()?;
 
-        let mut mailer = SmtpTransport::simple_builder(&smtp.host)?
+        let mut mailer = SmtpTransport::simple_builder(&cfg.host)?
             .hello_name(ClientId::Domain(sys_info::hostname()?))
-            .credentials(Credentials::new(smtp.user, smtp.password))
+            .credentials(Credentials::new(cfg.user, cfg.password))
             .smtp_utf8(true)
             .authentication_mechanism(Mechanism::Plain)
             .build();

@@ -8,5 +8,7 @@ error_chain!{
         R2d2(r2d2::Error);
         ChronoParse(chrono::ParseError);
         Diesel(diesel::result::Error);
+        Base64Decode(base64::DecodeError);
+        Amqp(amqp::AMQPError);
     }
 }

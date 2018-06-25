@@ -1,5 +1,3 @@
-pub mod consumers;
-
 use chrono::{NaiveDateTime, Utc};
 use sitemap::structs::ChangeFreq;
 

@@ -5,7 +5,6 @@ use sodiumoxide::{
 
 use super::super::errors::Result;
 
-#[derive(Clone)]
 pub struct Encryptor {
     key: secretbox::Key,
 }

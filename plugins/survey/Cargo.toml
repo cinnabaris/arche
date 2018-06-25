@@ -3,4 +3,4 @@ name = "survey"
 version = "0.1.0"
 
 [dependencies]
-nut = "*"
+nut = { path = "../nut" }

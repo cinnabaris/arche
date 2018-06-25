@@ -16,7 +16,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn pool(&self) -> Result<Pool<RedisConnectionManager>> {
+    pub fn open(&self) -> Result<Pool<RedisConnectionManager>> {
         Ok(Pool::new(RedisConnectionManager::new(ConnectionInfo {
             addr: Box::new(ConnectionAddr::Tcp(self.host.clone(), self.port)),
             db: self.db,
@@ -25,7 +25,6 @@ impl Config {
     }
 }
 
-#[derive(Clone)]
 pub struct Cache {
     namespace: String,
     pool: Pool<RedisConnectionManager>,
@@ -44,7 +43,7 @@ impl Cache {
     }
 }
 
-impl super::Cache for Cache {
+impl super::Provider for Cache {
     fn keys(&self) -> Result<Vec<(String, isize)>> {
         let con = self.pool.get()?;
         let con = con.deref();

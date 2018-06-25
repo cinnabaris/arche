@@ -67,10 +67,21 @@ extern crate url;
 extern crate uuid;
 extern crate validator;
 
+#[macro_use]
+pub mod macros;
+
 pub mod cache;
+// pub mod consumers;
+pub mod context;
+pub mod env;
 pub mod errors;
+// pub mod i18n;
 pub mod jwt;
 pub mod orm;
 pub mod pagination;
+pub mod queue;
 pub mod rfc;
+// pub mod routes;
 pub mod security;
+pub mod settings;
+pub mod storage;

@@ -4,7 +4,7 @@ version = "0.1.0"
 
 [dependencies]
 error-chain = "0.12"
-hyper = "0.12"
+hyper = "0.11"
 toml = "0.4"
 rust-ini = "0.10"
 csv = "1"
@@ -55,7 +55,7 @@ features=["query_encoding"]
 
 [dependencies.diesel]
 version = "1.3"
-features = ["postgres", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
+features = ["postgres", "mysql", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
 
 [dependencies.chrono]
 version = "0.4"

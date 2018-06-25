@@ -17,11 +17,11 @@ use serde::ser::Serialize;
 use url::Url;
 
 use super::{
-    env, result::{Error, Result},
+    env,
+    errors::{Error, Result},
 };
 
-#[cfg(feature = "postgresql")]
-use super::dao::postgresql::{self, schema::locales};
+use super::dao::postgresql;
 
 pub trait Dao {
     fn get_locale(&self, lang: &String, code: &String) -> Result<String>;
@@ -35,9 +35,9 @@ pub trait Dao {
     fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>>;
 }
 
-#[cfg(feature = "postgresql")]
 impl<'a> Dao for postgresql::Dao<'a> {
     fn get_locale(&self, lang: &String, code: &String) -> Result<String> {
+        use super::dao::postgresql::schema::locales;
         let msg = locales::dsl::locales
             .select(locales::dsl::message)
             .filter(locales::dsl::lang.eq(lang))
@@ -52,6 +52,7 @@ impl<'a> Dao for postgresql::Dao<'a> {
         message: &String,
         override_: bool,
     ) -> Result<Option<i32>> {
+        use super::dao::postgresql::schema::locales;
         let now = Utc::now().naive_utc();
         match locales::dsl::locales
             .select(locales::dsl::id)
@@ -87,6 +88,8 @@ impl<'a> Dao for postgresql::Dao<'a> {
         }
     }
     fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>> {
+        use super::dao::postgresql::schema::locales;
+
         let mut items = BTreeMap::new();
         for (code, message) in locales::dsl::locales
             .select((locales::dsl::code, locales::dsl::message))
@@ -179,7 +182,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Locale {
 //-----------------------------------------------------------------------------
 
 pub fn e<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Option<S>) -> Error {
-    Error::WithDescription(t(db, lang, code, args))
+    t(db, lang, code, args).into()
 }
 
 pub fn t<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Option<S>) -> String {
