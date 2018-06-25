@@ -2,9 +2,6 @@
 
 A complete open source e-commerce solution built with Rust and React(STILL IN DEVELOPMENT).
 
-Inspired by [Solidus](https://github.com/solidusio/solidus) and [Discourse
-](https://github.com/discourse/discourse).
-
 ## Install
 
 -   install rustup
