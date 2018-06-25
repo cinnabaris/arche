@@ -27,6 +27,7 @@ pub fn verify(cipher: &[u8], plain: &[u8]) -> bool {
     }
 }
 
+#[derive(Clone)]
 pub struct Encryptor {
     key: secretbox::Key,
 }

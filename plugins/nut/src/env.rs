@@ -10,11 +10,6 @@ use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 
 use super::{cache, errors::Result, orm, queue, storage};
 
-pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
-pub const NAME: &'static str = env!("CARGO_PKG_NAME");
-pub const DESCRIPTION: &'static str = env!("CARGO_PKG_DESCRIPTION");
-pub const HOMEPAGE: &'static str = env!("CARGO_PKG_HOMEPAGE");
-pub const AUTHORS: &'static str = env!("CARGO_PKG_AUTHORS");
 pub const BANNER: &'static str = r#"
 _____   _____ _    _ ______
 /\   |  __ \ / ____| |  | |  ____|

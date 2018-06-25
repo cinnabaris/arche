@@ -1,4 +1,3 @@
-pub mod migration;
 pub mod schema;
 
 use std::ops::Deref;

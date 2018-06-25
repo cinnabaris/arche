@@ -25,7 +25,6 @@ extern crate amqp;
 extern crate base64;
 extern crate byteorder;
 extern crate chrono;
-extern crate clap;
 extern crate csv;
 extern crate epub;
 extern crate eui48;

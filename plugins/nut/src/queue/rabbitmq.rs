@@ -13,7 +13,7 @@ pub struct Config {
     pub user: String,
     pub password: String,
     #[serde(rename = "virtual")]
-    pub _virtual: String,
+    pub virtual_: String,
 }
 
 impl Config {
@@ -23,12 +23,13 @@ impl Config {
             port: self.port,
             login: self.user.clone(),
             password: self.password.clone(),
-            vhost: self._virtual.clone(),
+            vhost: self.virtual_.clone(),
             ..Default::default()
         }
     }
 }
 
+#[derive(Clone)]
 pub struct Queue {
     queue: String,
     cfg: Config,

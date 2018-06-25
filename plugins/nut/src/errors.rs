@@ -15,5 +15,10 @@ error_chain!{
         LettreEmail(lettre_email::error::Error);
         LettreSmtp(lettre::smtp::error::Error);
         UrlParse(url::ParseError);
+        TomlSer(toml::ser::Error);
+        TomlDe(toml::de::Error);
+        Log4rs(log4rs::Error);
+        RocketConfig(rocket::config::ConfigError);
+        HandlebarsTemplateRender(handlebars::TemplateRenderError);
     }
 }

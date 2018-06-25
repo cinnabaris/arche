@@ -1,4 +1,3 @@
-pub mod migration;
 pub mod schema;
 
 use diesel::{mysql::MysqlConnection, r2d2::ConnectionManager};
