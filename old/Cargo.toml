@@ -1,13 +1,4 @@
-[package]
-name = "arche"
-version = "0.3.0"
-authors = ["Jeremy Zheng <jitang.zheng@gmail.com>"]
-description = "A complete open source e-commerce solution built with Rust and React."
-homepage = "https://github.com/cinnabaris/arche"
-license = "MIT"
 
-[profile.release]
-lto = true
 
 [features]
 default = ["ch-redis", "sodium", "mq-rabbit", "st-nfs", "postgresql"]

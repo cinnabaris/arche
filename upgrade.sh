@@ -3,14 +3,13 @@
 set -e
 
 rustup update
-rustup component add rls-preview rust-analysis rust-src
-cargo install --force rustfmt-nightly
-cargo install --force clippy
-cargo install --force diesel_cli
+rustup component add rls-preview rust-analysis rust-src rustfmt-preview
+# cargo install --force clippy
+# cargo install --force diesel_cli
 cargo clean
 cargo update
-cargo build
 cargo check
+cargo build
 cargo doc
 cargo build --release
 
