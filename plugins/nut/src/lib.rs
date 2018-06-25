@@ -69,4 +69,5 @@ extern crate validator;
 
 pub mod cache;
 pub mod errors;
+pub mod orm;
 pub mod security;

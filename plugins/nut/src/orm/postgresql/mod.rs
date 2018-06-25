@@ -6,10 +6,12 @@ use std::ops::Deref;
 use diesel::{pg::PgConnection, r2d2::ConnectionManager};
 use r2d2::{self, PooledConnection};
 use rocket::{
-    http::Status, request::{self, FromRequest}, Outcome, Request, State,
+    http::Status,
+    request::{self, FromRequest},
+    Outcome, Request, State,
 };
 
-use super::super::result::Result;
+use super::super::errors::Result;
 
 pub const DRIVER: &'static str = "postgresql";
 

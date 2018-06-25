@@ -11,7 +11,7 @@ use diesel::sql_query;
 use diesel::sql_types::Text;
 use log;
 
-use super::super::super::result::Result;
+use super::super::super::errors::Result;
 
 const TABLE_NAME: &'static str = "__diesel_schema_migrations";
 const FIRST_VERSION: &'static str = "00000000000000";
@@ -121,7 +121,7 @@ fn migrations_list() -> Result<BTreeMap<String, PathBuf>> {
                     if let Some(i) = name.find('_') {
                         let name = &name[..i];
                         let version = if name == FIRST_VERSION {
-                            s!(name)
+                            String::from(name)
                         } else {
                             NaiveDateTime::parse_from_str(name, "%Y-%m-%d-%H%M%S")?
                                 .format("%Y%m%d%H%M%S")

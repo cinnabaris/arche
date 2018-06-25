@@ -1,16 +1,8 @@
+pub mod postgresql;
+
 use chrono::NaiveDateTime;
 
-#[cfg(feature = "mysql")]
-pub mod mysql;
-#[cfg(feature = "mysql")]
-pub use self::mysql::*;
-
-#[cfg(feature = "postgresql")]
-pub mod postgresql;
-#[cfg(feature = "postgresql")]
-pub use self::postgresql::*;
-
-use super::result::Result;
+use super::errors::Result;
 
 pub trait Migration {
     fn migrate(&self) -> Result<()>;
