@@ -33,5 +33,5 @@ gem install rails
 -   create application script
 
 ```bash
-rails new arche -d postgresql --api --skip-test --skip-git
+rails new arche -d postgresql --api --skip-test
 ```
