@@ -34,7 +34,8 @@ fn doc() -> Html<String> {
     graphiql_source("/graphql")
 }
 
-#[get("/graphql?<request>")]
+// #[get("/graphql?<request>")]
+#[post("/graphql", data = "<request>")]
 fn get(
     db: Database,
     token: Token,

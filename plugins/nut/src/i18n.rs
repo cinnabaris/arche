@@ -24,19 +24,19 @@ use super::{
 use super::orm::{self, schema::locales};
 
 pub trait Dao {
-    fn get_locale(&self, lang: &String, code: &String) -> Result<String>;
-    fn set_locale(
+    fn get(&self, lang: &String, code: &String) -> Result<String>;
+    fn set(
         &self,
         lang: &String,
         code: &String,
         message: &String,
         override_: bool,
     ) -> Result<Option<i64>>;
-    fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>>;
+    fn by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>>;
 }
 
 impl<'a> Dao for orm::Dao<'a> {
-    fn get_locale(&self, lang: &String, code: &String) -> Result<String> {
+    fn get(&self, lang: &String, code: &String) -> Result<String> {
         let msg = locales::dsl::locales
             .select(locales::dsl::message)
             .filter(locales::dsl::lang.eq(lang))
@@ -44,7 +44,7 @@ impl<'a> Dao for orm::Dao<'a> {
             .first::<String>(self.db)?;
         Ok(msg)
     }
-    fn set_locale(
+    fn set(
         &self,
         lang: &String,
         code: &String,
@@ -85,7 +85,7 @@ impl<'a> Dao for orm::Dao<'a> {
             }
         }
     }
-    fn list_locales_by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>> {
+    fn by_lang(&self, lang: &String) -> Result<BTreeMap<String, String>> {
         let mut items = BTreeMap::new();
         for (code, message) in locales::dsl::locales
             .select((locales::dsl::code, locales::dsl::message))
@@ -182,7 +182,7 @@ pub fn e<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Optio
 }
 
 pub fn t<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Option<S>) -> String {
-    if let Ok(msg) = db.get_locale(lang, code) {
+    if let Ok(msg) = db.get(lang, code) {
         if let Some(args) = args {
             if let Ok(msg) = Handlebars::new().render_template(&msg, &args) {
                 return msg;
@@ -200,7 +200,7 @@ pub fn sync<D: Dao>(db: &D, dir: PathBuf) -> Result<(usize, usize)> {
     for (lang, items) in load_from_files(dir)? {
         for (code, message) in items {
             total = total + 1;
-            if let Some(_id) = db.set_locale(&lang, &code, &message, false)? {
+            if let Some(_id) = db.set(&lang, &code, &message, false)? {
                 inserted = inserted + 1;
             }
         }

@@ -9,11 +9,11 @@ use super::{context::Context, models::Locale};
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[graphql(description = "Query locales by lang")]
-pub struct LocalesByLang {
+pub struct ListLocaleByLang {
     #[validate(length(min = "2", max = "8"))]
     pub lang: String,
 }
-impl LocalesByLang {
+impl ListLocaleByLang {
     pub fn call(&self, ctx: &Context) -> Result<Vec<Locale>> {
         self.validate()?;
         let db = ctx.db.deref();
