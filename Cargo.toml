@@ -1,9 +1,0 @@
-[profile.release]
-lto = true
-
-[workspace]
-members = [
-    "app",
-    "plugins/nut",
-    "plugins/survey",
-]
