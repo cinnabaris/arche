@@ -177,14 +177,14 @@ impl<'a, 'r> FromRequest<'a, 'r> for Locale {
 
 //-----------------------------------------------------------------------------
 
-pub fn e<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Option<S>) -> Error {
+pub fn e<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: &Option<S>) -> Error {
     t(db, lang, code, args).into()
 }
 
-pub fn t<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: Option<S>) -> String {
+pub fn t<S: Serialize, D: Dao>(db: &D, lang: &String, code: &String, args: &Option<S>) -> String {
     if let Ok(msg) = db.get(lang, code) {
         if let Some(args) = args {
-            if let Ok(msg) = Handlebars::new().render_template(&msg, &args) {
+            if let Ok(msg) = Handlebars::new().render_template(&msg, args) {
                 return msg;
             }
         } else {

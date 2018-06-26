@@ -6,7 +6,7 @@ use std::path::Path;
 
 use base64;
 use handlebars::Handlebars;
-use nut::{cache, env, errors::Result, orm, queue, security, storage};
+use nut::{cache, env, errors::Result, oauth, orm, queue, security, storage};
 use rocket::config::Environment;
 use toml;
 
@@ -65,6 +65,13 @@ pub fn config() -> Result<()> {
                 String::from("http://localhost:3000"),
                 String::from("http://localhost:8080"),
             ],
+        },
+        oauth: oauth::Config {
+            line: Some(oauth::line::Config {
+                channel_id: String::from("123456"),
+                channel_secret: String::from("secret"),
+                callback_url: String::from("http://localhost:3000/my/oauth/line"),
+            }),
         },
         database: orm::Config {
             #[cfg(feature = "postgresql")]

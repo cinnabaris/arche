@@ -12,8 +12,10 @@ graphql_object!(Query: Context |&self| {
     }
 
     //--------------------nut-----------------------
-
-    field locales(&executor, form: nut::graphql::query::ListLocaleByLang) -> FieldResult<Vec<nut::graphql::models::Locale>> {
+    field getSiteInfo(&executor) -> FieldResult<Result<nut::graphql::models::SiteInfo>> {
+        ge!(nut::graphql::query::get_site_info(&executor.context()))
+    }
+    field listLocalesByLang(&executor, form: nut::graphql::query::ListLocaleByLang) -> FieldResult<Vec<nut::graphql::models::Locale>> {
         gq!(executor, form)
     }
 

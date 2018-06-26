@@ -8,7 +8,7 @@ use rocket::{
 };
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 
-use super::{cache, errors::Result, orm, queue, storage};
+use super::{cache, errors::Result, oauth, orm, queue, storage};
 
 pub const BANNER: &'static str = r#"
 _____   _____ _    _ ______
@@ -29,6 +29,7 @@ pub struct Config {
     pub secret_key: String, // 32-bits base64 encode string
     pub workers: u16,
     pub http: Http,
+    pub oauth: oauth::Config,
     pub database: orm::Config,
     pub cache: cache::Config,
     pub queue: queue::Config,

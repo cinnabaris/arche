@@ -4,8 +4,57 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use validator::Validate;
 
-use super::super::{errors::Result, orm::schema::*, rfc::Utc as ToUtc};
-use super::{context::Context, models::Locale};
+use super::super::{
+    errors::Result,
+    i18n,
+    orm::{schema::*, Dao},
+    rfc::Utc as ToUtc,
+    settings,
+};
+use super::{
+    context::Context,
+    models::{Locale, Oauth, SiteInfo},
+};
+
+pub fn get_site_info(ctx: &Context) -> Result<SiteInfo> {
+    let db = ctx.db.deref();
+    let db = Dao::new(db);
+    Ok(SiteInfo {
+        locale: ctx.locale.clone(),
+        title: i18n::t(
+            &db,
+            &ctx.locale,
+            &String::from("site.title"),
+            &None::<String>,
+        ),
+        subhead: i18n::t(
+            &db,
+            &ctx.locale,
+            &String::from("site.subhead"),
+            &None::<String>,
+        ),
+        keywords: i18n::t(
+            &db,
+            &ctx.locale,
+            &String::from("site.keywords"),
+            &None::<String>,
+        ),
+        description: i18n::t(
+            &db,
+            &ctx.locale,
+            &String::from("site.description"),
+            &None::<String>,
+        ),
+        copyright: i18n::t(
+            &db,
+            &ctx.locale,
+            &String::from("site.copyright"),
+            &None::<String>,
+        ),
+        author: settings::get(&db, &ctx.encryptor, &String::from("site.author"))?,
+        oauth: Oauth::new(&ctx.config.oauth),
+    })
+}
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[graphql(description = "Query locales by lang")]

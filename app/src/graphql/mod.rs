@@ -23,7 +23,10 @@ use juniper_rocket::{graphiql_source, GraphQLRequest, GraphQLResponse};
 use rocket::response::content::Html;
 use rocket::{Route, State};
 
-use nut::{graphql::context::Context, i18n::Locale, jwt::Token, orm::Connection as Database};
+use nut::{
+    env::Config, graphql::context::Context, i18n::Locale, jwt::Token, orm::Connection as Database,
+    security::Encryptor,
+};
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     vec![("/", routes!(doc, get))]
@@ -38,6 +41,8 @@ fn doc() -> Html<String> {
 #[post("/graphql", data = "<request>")]
 fn get(
     db: Database,
+    config: Config,
+    encryptor: Encryptor,
     token: Token,
     locale: Locale,
     remote: SocketAddr,
@@ -48,6 +53,8 @@ fn get(
     request.execute(
         &schema,
         &Context {
+            config: config,
+            encryptor: encryptor,
             locale: locale.name,
             remote: remote,
             db: db,

@@ -1,16 +1,18 @@
 use std::net::SocketAddr;
 
 use juniper;
-use rocket::http::Status;
+use rocket::{http::Status, State};
 
-use super::super::{errors::Result, orm::Connection as Database};
+use super::super::{env::Config, errors::Result, orm::Connection as Database, security::Encryptor};
 use super::models::Role;
 
 pub struct Context {
     pub locale: String,
     pub token: Option<String>,
     pub remote: SocketAddr,
+    pub encryptor: Encryptor,
     pub db: Database,
+    pub config: Config,
 }
 
 impl juniper::Context for Context {}

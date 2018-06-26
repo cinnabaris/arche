@@ -77,6 +77,7 @@ pub mod errors;
 pub mod graphql;
 pub mod i18n;
 pub mod jwt;
+pub mod oauth;
 pub mod orm;
 pub mod pagination;
 pub mod queue;
