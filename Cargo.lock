@@ -81,7 +81,7 @@ dependencies = [
 
 [[package]]
 name = "arche"
-version = "0.4.0"
+version = "0.1.0"
 dependencies = [
  "amqp 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "base64 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
