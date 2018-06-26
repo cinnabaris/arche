@@ -8,7 +8,7 @@ import VueI18n from 'vue-i18n'
 import Vuetify from 'vuetify'
 
 import routes from './plugins'
-import messages from './locales'
+import {locales} from './locales'
 
 Vue.config.productionTip = false
 
@@ -19,7 +19,7 @@ Vue.use(Vuetify)
 
 const router = new VueRouter({base: '/my', mode: 'history', routes})
 const store = new Vuex.Store({})
-const i18n = new VueI18n({locale: 'en-US', messages})
+const i18n = new VueI18n(locales)
 
 new Vue({
   router,
