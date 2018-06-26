@@ -1,2 +1,0 @@
-class Notice < ApplicationRecord
-end

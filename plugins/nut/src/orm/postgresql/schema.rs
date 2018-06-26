@@ -31,9 +31,79 @@ table! {
         logo -> Varchar,
         loc -> Varchar,
         lang -> Varchar,
-        sort -> Int2,
+        position -> Int2,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_badges (id) {
+        id -> Int8,
+        body -> Text,
+        title -> Varchar,
+        media_type -> Varchar,
+        icon -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_categories (id) {
+        id -> Int8,
+        title -> Varchar,
+        body -> Text,
+        media_type -> Varchar,
+        background -> Varchar,
+        foreground -> Varchar,
+        position -> Int2,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_posts (id) {
+        id -> Int8,
+        user_id -> Int8,
+        topic_id -> Int8,
+        post_id -> Nullable<Int8>,
+        body -> Text,
+        media_type -> Varchar,
+        deleted_at -> Nullable<Timestamp>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_posts_badges (id) {
+        id -> Int8,
+        badage_id -> Int8,
+        post_id -> Int8,
+    }
+}
+
+table! {
+    forum_topics (id) {
+        id -> Int8,
+        category_id -> Int8,
+        user_id -> Int8,
+        title -> Varchar,
+        body -> Text,
+        media_type -> Varchar,
+        deleted_at -> Nullable<Timestamp>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    forum_topics_badges (id) {
+        id -> Int8,
+        badage_id -> Int8,
+        topic_id -> Int8,
     }
 }
 
@@ -43,7 +113,7 @@ table! {
         title -> Varchar,
         home -> Varchar,
         logo -> Varchar,
-        sort -> Int2,
+        position -> Int2,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -94,12 +164,13 @@ table! {
 }
 
 table! {
-    notices (id) {
+    notifications (id) {
         id -> Int8,
         user_id -> Int8,
-        title -> Varchar,
+        url -> Varchar,
         body -> Varchar,
         media_type -> Varchar,
+        level -> Varchar,
         read -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -235,12 +306,18 @@ allow_tables_to_appear_in_same_query!(
     ar_internal_metadata,
     attachments,
     cards,
+    forum_badges,
+    forum_categories,
+    forum_posts,
+    forum_posts_badges,
+    forum_topics,
+    forum_topics_badges,
     friend_links,
     leave_words,
     links,
     locales,
     logs,
-    notices,
+    notifications,
     policies,
     roles,
     schema_migrations,
