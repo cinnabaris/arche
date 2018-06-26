@@ -6,12 +6,12 @@ build: api www
 api:
 	cargo build --release
 	strip -s target/release/arche
-	mkdir -p $(dist)
-	-cp -r target/release/arche templates themes log4rs.yml LICENSE README.md $(dist)/
+	mkdir -p $(dist)/public $(dist)/tmp
+	-cp -r target/release/arche templates themes log4rs.yml package.json package-lock.json LICENSE README.md $(dist)/
 
 www:
 	cd dashboard && npm run build
-	-cp -r dashboard/build $(dist)/dashboard
+	-cp -r dashboard/dist $(dist)/dashboard
 
 schema:
 	DATABASE_URL="postgres://postgres:@localhost:5432/arche" diesel print-schema > plugins/nut/src/orm/postgresql/schema.rs
@@ -19,4 +19,4 @@ schema:
 
 clean:
 	cargo clean
-	-rm -r $(dist) $(dist).tar.xz dashboard/build
+	-rm -r $(dist) $(dist).tar.xz dashboard/dist
