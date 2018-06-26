@@ -12,6 +12,7 @@ pub fn consume(ctx: &Arc<Context>) -> Result<()> {
                 String::from(send_mail::NAME),
                 Box::new(send_mail::Consumer::new(Arc::clone(ctx))),
             );
+            info!("starting worker thread");
             let name = ch.basic_consume(
                 it,
                 &ctx.config.queue.name[..],

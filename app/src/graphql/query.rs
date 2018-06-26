@@ -1,7 +1,7 @@
-// use juniper::{self, FieldResult};
+use juniper::{self, FieldResult};
+use nut::{self, graphql::context::Context};
 
 use super::super::app::VERSION;
-use super::context::Context;
 
 pub struct Query;
 
@@ -11,20 +11,12 @@ graphql_object!(Query: Context |&self| {
         VERSION
     }
 
-    //--------------------nut--------------------
+    //--------------------nut-----------------------
 
-    // field locales(&executor, form: nut::schema::locales::FmByLang) -> FieldResult<Vec<nut::schema::locales::Locale>> {
-    //     gq!(executor, form)
-    // }
+    field locales(&executor, form: nut::graphql::query::LocalesByLang) -> FieldResult<Vec<nut::graphql::models::Locale>> {
+        gq!(executor, form)
+    }
 
-    //--------------------cbeta--------------------
-
-    // field cbetaIndexBook(&executor) -> FieldResult<Vec<cbeta::schema::books::Book>> {
-    //     ge!(cbeta::schema::books::all(&executor.context()))
-    // }
-    //
-    // field cbetaShowBook(&executor, form: cbeta::schema::books::FmById) -> FieldResult<cbeta::models::Book> {
-    //     gq!(executor, form)
-    // }
+    //--------------------forum--------------------
 
 });

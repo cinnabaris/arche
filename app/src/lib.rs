@@ -5,10 +5,6 @@ extern crate rocket;
 #[macro_use]
 extern crate log;
 #[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
 extern crate serde_json;
 #[macro_use]
 extern crate juniper;
@@ -17,6 +13,7 @@ extern crate amqp;
 extern crate base64;
 extern crate chrono;
 extern crate clap;
+extern crate diesel;
 extern crate handlebars;
 extern crate juniper_rocket;
 extern crate nut;
