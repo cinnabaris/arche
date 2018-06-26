@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local, NaiveDateTime};
+use chrono::{DateTime, Local, NaiveDateTime, Utc as UTC};
 
 pub trait RFC822 {
     fn to_rfc822(&self) -> String;
@@ -25,5 +25,15 @@ impl RFC3399 for NaiveDateTime {
         DateTime::<Local>::from_utc(*self, *Local::now().offset())
             .format("%+")
             .to_string()
+    }
+}
+
+pub trait Utc {
+    fn to_utc(&self) -> DateTime<UTC>;
+}
+
+impl Utc for NaiveDateTime {
+    fn to_utc(&self) -> DateTime<UTC> {
+        DateTime::<UTC>::from_utc(*self, *UTC::now().offset())
     }
 }

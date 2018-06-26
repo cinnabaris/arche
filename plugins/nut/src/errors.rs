@@ -20,5 +20,6 @@ error_chain!{
         Log4rs(log4rs::Error);
         RocketConfig(rocket::config::ConfigError);
         HandlebarsTemplateRender(handlebars::TemplateRenderError);
+        Validator(validator::ValidationErrors);
     }
 }

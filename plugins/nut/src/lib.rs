@@ -9,7 +9,7 @@ extern crate rocket;
 #[macro_use]
 extern crate error_chain;
 #[macro_use(log)]
-extern crate log;
+pub extern crate log;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
@@ -74,6 +74,7 @@ pub mod consumers;
 pub mod context;
 pub mod env;
 pub mod errors;
+pub mod graphql;
 pub mod i18n;
 pub mod jwt;
 pub mod orm;

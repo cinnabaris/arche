@@ -2,7 +2,7 @@ use std::ops::Add;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use frank_jwt::{decode, encode, Algorithm};
-use hyper::header::{Header, Host};
+use hyper::header::{Authorization, Bearer, Header, Host, Raw};
 use rocket::{
     http::Status,
     request::{self, FromRequest},
@@ -27,6 +27,26 @@ impl<'a, 'r> FromRequest<'a, 'r> for Home {
     }
 }
 
+//-----------------------------------------------------------------------------
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Token(pub Option<String>);
+
+impl<'a, 'r> FromRequest<'a, 'r> for Token {
+    type Error = ();
+
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, ()> {
+        if let Some(auth) = req
+            .headers()
+            .get_one(Authorization::<Bearer>::header_name())
+        {
+            if let Ok(auth) = Authorization::<Bearer>::parse_header(&Raw::from(auth)) {
+                let Authorization::<Bearer>(bearer) = auth;
+                return Outcome::Success(Token(Some(bearer.token)));
+            }
+        }
+        Outcome::Success(Token(None))
+    }
+}
 //-----------------------------------------------------------------------------
 
 // https://www.ibm.com/support/knowledgecenter/zh/SSEQTP_8.5.5/com.ibm.websphere.wlp.doc/ae/cwlp_jwttoken.html
