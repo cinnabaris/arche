@@ -11,7 +11,7 @@ use clap;
 use nut::{env, errors::Result};
 use sodiumoxide;
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const NAME: &'static str = env!("CARGO_PKG_NAME");
 const DESCRIPTION: &'static str = env!("CARGO_PKG_DESCRIPTION");
 const HOMEPAGE: &'static str = env!("CARGO_PKG_HOMEPAGE");

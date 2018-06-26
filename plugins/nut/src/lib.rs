@@ -84,6 +84,7 @@ pub mod router;
 pub mod security;
 pub mod settings;
 pub mod storage;
+pub mod sys;
 
 use chrono::NaiveDateTime;
 use sitemap::structs::ChangeFreq;

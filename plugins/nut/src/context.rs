@@ -4,6 +4,7 @@ use frank_jwt::Algorithm;
 
 use super::{cache, env::Config, errors::Result, jwt::Jwt, orm, queue, security::Encryptor};
 
+#[derive(Clone)]
 pub struct Context {
     pub db: orm::Pool,
     pub cache: Arc<Box<cache::Cache>>,

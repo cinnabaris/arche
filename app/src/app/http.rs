@@ -10,7 +10,7 @@ use rocket::{
 };
 use rocket_contrib::Template;
 
-use super::super::router;
+use super::super::{graphql, router, worker};
 
 pub fn server() -> Result<()> {
     let ctx = Context::new(&super::parse_config()?)?;
@@ -39,10 +39,10 @@ pub fn server() -> Result<()> {
         .manage(ctx.cache.clone())
         .manage(ctx.encryptor.clone())
         .manage(ctx.queue.clone())
-        // .manage(graphql::schema::Schema::new(
-        //     graphql::query::Query {},
-        //     graphql::mutation::Mutation {},
-        // ))
+        .manage(graphql::schema::Schema::new(
+            graphql::query::Query {},
+            graphql::mutation::Mutation {},
+        ))
         .manage(ctx.config.clone());
 
     for (pt, rt) in router::routes() {
@@ -64,12 +64,10 @@ pub fn server() -> Result<()> {
 
     // worker
     loop {
-        // let name = sys_info::hostname()?;
-        // info!("starting worker thread {}", name);
-        // match ctx.queue.consume(name, &Arc::clone(&ctx)) {
-        //     Ok(_) => info!("exiting worker"),
-        //     Err(e) => error!("{:?}", e),
-        // };
+        match worker::consume(&Arc::new(ctx.clone())) {
+            Ok(_) => info!("exiting worker"),
+            Err(e) => error!("{:?}", e),
+        };
         thread::sleep(Duration::from_secs(10));
     }
 }

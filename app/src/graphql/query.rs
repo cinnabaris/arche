@@ -1,6 +1,6 @@
 // use juniper::{self, FieldResult};
 
-use super::super::env;
+use super::super::app::VERSION;
 use super::context::Context;
 
 pub struct Query;
@@ -8,7 +8,7 @@ pub struct Query;
 graphql_object!(Query: Context |&self| {
 
     field apiVersion() -> &str {
-        env::VERSION
+        VERSION
     }
 
     //--------------------nut--------------------

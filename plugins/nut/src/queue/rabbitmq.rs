@@ -17,7 +17,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn options(&self) -> Options {
+    fn options(&self) -> Options {
         Options {
             host: self.host.clone(),
             port: self.port,
@@ -27,29 +27,15 @@ impl Config {
             ..Default::default()
         }
     }
-}
 
-#[derive(Clone)]
-pub struct Queue {
-    queue: String,
-    cfg: Config,
-}
-
-impl Queue {
-    pub fn new(queue: String, cfg: Config) -> Self {
-        Self {
-            queue: queue,
-            cfg: cfg,
-        }
-    }
-    fn open<F>(&self, f: F) -> Result<()>
+    pub fn open<F>(&self, queue: &String, f: F) -> Result<()>
     where
         F: Fn(&mut amqp::Channel) -> Result<()>,
     {
-        let mut ss = amqp::Session::new(self.cfg.options())?;
+        let mut ss = amqp::Session::new(self.options())?;
         let mut ch = ss.open_channel(1)?;
         ch.queue_declare(
-            &self.queue[..],
+            &queue[..],
             false, // passive,
             true,  // durable
             false, // exclusive
@@ -67,6 +53,21 @@ impl Queue {
     }
 }
 
+#[derive(Clone)]
+pub struct Queue {
+    queue: String,
+    cfg: Config,
+}
+
+impl Queue {
+    pub fn new(queue: String, cfg: Config) -> Self {
+        Self {
+            queue: queue,
+            cfg: cfg,
+        }
+    }
+}
+
 impl super::Queue for Queue {
     fn publish(
         &self,
@@ -77,7 +78,7 @@ impl super::Queue for Queue {
     ) -> Result<()> {
         let id = Uuid::new_v4().to_string();
         log::info!("push task into queue {}@{}", id, self.queue);
-        self.open(|ch| {
+        self.cfg.open(&self.queue, |ch| {
             ch.basic_publish(
                 "",
                 &self.queue[..],

@@ -1,21 +1,28 @@
-#![feature(extern_prelude)]
+#![feature(extern_prelude, plugin, attr_literals, custom_attribute)]
+#![plugin(rocket_codegen)]
+extern crate rocket;
 
 #[macro_use]
 extern crate log;
 #[macro_use]
+extern crate diesel;
+#[macro_use]
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
-
-extern crate base64;
 #[macro_use]
-extern crate diesel;
+extern crate juniper;
+
+extern crate amqp;
+extern crate base64;
 extern crate chrono;
 extern crate clap;
 extern crate handlebars;
+extern crate juniper_rocket;
 extern crate nut;
-extern crate rocket;
 extern crate rocket_contrib;
+extern crate serde;
+extern crate serde_xml_rs;
 extern crate sodiumoxide;
 extern crate survey;
 extern crate toml;
