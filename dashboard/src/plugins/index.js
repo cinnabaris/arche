@@ -13,8 +13,8 @@ Vue.use(VueRouter)
 Vue.use(VueI18n)
 Vue.use(Vuetify)
 
-const router = new VueRouter({mode: 'history', routes: [].concat(forum).concat(survey).concat(nut)})
-
+const routes = [].concat(forum).concat(survey).concat(nut)
+const router = new VueRouter({base: '/my', mode: 'history', routes})
 const store = new Vuex.Store({})
 
 export default {
