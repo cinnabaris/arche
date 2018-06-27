@@ -1,6 +1,6 @@
 # arche
 
-A complete open source e-commerce solution built with Rust and React(STILL IN DEVELOPMENT).
+A complete open source e-commerce solution built with Rust language(STILL IN DEVELOPMENT).
 
 ## Install
 
@@ -120,3 +120,4 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [Let’s Encrypt](https://letsencrypt.org/)
 -   [Certbot](https://certbot.eff.org/)
 -   [SSL Server Test](https://www.ssllabs.com/ssltest/index.html)
+-   [LINE Developers](https://developers.line.me/en/)
