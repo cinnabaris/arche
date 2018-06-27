@@ -14,6 +14,7 @@ extern crate validator_derive;
 #[macro_use]
 extern crate juniper;
 
+#[cfg(feature = "mq-rabbit")]
 extern crate amqp;
 extern crate base64;
 extern crate byteorder;
@@ -37,14 +38,22 @@ extern crate md5;
 extern crate mime;
 extern crate mustache;
 extern crate r2d2;
+#[cfg(feature = "ch-redis")]
 extern crate r2d2_redis;
+#[cfg(feature = "ch-redis")]
 extern crate redis;
 extern crate regex;
 extern crate robots_txt;
 extern crate rss;
+#[cfg(any(feature = "ch-aws", feature = "st-aws", feature = "mq-aws"))]
 extern crate rusoto_core;
+#[cfg(feature = "ch-aws")]
+extern crate rusoto_elasticache;
+#[cfg(feature = "st-aws")]
 extern crate rusoto_s3;
+#[cfg(feature = "mq-aws")]
 extern crate rusoto_sns;
+#[cfg(feature = "mq-aws")]
 extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
@@ -60,7 +69,14 @@ extern crate validator;
 #[macro_use]
 pub mod macros;
 
+pub mod cache;
 pub mod context;
 pub mod errors;
 pub mod i18n;
 pub mod orm;
+pub mod queue;
+pub mod rfc;
+pub mod settings;
+pub mod storage;
+pub mod sys;
+pub mod utils;
