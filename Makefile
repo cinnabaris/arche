@@ -14,8 +14,8 @@ www:
 	-cp -r dashboard/dist $(dist)/dashboard
 
 schema:
-	DATABASE_URL="postgres://postgres:@localhost:5432/arche" diesel print-schema > plugins/nut/src/orm/postgresql/schema.rs
-	DATABASE_URL="mysql://root:test@localhost:3306/arche" diesel print-schema > plugins/nut/src/orm/mysql/schema.rs
+	DATABASE_URL="postgres://postgres:@localhost:5432/arche" diesel print-schema > src/orm/postgresql/schema.rs
+	DATABASE_URL="mysql://root:test@localhost:3306/arche" diesel print-schema > src/orm/mysql/schema.rs
 
 clean:
 	cargo clean

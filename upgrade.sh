@@ -9,6 +9,7 @@ cargo install --force diesel_cli
 cargo clean
 cargo update
 cargo check
+cargo check --no-default-features --features mysql
 cargo doc
 cargo build
 cargo build --release
