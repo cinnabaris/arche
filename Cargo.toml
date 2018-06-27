@@ -10,9 +10,15 @@ license = "MIT"
 lto = true
 
 [features]
-default = ["postgresql"]
-postgresql = ["diesel/postgres"]
-mysql = ["diesel/mysql"]
+default = ["db-pg", "st-fs", "ch-redis", "mq-rabbit"]
+db-pg = ["diesel/postgres"]
+db-my = ["diesel/mysql"]
+st-fs = []
+ch-redis = ["redis", "r2d2_redis"]
+mq-rabbit = ["amqp"]
+st-aws = ["rusoto_core", "rusoto_s3"]
+ch-aws = ["rusoto_core", "rusoto_elasticache"]
+mq-aws = ["rusoto_core", "rusoto_sqs", "rusoto_sns"]
 
 [dependencies]
 error-chain = "0.12"
@@ -26,8 +32,8 @@ serde_derive = "1.0"
 serde_json = "1.0"
 serde-xml-rs = "0.2"
 r2d2 = "0.8"
-r2d2_redis = "0.7"
-redis = "0.8"
+r2d2_redis = {version = "0.7", optional=true}
+redis = {version = "0.8", optional = true}
 log = "0.4"
 log4rs = "0.8"
 sha2 = "0.7"
@@ -42,10 +48,11 @@ maxminddb = "0.9"
 lettre = "0.8"
 lettre_email = "0.8"
 mime = "0.3"
-rusoto_core = "0.32"
-rusoto_sqs = "0.32"
-rusoto_sns = "0.32"
-rusoto_s3 = "0.32"
+rusoto_core = { version = "0.32", optional = true }
+rusoto_sqs = { version = "0.32", optional = true }
+rusoto_sns = { version = "0.32", optional = true }
+rusoto_s3 = { version = "0.32", optional = true }
+rusoto_elasticache = { version = "0.32", optional = true }
 validator = "0.6"
 validator_derive = "0.6"
 language-tags = "0.2"
@@ -64,7 +71,7 @@ features=["query_encoding"]
 
 [dependencies.diesel]
 version = "1.3"
-features = ["postgres", "mysql", "chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
+features = ["chrono", "serde_json", "uuid", "network-address", "numeric", "r2d2", "128-column-tables"]
 optional = true
 
 [dependencies.chrono]
@@ -74,6 +81,7 @@ features = ["serde"]
 [dependencies.amqp]
 version = "0.1"
 default-features = false
+optional = true
 
 [dependencies.uuid]
 version = "0.6"

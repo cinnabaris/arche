@@ -107,6 +107,7 @@ dependencies = [
  "robots_txt 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rss 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusoto_core 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rusoto_elasticache 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusoto_s3 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusoto_sns 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusoto_sqs 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1716,6 +1717,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rusoto_elasticache"
+version = "0.32.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "futures 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hyper 0.11.27 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rusoto_core 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tokio-core 0.1.17 (registry+https://github.com/rust-lang/crates.io-index)",
+ "xml-rs 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "rusoto_s3"
 version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2718,6 +2731,7 @@ dependencies = [
 "checksum rss 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5d76fce76b29eeec1d003ec42d8819b0d07839c65d00219941ddf815fdb94812"
 "checksum rusoto_core 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)" = "12daaa6d62d64f6447bf0299ce775f4e05f8e75e5418e817da094b9de04ad22d"
 "checksum rusoto_credential 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "53199d09fd1b7d4f5ac50f4d23106577624238ea77cae2b44eb1d1fc4cd956a4"
+"checksum rusoto_elasticache 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e78f21b860e5594b5577c46285bcf834cd839dfc11b7eccfaea1af5c93ec3f14"
 "checksum rusoto_s3 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)" = "81f63c18e900e136aff674e1745b816e6eb966c8700e0dca046805806fe81cf8"
 "checksum rusoto_sns 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3e3a195c5e58d616af456ddaef42dd104937fc67c7c1a2558238c9ee988c693a"
 "checksum rusoto_sqs 0.32.0 (registry+https://github.com/rust-lang/crates.io-index)" = "995322c1530460a18fadd2f16761f22ba3f4e1fe630e344ca97e81d921abfb00"
