@@ -6,6 +6,14 @@ pub struct Config {
     pub local_root: String,
 }
 
-pub struct Storage {}
+impl Config {
+    pub fn open(&self) -> Storage {
+        Storage { _cfg: self.clone() }
+    }
+}
+
+pub struct Storage {
+    _cfg: Config,
+}
 
 impl super::Provider for Storage {}

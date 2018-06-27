@@ -15,11 +15,11 @@ pub struct Config {
     pub password: String,
     #[serde(rename = "virtual")]
     pub virtual_: String,
-    pub queue: String,
+    pub name: String,
 }
 
 impl Config {
-    fn options(&self) -> Options {
+    pub fn options(&self) -> Options {
         Options {
             host: self.host.clone(),
             port: self.port,
@@ -50,8 +50,8 @@ impl super::Provider for Producer {
         payload: &T,
     ) -> Result<()> {
         let id = Uuid::new_v4().to_string();
-        info!("push task into queue {}@{}", id, self.cfg.queue);
-        open(self.cfg.queue.clone(), self.cfg.options(), |ch, qu| {
+        info!("push task into queue {}@{}", id, self.cfg.name);
+        open(self.cfg.name.clone(), self.cfg.options(), |ch, qu| {
             ch.basic_publish(
                 "",
                 &qu[..],

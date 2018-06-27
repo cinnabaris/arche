@@ -1,12 +1,14 @@
+use std::sync::Arc;
+
 use super::super::{context::Context, errors::Result};
 
 pub struct Consumer {
-    ctx: Context,
+    _ctx: Arc<Context>,
 }
 
 impl Consumer {
-    pub fn new(ctx: Context) -> Self {
-        Self { ctx: ctx }
+    pub fn new(ctx: Arc<Context>) -> Self {
+        Self { _ctx: ctx }
     }
 
     pub fn consume(
