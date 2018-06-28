@@ -19,7 +19,10 @@ impl Router {
         Self { ctx: ctx }
     }
     fn handle(&self, req: Request<Body>) -> Result<(Option<Body>, StatusCode)> {
-        match (req.method(), req.uri().path()) {
+        let method = req.method();
+        let uri = req.uri();
+        info!("{:?} {} {}", req.version(), method, uri);
+        match (method, uri.path()) {
             (&Method::GET, "/doc") => {
                 // TODO graphql doc
                 Ok((
