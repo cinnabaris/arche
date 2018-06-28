@@ -82,8 +82,7 @@ pub fn main() -> Result<()> {
         thread::sleep(Duration::from_secs(10));
     });
 
-    http::server(&http, Arc::clone(&ctx));
-    Ok(())
+    http::server(&http, Arc::clone(&ctx))
 }
 
 fn config_file() -> PathBuf {

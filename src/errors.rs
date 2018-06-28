@@ -20,5 +20,7 @@ error_chain!{
         Log4rs(::log4rs::Error);
         Validator(::validator::ValidationErrors);
         Mustache(::mustache::Error);
+        HyperInvalidHeader(::hyper::header::InvalidHeaderValue);
+        Regex(::regex::Error);
     }
 }

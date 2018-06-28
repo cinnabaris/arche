@@ -16,6 +16,7 @@ macro_rules! ge {
 pub mod context;
 pub mod mutation;
 pub mod query;
+pub mod routes;
 pub mod schema;
 
 use std::fmt;

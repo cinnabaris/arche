@@ -13,6 +13,8 @@ extern crate diesel;
 extern crate validator_derive;
 #[macro_use]
 extern crate juniper;
+#[macro_use]
+extern crate lazy_static;
 
 #[cfg(feature = "mq-rabbit")]
 extern crate amqp;

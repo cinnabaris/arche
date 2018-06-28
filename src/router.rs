@@ -3,42 +3,56 @@ use std::sync::Arc;
 
 use futures::future;
 use hyper::{
-    self, rt::Future, service::{NewService, Service}, Body, Method, Request, Response, StatusCode,
+    self, header::{HeaderValue, CONTENT_TYPE}, rt::Future, service::{NewService, Service}, Body,
+    Method, Request, Response, StatusCode,
 };
+use mime;
+use regex::Regex;
 
-use super::{context::Context, errors::Result};
+use super::{context::Context, errors::Result, graphql};
 
-type BoxFut = Box<Future<Item = hyper::Response<Body>, Error = hyper::Error> + Send>;
+pub fn routes() -> Result<Vec<(Method, Regex, Box<Route>)>> {
+    let mut items: Vec<(Method, Regex, Box<Route>)> = Vec::new();
+    items.push((
+        Method::GET,
+        Regex::new(r"^/doc$")?,
+        Box::new(graphql::routes::Doc {}),
+    ));
+    Ok(items)
+}
+
+pub trait Route: Sync + Send {
+    fn handle(
+        &self,
+        ctx: Arc<Context>,
+        req: &Request<Body>,
+    ) -> Result<(StatusCode, mime::Mime, Option<Body>)>;
+}
 
 pub struct Router {
     ctx: Arc<Context>,
+    routes: Arc<Vec<(Method, Regex, Box<Route>)>>,
 }
 
 impl Router {
-    fn new(ctx: Arc<Context>) -> Self {
-        Self { ctx: ctx }
+    fn new(ctx: Arc<Context>, routes: Arc<Vec<(Method, Regex, Box<Route>)>>) -> Self {
+        Self {
+            ctx: ctx,
+            routes: routes,
+        }
     }
-    fn handle(&self, req: Request<Body>) -> Result<(Option<Body>, StatusCode)> {
+    fn handle(&self, req: &Request<Body>) -> Result<(StatusCode, mime::Mime, Option<Body>)> {
         let method = req.method();
         let uri = req.uri();
         info!("{:?} {} {}", req.version(), method, uri);
-        match (method, uri.path()) {
-            (&Method::GET, "/doc") => {
-                // TODO graphql doc
-                Ok((
-                    Some(Body::from("Try POSTing data to /echo")),
-                    StatusCode::OK,
-                ))
+        let path = uri.path();
+        for (m, p, h) in self.routes.iter() {
+            if m == method && p.is_match(path) {
+                info!("match {}", p);
+                return h.handle(Arc::clone(&self.ctx), req);
             }
-            (&Method::POST, "/graphql") => {
-                // TODO graphql handle
-                Ok((
-                    Some(Body::from("Try POSTing data to /echo")),
-                    StatusCode::OK,
-                ))
-            }
-            _ => Ok((None, StatusCode::NOT_FOUND)),
         }
+        Ok((StatusCode::NOT_FOUND, mime::TEXT_PLAIN_UTF_8, None))
     }
 }
 
@@ -46,17 +60,22 @@ impl Service for Router {
     type ReqBody = Body;
     type ResBody = Body;
     type Error = hyper::Error;
-    type Future = BoxFut;
+    type Future = Box<Future<Item = hyper::Response<Body>, Error = hyper::Error> + Send>;
 
     fn call(&mut self, req: Request<Self::ReqBody>) -> Self::Future {
-        let (body, code) = match self.handle(req) {
+        let (code, content_type, body) = match self.handle(&req) {
             Ok(v) => v,
             Err(e) => (
-                Some(Body::from(format!("{:?}", e))),
                 StatusCode::INTERNAL_SERVER_ERROR,
+                mime::TEXT_PLAIN_UTF_8,
+                Some(Body::from(format!("{:?}", e))),
             ),
         };
+        info!("{} {}", code, content_type);
         let mut res = Response::new(Body::empty());
+        if let Ok(t) = HeaderValue::from_str(content_type.type_().as_str()) {
+            res.headers_mut().insert(CONTENT_TYPE, t);
+        }
         if let Some(b) = body {
             *res.body_mut() = b;
         }
@@ -77,11 +96,15 @@ impl future::IntoFuture for Router {
 
 pub struct RouterBuilder {
     ctx: Arc<Context>,
+    routes: Arc<Vec<(Method, Regex, Box<Route>)>>,
 }
 
 impl RouterBuilder {
-    pub fn new(ctx: Arc<Context>) -> Self {
-        Self { ctx: ctx }
+    pub fn new(ctx: Arc<Context>, routes: Arc<Vec<(Method, Regex, Box<Route>)>>) -> Self {
+        Self {
+            ctx: ctx,
+            routes: routes,
+        }
     }
 }
 
@@ -94,13 +117,9 @@ impl NewService for RouterBuilder {
     type Future = Box<Future<Item = Self::Service, Error = Self::InitError> + Send>;
 
     fn new_service(&self) -> Self::Future {
-        let ctx = Arc::clone(&self.ctx);
-        Box::new(future::ok(Router::new(ctx)))
+        Box::new(future::ok(Router::new(
+            Arc::clone(&self.ctx),
+            Arc::clone(&self.routes),
+        )))
     }
-}
-
-pub fn routes() -> Vec<(String, String, String)> {
-    let items = Vec::new();
-
-    items
 }
