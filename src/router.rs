@@ -26,7 +26,7 @@ pub trait Route: Sync + Send {
         &self,
         ctx: Arc<Context>,
         req: &Request<Body>,
-    ) -> Result<(StatusCode, mime::Mime, Option<Body>)>;
+    ) -> Result<(mime::Mime, Response<Body>)>;
 }
 
 pub struct Router {
@@ -41,7 +41,7 @@ impl Router {
             routes: routes,
         }
     }
-    fn handle(&self, req: &Request<Body>) -> Result<(StatusCode, mime::Mime, Option<Body>)> {
+    fn handle(&self, req: &Request<Body>) -> Result<(mime::Mime, Response<Body>)> {
         let method = req.method();
         let uri = req.uri();
         info!("{:?} {} {}", req.version(), method, uri);
@@ -52,7 +52,9 @@ impl Router {
                 return h.handle(Arc::clone(&self.ctx), req);
             }
         }
-        Ok((StatusCode::NOT_FOUND, mime::TEXT_PLAIN_UTF_8, None))
+        let mut res = Response::new(Body::empty());
+        *res.status_mut() = StatusCode::NOT_FOUND;
+        Ok((mime::TEXT_PLAIN_UTF_8, res))
     }
 }
 
@@ -63,23 +65,18 @@ impl Service for Router {
     type Future = Box<Future<Item = hyper::Response<Body>, Error = hyper::Error> + Send>;
 
     fn call(&mut self, req: Request<Self::ReqBody>) -> Self::Future {
-        let (code, content_type, body) = match self.handle(&req) {
+        let (mty, mut res) = match self.handle(&req) {
             Ok(v) => v,
-            Err(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                mime::TEXT_PLAIN_UTF_8,
-                Some(Body::from(format!("{:?}", e))),
-            ),
+            Err(e) => {
+                error!("{:?}", e);
+                let mut res = Response::new(Body::empty());
+                *res.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
+                (mime::TEXT_PLAIN_UTF_8, res)
+            }
         };
-        info!("{} {}", code, content_type);
-        let mut res = Response::new(Body::empty());
-        if let Ok(t) = HeaderValue::from_str(content_type.type_().as_str()) {
+        if let Ok(t) = HeaderValue::from_str(format!("{}", mty).as_str()) {
             res.headers_mut().insert(CONTENT_TYPE, t);
         }
-        if let Some(b) = body {
-            *res.body_mut() = b;
-        }
-        *res.status_mut() = code;
         Box::new(future::ok(res))
     }
 }

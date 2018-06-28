@@ -22,5 +22,6 @@ error_chain!{
         Mustache(::mustache::Error);
         HyperInvalidHeader(::hyper::header::InvalidHeaderValue);
         Regex(::regex::Error);
+        Hyper(::hyper::Error);
     }
 }

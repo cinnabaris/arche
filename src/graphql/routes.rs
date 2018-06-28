@@ -1,7 +1,8 @@
 use std::io::{Cursor, Read};
 use std::sync::Arc;
 
-use hyper::{header::CONTENT_TYPE, Body, Method, Request, StatusCode};
+use futures::{Future, Stream};
+use hyper::{self, header::CONTENT_TYPE, Body, Method, Request, Response, StatusCode};
 use juniper::{graphiql::graphiql_source, http, FieldError, GraphQLType, InputValue, RootNode};
 use mime;
 use serde_json;
@@ -10,16 +11,10 @@ use super::super::{context::Context, errors::Result, router::Route};
 
 pub struct Doc {}
 impl Route for Doc {
-    fn handle(
-        &self,
-        _: Arc<Context>,
-        _: &Request<Body>,
-    ) -> Result<(StatusCode, mime::Mime, Option<Body>)> {
-        Ok((
-            StatusCode::OK,
-            mime::TEXT_HTML_UTF_8,
-            Some(Body::from(graphiql_source("/graphql"))),
-        ))
+    fn handle(&self, _: Arc<Context>, _: &Request<Body>) -> Result<(mime::Mime, Response<Body>)> {
+        let mut res = Response::new(Body::empty());
+        *res.body_mut() = Body::from(graphiql_source("/graphql"));
+        Ok((mime::TEXT_HTML_UTF_8, res))
     }
 }
 
@@ -72,27 +67,29 @@ impl<'a> GraphQLBatchResponse<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct GraphQLRequest(GraphQLBatchRequest);
 
 pub struct GraphQLResponse(StatusCode, String);
 
 impl GraphQLRequest {
-    // pub fn new(req: Request<Body>) -> Result<Option<Self>> {
+    // pub fn new(req: &Request<Body>) -> Result<Option<Self>> {
     //     if let Some(ref ct) = req.headers().get(CONTENT_TYPE) {};
-    //     if !request.content_type().map_or(false, |ct| ct.is_json()) {
-    //         return Forward(data);
-    //     }
     //
-    //     let mut body = String::new();
-    //     if let Err(e) = data.open().read_to_string(&mut body) {
-    //         return Failure((Status::InternalServerError, format!("{:?}", e)));
-    //     }
     //
-    //     match serde_json::from_str(&body) {
-    //         Ok(value) => Success(GraphQLRequest(value)),
-    //         Err(failure) => return Failure((Status::BadRequest, format!("{}", failure))),
-    //     }
+    //     let it: Self = serde_json::from_slice(&body)?;
+    //     Ok(Some(it))
+    //     // req.body().concat().and_then(|body| {
+    //     //     let it: Self = serde_json::from_slice(&body)?;
+    //     //     Ok(Some(it))
+    //     //     // let payload = deserialize(&body);
+    //     //     // // you should make `db.insert` async and return a future too
+    //     //     // db.insert(table, payload).then(|result| {
+    //     //     //     match result {
+    //     //     //         // ...
+    //     //     //     }
+    //     //     // })
+    //     // })
     // }
 
     pub fn execute<CtxT, QueryT, MutationT>(
