@@ -1,7 +1,7 @@
 <template>
-<div>
+<application-layout>
   <h1>leave me a message</h1>
-</div>
+</application-layout>
 </template>
 
 <script>

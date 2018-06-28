@@ -1,4 +1,5 @@
 import 'vuetify/dist/vuetify.min.css'
+import 'material-design-icons/iconfont/material-icons.css'
 import 'mdi/css/materialdesignicons.min.css'
 
 import Vue from 'vue'
@@ -9,6 +10,7 @@ import Vuetify from 'vuetify'
 
 import routes from './plugins'
 import {locales} from './locales'
+import './layouts'
 
 Vue.config.productionTip = false
 
