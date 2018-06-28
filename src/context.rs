@@ -11,7 +11,7 @@ pub struct Context {
     pub queue: Producer,
     pub storage: Storage,
     pub encryptor: Encryptor,
-    // pub config: Config,
+    pub config: Config,
     pub jwt: Jwt,
 }
 
@@ -24,7 +24,7 @@ impl Context {
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
             storage: cfg.storage.open(),
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
-            // config: cfg.clone(),
+            config: cfg.clone(),
         })
     }
 }

@@ -8,6 +8,9 @@ pub struct Config {
 }
 
 impl super::Oauth for Config {
+    fn name(&self) -> &'static str {
+        "line"
+    }
     // https://developers.line.me/en/docs/line-login/login-button/
     fn authorization_url(&self, state: &String, nonce: &String) -> String {
         form_urlencoded::Serializer::new(String::from(
