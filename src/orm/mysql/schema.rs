@@ -193,8 +193,8 @@ table! {
     roles (id) {
         id -> Bigint,
         name -> Varchar,
-        resource_type -> Varchar,
-        resource_id -> Bigint,
+        resource_type -> Nullable<Varchar>,
+        resource_id -> Nullable<Bigint>,
         created_at -> Datetime,
     }
 }

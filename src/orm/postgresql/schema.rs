@@ -193,8 +193,8 @@ table! {
     roles (id) {
         id -> Int8,
         name -> Varchar,
-        resource_type -> Varchar,
-        resource_id -> Int8,
+        resource_type -> Nullable<Varchar>,
+        resource_id -> Nullable<Int8>,
         created_at -> Timestamp,
     }
 }
