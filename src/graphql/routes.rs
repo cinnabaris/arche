@@ -2,7 +2,8 @@ use std::io::{Cursor, Read};
 use std::sync::Arc;
 
 use futures::{Future, Stream};
-use hyper::{self, header::CONTENT_TYPE, Body, Method, Request, Response, StatusCode};
+use http::request::Parts;
+use hyper::{self, header::CONTENT_TYPE, Body, Chunk, Method, Request, Response, StatusCode};
 use juniper::{graphiql::graphiql_source, http, FieldError, GraphQLType, InputValue, RootNode};
 use mime;
 use serde_json;
@@ -11,10 +12,27 @@ use super::super::{context::Context, errors::Result, router::Route};
 
 pub struct Doc {}
 impl Route for Doc {
-    fn handle(&self, _: Arc<Context>, _: &Request<Body>) -> Result<(mime::Mime, Response<Body>)> {
-        let mut res = Response::new(Body::empty());
-        *res.body_mut() = Body::from(graphiql_source("/graphql"));
-        Ok((mime::TEXT_HTML_UTF_8, res))
+    fn handle(
+        &self,
+        _: Arc<Context>,
+        _: &Parts,
+        body: &Vec<u8>,
+    ) -> Result<(StatusCode, mime::Mime, Option<String>)> {
+        let buf = graphiql_source("/graphql");
+        Ok((StatusCode::OK, mime::TEXT_HTML_UTF_8, Some(buf)))
+    }
+}
+
+pub struct GraphQL {}
+impl Route for GraphQL {
+    fn handle(
+        &self,
+        _: Arc<Context>,
+        _: &Parts,
+        body: &Vec<u8>,
+    ) -> Result<(StatusCode, mime::Mime, Option<String>)> {
+        let buf = serde_json::to_string(&json!({"aaa":111}))?;
+        Ok((StatusCode::OK, mime::APPLICATION_JSON, Some(buf)))
     }
 }
 

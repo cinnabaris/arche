@@ -1,7 +1,9 @@
 use std::error::Error as StdError;
+use std::result::Result as StdResult;
 use std::sync::Arc;
 
-use futures::future;
+use futures::{future, Stream};
+use http::request::Parts;
 use hyper::{
     self, header::{HeaderValue, CONTENT_TYPE}, rt::Future, service::{NewService, Service}, Body,
     Method, Request, Response, StatusCode,
@@ -18,6 +20,11 @@ pub fn routes() -> Result<Vec<(Method, Regex, Box<Route>)>> {
         Regex::new(r"^/doc$")?,
         Box::new(graphql::routes::Doc {}),
     ));
+    items.push((
+        Method::POST,
+        Regex::new(r"^/graphql$")?,
+        Box::new(graphql::routes::GraphQL {}),
+    ));
     Ok(items)
 }
 
@@ -25,8 +32,9 @@ pub trait Route: Sync + Send {
     fn handle(
         &self,
         ctx: Arc<Context>,
-        req: &Request<Body>,
-    ) -> Result<(mime::Mime, Response<Body>)>;
+        parts: &Parts,
+        body: &Vec<u8>,
+    ) -> Result<(StatusCode, mime::Mime, Option<String>)>;
 }
 
 pub struct Router {
@@ -41,21 +49,26 @@ impl Router {
             routes: routes,
         }
     }
-    fn handle(&self, req: &Request<Body>) -> Result<(mime::Mime, Response<Body>)> {
-        let method = req.method();
-        let uri = req.uri();
-        info!("{:?} {} {}", req.version(), method, uri);
-        let path = uri.path();
-        for (m, p, h) in self.routes.iter() {
-            if m == method && p.is_match(path) {
-                info!("match {}", p);
-                return h.handle(Arc::clone(&self.ctx), req);
-            }
+}
+
+fn handle(
+    ctx: Arc<Context>,
+    parts: &Parts,
+    body: &Vec<u8>,
+    routes: Arc<Vec<(Method, Regex, Box<Route>)>>,
+) -> Result<(StatusCode, mime::Mime, Option<String>)> {
+    debug!(
+        "request body: {:?}",
+        String::from_utf8(body.as_slice().to_vec())
+    );
+    let pth = parts.uri.path();
+    for (m, p, h) in routes.iter() {
+        if m == &parts.method && p.is_match(pth) {
+            info!("match {}", p);
+            return h.handle(ctx, parts, body);
         }
-        let mut res = Response::new(Body::empty());
-        *res.status_mut() = StatusCode::NOT_FOUND;
-        Ok((mime::TEXT_PLAIN_UTF_8, res))
     }
+    Ok((StatusCode::NOT_FOUND, mime::TEXT_PLAIN_UTF_8, None))
 }
 
 impl Service for Router {
@@ -65,19 +78,35 @@ impl Service for Router {
     type Future = Box<Future<Item = hyper::Response<Body>, Error = hyper::Error> + Send>;
 
     fn call(&mut self, req: Request<Self::ReqBody>) -> Self::Future {
-        let (mty, mut res) = match self.handle(&req) {
-            Ok(v) => v,
-            Err(e) => {
-                error!("{:?}", e);
-                let mut res = Response::new(Body::empty());
-                *res.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
-                (mime::TEXT_PLAIN_UTF_8, res)
+        let ctx = Arc::clone(&self.ctx);
+        let routes = Arc::clone(&self.routes);
+        let (parts, body) = req.into_parts();
+        info!("{:?} {} {}", parts.version, parts.method, parts.uri);
+        let reversed = body.concat2().map(move |chunk| {
+            let body = chunk.iter().cloned().collect::<Vec<u8>>();
+            let (sc, ct, bd) = match handle(ctx, &parts, &body, routes) {
+                Ok(v) => v,
+                Err(e) => {
+                    error!("{:?}", e);
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        mime::TEXT_PLAIN_UTF_8,
+                        None,
+                    )
+                }
+            };
+            info!("{} {}", sc, ct);
+            let mut res = Response::new(Body::empty());
+            *res.status_mut() = sc;
+            if let Ok(t) = HeaderValue::from_str(&format!("{}", ct)[..]) {
+                res.headers_mut().insert(CONTENT_TYPE, t);
             }
-        };
-        if let Ok(t) = HeaderValue::from_str(format!("{}", mty).as_str()) {
-            res.headers_mut().insert(CONTENT_TYPE, t);
-        }
-        Box::new(future::ok(res))
+            if let Some(b) = bd {
+                *res.body_mut() = Body::from(b);
+            }
+            res
+        });
+        Box::new(reversed)
     }
 }
 

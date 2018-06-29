@@ -13,8 +13,8 @@ extern crate diesel;
 extern crate validator_derive;
 #[macro_use]
 extern crate juniper;
-#[macro_use]
-extern crate lazy_static;
+// #[macro_use]
+// extern crate lazy_static;
 
 #[cfg(feature = "mq-rabbit")]
 extern crate amqp;
@@ -30,6 +30,7 @@ extern crate frank_jwt;
 extern crate futures;
 extern crate geo;
 extern crate hex;
+extern crate http;
 extern crate hyper;
 extern crate ini;
 extern crate language_tags;
