@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+// use std::net::SocketAddr;
 use std::sync::Arc;
 
 use hyper::StatusCode;
@@ -10,7 +10,7 @@ use super::Role;
 pub struct Context {
     pub locale: String,
     pub token: Option<String>,
-    pub remote: SocketAddr,
+    // pub remote: SocketAddr,
     pub state: Arc<context::Context>,
 }
 

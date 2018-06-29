@@ -2,6 +2,7 @@ error_chain!{
     foreign_links {
         StdIo(::std::io::Error);
         StdSystemTime(::std::time::SystemTimeError);
+        StdStrUtf8(::std::str::Utf8Error);
 
         SerdeJson(::serde_json::Error);
         Redis(::redis::RedisError) #[cfg(feature = "ch-redis")];

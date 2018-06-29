@@ -1,5 +1,4 @@
 use std::error::Error as StdError;
-use std::result::Result as StdResult;
 use std::sync::Arc;
 
 use futures::{future, Stream};
@@ -57,10 +56,6 @@ fn handle(
     body: &Vec<u8>,
     routes: Arc<Vec<(Method, Regex, Box<Route>)>>,
 ) -> Result<(StatusCode, mime::Mime, Option<String>)> {
-    debug!(
-        "request body: {:?}",
-        String::from_utf8(body.as_slice().to_vec())
-    );
     let pth = parts.uri.path();
     for (m, p, h) in routes.iter() {
         if m == &parts.method && p.is_match(pth) {

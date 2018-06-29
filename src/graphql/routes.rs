@@ -1,10 +1,8 @@
-use std::io::{Cursor, Read};
 use std::sync::Arc;
 
-use futures::{Future, Stream};
 use http::request::Parts;
-use hyper::{self, header::CONTENT_TYPE, Body, Chunk, Method, Request, Response, StatusCode};
-use juniper::{graphiql::graphiql_source, http, FieldError, GraphQLType, InputValue, RootNode};
+use hyper::StatusCode;
+use juniper::{graphiql::graphiql_source, http, GraphQLType, RootNode};
 use mime;
 use serde_json;
 
@@ -16,7 +14,7 @@ impl Route for Doc {
         &self,
         _: Arc<Context>,
         _: &Parts,
-        body: &Vec<u8>,
+        _: &Vec<u8>,
     ) -> Result<(StatusCode, mime::Mime, Option<String>)> {
         let buf = graphiql_source("/graphql");
         Ok((StatusCode::OK, mime::TEXT_HTML_UTF_8, Some(buf)))
@@ -27,12 +25,22 @@ pub struct GraphQL {}
 impl Route for GraphQL {
     fn handle(
         &self,
-        _: Arc<Context>,
+        ctx: Arc<Context>,
         _: &Parts,
         body: &Vec<u8>,
     ) -> Result<(StatusCode, mime::Mime, Option<String>)> {
-        let buf = serde_json::to_string(&json!({"aaa":111}))?;
-        Ok((StatusCode::OK, mime::APPLICATION_JSON, Some(buf)))
+        let req: GraphQLBatchRequest = serde_json::from_slice(body)?;
+        debug!("graphql query:\n{:?}", req);
+        let req = GraphQLRequest(req);
+
+        let ctx = super::context::Context {
+            locale: "en-US".to_string(),
+            token: Some("change-me".to_string()),
+            state: ctx,
+        };
+        let sch = super::schema::Schema::new(super::query::Query, super::mutation::Mutation);
+        let GraphQLResponse(code, buf) = req.execute(&sch, &ctx)?;
+        Ok((code, mime::APPLICATION_JSON, Some(buf)))
     }
 }
 
@@ -85,31 +93,12 @@ impl<'a> GraphQLBatchResponse<'a> {
     }
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct GraphQLRequest(GraphQLBatchRequest);
 
 pub struct GraphQLResponse(StatusCode, String);
 
 impl GraphQLRequest {
-    // pub fn new(req: &Request<Body>) -> Result<Option<Self>> {
-    //     if let Some(ref ct) = req.headers().get(CONTENT_TYPE) {};
-    //
-    //
-    //     let it: Self = serde_json::from_slice(&body)?;
-    //     Ok(Some(it))
-    //     // req.body().concat().and_then(|body| {
-    //     //     let it: Self = serde_json::from_slice(&body)?;
-    //     //     Ok(Some(it))
-    //     //     // let payload = deserialize(&body);
-    //     //     // // you should make `db.insert` async and return a future too
-    //     //     // db.insert(table, payload).then(|result| {
-    //     //     //     match result {
-    //     //     //         // ...
-    //     //     //     }
-    //     //     // })
-    //     // })
-    // }
-
     pub fn execute<CtxT, QueryT, MutationT>(
         &self,
         root_node: &RootNode<QueryT, MutationT>,
@@ -130,34 +119,3 @@ impl GraphQLRequest {
         Ok(GraphQLResponse(status, json))
     }
 }
-//
-// impl GraphQLResponse {
-//     pub fn error(error: FieldError) -> Self {
-//         let response = http::GraphQLResponse::error(error);
-//         let json = serde_json::to_string(&response).unwrap();
-//         GraphQLResponse(StatusCode::BAD_REQUEST, json)
-//     }
-//
-//     pub fn custom(status: StatusCode, response: serde_json::Value) -> Self {
-//         let json = serde_json::to_string(&response).unwrap();
-//         GraphQLResponse(status, json)
-//     }
-// }
-//
-// impl FromData for GraphQLRequest {
-//     type Error = String;
-//
-
-// }
-//
-// impl<'r> Responder<'r> for GraphQLResponse {
-//     fn respond_to(self, _: &Request) -> Result<Response<'r>, Status> {
-//         let GraphQLResponse(status, body) = self;
-//
-//         Ok(Response::build()
-//             .header(ContentType::new("application", "json"))
-//             .status(status)
-//             .sized_body(Cursor::new(body))
-//             .finalize())
-//     }
-// }
