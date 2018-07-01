@@ -47,9 +47,9 @@ const main = (id) => {
         <Provider store={store}>
           <ConnectedRouter history={history}>
             <Switch>
-              <Route exact={true} component={Application}/>
-              <Route exact={true} component={Dashboard}/>
               <Route exact={true} path="/" component={Home}/>
+              <Route path="/users" component={Application}/>
+              <Route path="/dashboard" component={Dashboard}/>
               <Route component={NotFound}/>
             </Switch>
           </ConnectedRouter>
