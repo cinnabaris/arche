@@ -9,11 +9,11 @@ import {ConnectedRouter, routerReducer, routerMiddleware} from 'react-router-red
 import {addLocaleData, IntlProvider} from 'react-intl'
 import {LocaleProvider} from 'antd'
 import {request} from 'graphql-request'
+import Exception from 'ant-design-pro/lib/Exception'
 
 import './main.css';
 import Application from './layouts/application'
 import Dashboard from './layouts/dashboard'
-import NotFound from './routes/NotFound'
 import reducers from './reducers'
 import {get as detectLocale} from './intl'
 import {BACKEND} from './config'
@@ -50,7 +50,7 @@ const main = (id) => {
               <Route exact={true} path="/" component={Home}/>
               <Route path="/users" component={Application}/>
               <Route path="/dashboard" component={Dashboard}/>
-              <Route component={NotFound}/>
+              <Route component={() => (<Exception type="404"/>)}/>
             </Switch>
           </ConnectedRouter>
         </Provider>

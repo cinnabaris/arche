@@ -1,11 +1,11 @@
 import React, {Component} from 'react'
 import {Route} from "react-router"
 import {Switch} from 'react-router-dom'
+import Exception from 'ant-design-pro/lib/Exception'
 
 import Header from './Header'
 import Footer from './Footer'
 import {createLoading} from '../'
-import NotFound from '../../routes/NotFound'
 
 class Widget extends Component {
   render() {
@@ -14,7 +14,7 @@ class Widget extends Component {
       <Header/>
       <Switch>
         <Route exact={true} path={`${match.url}/survey/forms/new`} component={createLoading(() => import ('../../routes/survey/forms/New'))}/>
-        <Route component={NotFound}/>
+        <Route component={() => (<Exception type="404"/>)}/>
       </Switch>
       <Footer/>
     </div>);

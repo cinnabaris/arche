@@ -1,7 +1,11 @@
+import React from 'react'
 import Loadable from 'react-loadable'
 
-import Loading from '../routes/Loading'
+import {Spin} from 'antd'
 
 export const createLoading = (loader) => {
-  return Loadable({loader: loader, loading: Loading})
+  return Loadable({
+    loader: loader,
+    loading: () => (<Spin/>)
+  })
 }
