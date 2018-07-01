@@ -122,3 +122,4 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [SSL Server Test](https://www.ssllabs.com/ssltest/index.html)
 -   [LINE Developers](https://developers.line.me/en/)
 -   [Material Icons](https://material.io/tools/icons/?style=baseline)
+-   [Material Design Icons](https://materialdesignicons.com/)
