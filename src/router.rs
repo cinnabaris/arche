@@ -4,8 +4,11 @@ use std::sync::Arc;
 use futures::{future, Stream};
 use http::request::Parts;
 use hyper::{
-    self, header::{HeaderValue, CONTENT_TYPE}, rt::Future, service::{NewService, Service}, Body,
-    Method, Request, Response, StatusCode,
+    self,
+    header::{HeaderValue, CONTENT_TYPE},
+    rt::Future,
+    service::{NewService, Service},
+    Body, Method, Request, Response, StatusCode,
 };
 use mime;
 use regex::Regex;

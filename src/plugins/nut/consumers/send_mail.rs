@@ -3,7 +3,8 @@ use std::ops::Deref;
 use std::path::PathBuf;
 
 use lettre::{
-    smtp::authentication::{Credentials, Mechanism}, EmailTransport, SmtpTransport,
+    smtp::authentication::{Credentials, Mechanism},
+    EmailTransport, SmtpTransport,
 };
 use lettre_email::EmailBuilder;
 use mime;

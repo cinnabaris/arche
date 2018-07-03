@@ -2,12 +2,13 @@
 
 set -e
 
+rustup override set nightly
 rustup update
+cargo update
 rustup component add rls-preview rust-analysis rust-src rustfmt-preview
-# cargo install --force clippy
+cargo install --force clippy
 cargo install --force diesel_cli
 cargo clean
-cargo update
 cargo check
 cargo doc
 cargo build

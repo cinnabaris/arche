@@ -4,7 +4,8 @@ use mustache;
 use serde::ser::Serialize;
 
 use super::{
-    errors::{Error, Result}, orm::{schema::locales, Connection as Db},
+    errors::{Error, Result},
+    orm::{schema::locales, Connection as Db},
 };
 
 pub fn get(db: &Db, lang: &String, code: &String) -> Result<String> {

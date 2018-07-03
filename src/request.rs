@@ -1,5 +1,7 @@
 use http::{
-    header::{AsHeaderName, AUTHORIZATION, HOST, ORIGIN}, request::Parts, HeaderMap,
+    header::{AsHeaderName, AUTHORIZATION, HOST, ORIGIN},
+    request::Parts,
+    HeaderMap,
 };
 
 pub fn locale(parts: &Parts) -> Option<String> {

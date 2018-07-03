@@ -6,7 +6,9 @@ use diesel::{delete, insert_into, prelude::*, update};
 use uuid::Uuid;
 
 use super::super::super::{
-    errors::Result, orm::{schema::*, Connection as Db}, utils,
+    errors::Result,
+    orm::{schema::*, Connection as Db},
+    utils,
 };
 pub fn can(
     db: &Db,

@@ -6,7 +6,9 @@ use serde::ser::Serialize;
 use serde_json;
 
 use super::{
-    errors::Result, orm::{schema::settings, Connection as Db}, utils::Encryptor,
+    errors::Result,
+    orm::{schema::settings, Connection as Db},
+    utils::Encryptor,
 };
 
 pub fn get<K: Serialize, V: DeserializeOwned>(db: &Db, et: &Encryptor, key: &K) -> Result<V> {

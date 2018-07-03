@@ -4,7 +4,9 @@ use std::sync::Arc;
 use amqp::{Basic, Table};
 
 use super::super::{
-    context::Context, errors::Result, queue::{self, consumer::Consumer, Config},
+    context::Context,
+    errors::Result,
+    queue::{self, consumer::Consumer, Config},
 };
 
 #[cfg(feature = "mq-rabbit")]
