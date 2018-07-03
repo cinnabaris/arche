@@ -10,5 +10,8 @@ graphql_object!(
         field updateLocale(&executor, form: nut::graphql::mutation::UpdateLocale) -> FieldResult<String> {
             gq!(executor, form)
         }
+        field signUpUser(&executor, form: nut::graphql::mutation::SignUpUser) -> FieldResult<String> {
+            gq!(executor, form)
+        }
     }
 );

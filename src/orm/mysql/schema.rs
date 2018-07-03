@@ -275,6 +275,7 @@ table! {
         id -> Bigint,
         name -> Varchar,
         email -> Varchar,
+        password -> Nullable<Blob>,
         uid -> Varchar,
         provider_type -> Varchar,
         provider_id -> Varchar,

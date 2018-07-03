@@ -85,6 +85,7 @@ pub mod oauth;
 pub mod orm;
 pub mod plugins;
 pub mod queue;
+pub mod request;
 pub mod rfc;
 pub mod router;
 pub mod settings;

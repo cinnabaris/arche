@@ -275,6 +275,7 @@ table! {
         id -> Int8,
         name -> Varchar,
         email -> Varchar,
+        password -> Nullable<Bytea>,
         uid -> Varchar,
         provider_type -> Varchar,
         provider_id -> Varchar,

@@ -6,7 +6,7 @@ use juniper::{graphiql::graphiql_source, http, GraphQLType, RootNode};
 use mime;
 use serde_json;
 
-use super::super::{context::Context, errors::Result, router::Route};
+use super::super::{context::Context, errors::Result, request, router::Route};
 
 pub struct Doc {}
 impl Route for Doc {
@@ -26,16 +26,19 @@ impl Route for GraphQL {
     fn handle(
         &self,
         ctx: Arc<Context>,
-        _: &Parts,
+        parts: &Parts,
         body: &Vec<u8>,
     ) -> Result<(StatusCode, mime::Mime, Option<String>)> {
         let req: GraphQLBatchRequest = serde_json::from_slice(body)?;
         debug!("graphql query:\n{:?}", req);
         let req = GraphQLRequest(req);
 
+        debug!("{:?}", parts);
+
         let ctx = super::context::Context {
-            locale: "en-US".to_string(),
-            token: Some("change-me".to_string()),
+            locale: request::locale(&parts).unwrap_or("en-US".to_string()),
+            client_ip: request::client_ip(&parts).unwrap_or("::1".to_string()),
+            token: request::token(&parts),
             state: ctx,
         };
         let sch = super::schema::Schema::new(super::query::Query, super::mutation::Mutation);

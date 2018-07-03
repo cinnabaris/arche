@@ -1,16 +1,14 @@
-// use std::net::SocketAddr;
 use std::sync::Arc;
 
 use hyper::StatusCode;
 use juniper;
 
-use super::super::{context, errors::Result};
-use super::Role;
+use super::super::{context, errors::Result, plugins::nut::dao::Role};
 
 pub struct Context {
     pub locale: String,
     pub token: Option<String>,
-    // pub remote: SocketAddr,
+    pub client_ip: String,
     pub state: Arc<context::Context>,
 }
 
@@ -32,5 +30,8 @@ impl Context {
         let _id = self.current_user()?;
         // TODO
         Err(format!("{}", StatusCode::FORBIDDEN).into())
+    }
+    pub fn client_ip(&self) -> Result<String> {
+        Ok("ip".to_string())
     }
 }
