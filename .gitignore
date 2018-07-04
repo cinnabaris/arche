@@ -1,0 +1,13 @@
+# go
+/vendor/*/
+
+# npm
+/node_modules/
+
+# test
+/tmp/
+/config.toml
+
+# build
+/dist/
+/dist.tar.xz
