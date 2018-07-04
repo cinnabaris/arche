@@ -6,47 +6,58 @@
 
 -   install gvm
 
-
-    zsh < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+```bash
+zsh < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+```
 
 -   add to ~/.zshrc
 
-
-    [[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
+```bash
+[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
+```
 
 -   install go
 
-
-    gvm install go1.11beta1 -B
-    gvm use go1.11beta1 --default
+```bash
+gvm install go1.11beta1 -B
+gvm use go1.11beta1 --default
+```
 
 -   download source
 
-
-    go get -u github.com/kardianos/govendor
-    go get -d github.com/cinnabaris/arche
-    cd $GOPATH/src/github.com/cinnabaris/arche
-    make deps
-    make
+```bash
+go get -u github.com/kardianos/govendor
+go get -d github.com/cinnabaris/arche
+cd $GOPATH/src/github.com/cinnabaris/arche
+make deps
+make
+```
 
 ## Notes
 
 -   Generate a random key
 
-
-    openssl rand -base64 32
+```bash
+openssl rand -base64 32
+```
 
 -   ~/.npmrc
 
-
-    npm config set prefix '~/.npm-global'
+```bash
+npm config set prefix '~/.npm-global'
+```
 
 -   'Peer authentication failed for user', open file "/etc/postgresql/9.5/main/pg_hba.conf" change line:
 
+```text
+local   all             all                                     peer
+```
 
-    local   all             all                                     peer
     TO:
-    local   all             all                                     md5
+
+```text
+local   all             all                                     md5
+```
 
 ## Documents
 
