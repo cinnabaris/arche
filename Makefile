@@ -1,5 +1,5 @@
 dist=dist
-pkg=github.com/cinnabaris/arche/nut
+pkg=github.com/cinnabaris/arche/web
 theme=bootstrap
 
 VERSION=`git rev-parse --short HEAD`
