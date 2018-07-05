@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use rocket;
+use rocket_contrib::Template;
 
 use super::super::{context::Context, errors::Result, router};
 
@@ -12,6 +13,7 @@ pub fn server(ctx: Arc<Context>) -> Result<()> {
     app = app
         .manage(ctx.db.clone())
         .manage(ctx.config.clone())
+        .attach(Template::fairing())
         .catch(router::catchers());
     Err(app.launch().into())
 }

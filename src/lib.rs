@@ -48,6 +48,7 @@ extern crate r2d2_redis;
 extern crate redis;
 extern crate regex;
 extern crate robots_txt;
+extern crate rocket_contrib;
 extern crate rocket_cors;
 extern crate rss;
 extern crate rusoto_core;
