@@ -23,5 +23,7 @@ error_chain!{
         Mustache(::mustache::Error);
         Regex(::regex::Error);
         Hyper(::hyper::Error);
+        RocketConfig(::rocket::config::ConfigError);
+        RocketLaunch(::rocket::error::LaunchError);
     }
 }

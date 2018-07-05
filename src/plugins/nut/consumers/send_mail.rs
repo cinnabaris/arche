@@ -9,9 +9,10 @@ use lettre::{
 use lettre_email::EmailBuilder;
 use log;
 use mime;
+use rocket::config::Environment;
 use serde_json;
 
-use super::super::super::super::{context::Context, env::Environment, errors::Result, settings};
+use super::super::super::super::{context::Context, errors::Result, settings};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Config {
@@ -33,7 +34,7 @@ pub const NAME: &'static str = "send-mail";
 
 pub fn handle(ctx: &Context, payload: &[u8]) -> Result<()> {
     let it: Mail = serde_json::from_slice(payload)?;
-    match ctx.config.env {
+    match ctx.config.env() {
         Environment::Production => {
             let db = ctx.db.get()?;
             let db = db.deref();

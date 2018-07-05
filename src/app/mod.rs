@@ -72,7 +72,6 @@ pub fn main() -> Result<()> {
     let ctx = Context::new(&cfg)?;
     let ctx = Arc::new(ctx);
 
-    let http = cfg.http.clone();
     let que = cfg.queue.clone();
     let wrk = Arc::clone(&ctx);
     thread::spawn(move || {
@@ -83,7 +82,7 @@ pub fn main() -> Result<()> {
         thread::sleep(Duration::from_secs(10));
     });
 
-    http::server(&http, Arc::clone(&ctx))
+    http::server(Arc::clone(&ctx))
 }
 
 fn config_file() -> PathBuf {

@@ -1,6 +1,7 @@
-use std::fmt;
+use std::path::Path;
 
 use base64;
+use rocket;
 
 use super::{cache, errors::Result, oauth, orm, queue, storage};
 
@@ -22,7 +23,7 @@ _____   _____ _    _ ______
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
     pub name: String,
-    pub env: Environment,
+    pub env: String,
     #[serde(rename = "secretkey")]
     pub secret_key: String, // 32-bits base64 encode string
     pub http: Http,
@@ -40,31 +41,54 @@ impl Config {
         let buf = base64::decode(&self.secret_key)?;
         return Ok(buf);
     }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum Environment {
-    Production,
-    Staging,
-    Development,
-    Test,
-}
-
-impl fmt::Display for Environment {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Environment::Production => fmt.write_str("production"),
-            Environment::Staging => fmt.write_str("staging"),
-            Environment::Development => fmt.write_str("development"),
-            Environment::Test => fmt.write_str("test"),
+    pub fn env(&self) -> rocket::config::Environment {
+        match self.env.parse::<rocket::config::Environment>() {
+            Ok(v) => v,
+            Err(_) => rocket::config::Environment::Development,
         }
+    }
+    pub fn rocket(&self) -> Result<rocket::config::Config> {
+        Ok(rocket::config::Config::build(self.env())
+            .address("127.0.0.1")
+            .port(self.http.port)
+            .workers(self.http.workers)
+            .log_level(match self
+                .http
+                .logging_level
+                .parse::<rocket::config::LoggingLevel>()
+            {
+                Ok(v) => v,
+                Err(_) => rocket::config::LoggingLevel::Debug,
+            })
+            .secret_key(self.secret_key.clone())
+            .limits(
+                rocket::config::Limits::new()
+                    .limit("forms", self.http.limits)
+                    .limit("json", self.http.limits),
+            )
+            .extra(
+                "template_dir",
+                match Path::new("themes")
+                    .join(self.http.theme.clone())
+                    .join("views")
+                    .to_str()
+                {
+                    Some(v) => v,
+                    None => "views",
+                },
+            )
+            .finalize()?)
     }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Http {
     pub port: u16,
+    pub workers: u16,
+    //  one of "normal", "debug", or "critical"
+    pub logging_level: String,
     pub theme: String,
+    pub limits: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

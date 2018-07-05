@@ -7,6 +7,7 @@ use std::path::Path;
 use base64;
 use log;
 use mustache;
+use rocket;
 use toml;
 
 use super::super::{cache, env, errors::Result, oauth, orm, queue, storage, utils};
@@ -42,11 +43,14 @@ pub fn config() -> Result<()> {
     let cfg = env::Config {
         name: String::from("www.change-me.com"),
         secret_key: base64::encode(&utils::random::bytes(32)),
-        env: env::Environment::Development,
+        env: format!("{}", rocket::config::Environment::Development),
 
         http: env::Http {
             theme: String::from("bootstrap"),
+            workers: 32,
+            logging_level: format!("{}", rocket::config::LoggingLevel::Debug),
             port: 8080,
+            limits: 1 << 16,
         },
         oauth: oauth::Config {
             line: Some(oauth::line::Config {

@@ -4,7 +4,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use amqp::{self, Basic};
 use log;
 use mime;
-use serde::ser::Serialize;
 use serde_json;
 use uuid::Uuid;
 

@@ -1,4 +1,4 @@
-#![feature(plugin, use_extern_macros)]
+#![feature(plugin, use_extern_macros, extern_prelude)]
 #![plugin(rocket_codegen)]
 #![recursion_limit = "1024"]
 extern crate rocket;
