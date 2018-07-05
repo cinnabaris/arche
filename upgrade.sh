@@ -3,7 +3,6 @@
 go get -u github.com/kardianos/govendor
 
 govendor fetch github.com/go-pg/pg
-govendor fetch github.com/go-pg/migrations
 govendor fetch github.com/gomodule/redigo/redis
 govendor fetch github.com/urfave/negroni
 govendor fetch github.com/gorilla/mux
