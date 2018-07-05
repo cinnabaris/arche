@@ -22,7 +22,7 @@ impl Context {
             cache: cfg.cache.open()?,
             queue: Producer::new(cfg.queue.clone()),
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
-            storage: cfg.storage.open(),
+            storage: Storage::new(cfg.storage.clone()),
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),
             config: cfg.clone(),
         })

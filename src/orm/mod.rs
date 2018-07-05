@@ -1,11 +1,11 @@
-#[cfg(feature = "db-my")]
+#[cfg(feature = "mysql")]
 pub mod mysql;
-#[cfg(feature = "db-my")]
+#[cfg(feature = "mysql")]
 pub use self::mysql::{schema, Config, Connection, DRIVER};
 
-#[cfg(feature = "db-pg")]
+#[cfg(feature = "postgresql")]
 pub mod postgresql;
-#[cfg(feature = "db-pg")]
+#[cfg(feature = "postgresql")]
 pub use self::postgresql::{schema, Config, Connection, DRIVER};
 
 use diesel::r2d2::ConnectionManager;

@@ -5,6 +5,7 @@ use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 
 use base64;
+use log;
 use mustache;
 use toml;
 
@@ -16,7 +17,7 @@ pub fn nginx() -> Result<()> {
     let cfg = super::parse_config()?;
 
     let file = Path::new("tmp").join("nginx.conf");
-    info!("generate file {}", file.display());
+    log::info!("generate file {}", file.display());
     let mut fd = fs::OpenOptions::new()
         .write(true)
         .create_new(true)
@@ -54,7 +55,7 @@ pub fn config() -> Result<()> {
                 callback_url: String::from("http://localhost:3000/my/oauth/line"),
             }),
         },
-        #[cfg(feature = "db-pg")]
+        #[cfg(feature = "postgresql")]
         database: orm::Config {
             host: String::from(localhost),
             port: 5432,
@@ -62,32 +63,33 @@ pub fn config() -> Result<()> {
             user: String::from("postgres"),
             password: String::from(""),
         },
-        #[cfg(feature = "db-my")]
+        #[cfg(feature = "mysql")]
         database: orm::Config {
             host: String::from(localhost),
             port: 3306,
             name: String::from(env::NAME),
-            user: String::from("postgres"),
+            user: String::from("root"),
             password: String::from(""),
         },
-        #[cfg(feature = "ch-redis")]
         cache: cache::Config {
             namespace: String::from("www.change-me.com"),
-            host: String::from(localhost),
-            port: 6379,
-            db: 6,
-            password: None,
+            redis: Some(cache::Redis {
+                host: String::from(localhost),
+                port: 6379,
+                db: 6,
+                password: None,
+            }),
         },
-        #[cfg(feature = "mq-rabbit")]
         queue: queue::Config {
-            host: String::from(localhost),
-            port: 5672,
-            virtual_: String::from(env::NAME),
             name: String::from("tasks"),
-            user: String::from("guest"),
-            password: String::from("guest"),
+            rabbitmq: Some(queue::RabbitMQ {
+                host: String::from(localhost),
+                port: 5672,
+                virtual_: String::from(env::NAME),
+                user: String::from("guest"),
+                password: String::from("guest"),
+            }),
         },
-        #[cfg(any(feature = "ch-aws", feature = "st-aws", feature = "mq-aws"))]
         aws: env::Aws {
             access_key_id: String::from("change-me"),
             secret_access_key: String::from("change-me"),
@@ -95,21 +97,21 @@ pub fn config() -> Result<()> {
         elasticsearch: env::ElasticSearch {
             hosts: vec![String::from("http://localhost:9200")],
         },
-        #[cfg(feature = "st-fs")]
         storage: storage::Config {
-            end_point: String::from("/upload"),
-            local_root: String::from("tmp/upload"),
-        },
-        #[cfg(feature = "st-aws")]
-        storage: storage::Config {
-            region: String::from("us-west-2"),
-            bucket: String::from("www.change-me.com"),
+            nfs: Some(storage::Nfs {
+                end_point: String::from("/upload"),
+                local_root: String::from("tmp/upload"),
+            }),
+            s3: Some(storage::S3 {
+                region: String::from("us-west-2"),
+                bucket: String::from("www.change-me.com"),
+            }),
         },
     };
     let buf = toml::to_vec(&cfg)?;
 
     let file = super::config_file();
-    info!("generate file {}", file.display());
+    log::info!("generate file {}", file.display());
     let mut file = fs::OpenOptions::new()
         .write(true)
         .create_new(true)

@@ -4,6 +4,7 @@ pub mod generate;
 pub mod http;
 pub mod worker;
 
+use log;
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -76,8 +77,8 @@ pub fn main() -> Result<()> {
     let wrk = Arc::clone(&ctx);
     thread::spawn(move || {
         match worker::start(&que, Arc::clone(&wrk)) {
-            Ok(_) => warn!("worker exit."),
-            Err(e) => error!("failed in worker: {:?}", e),
+            Ok(_) => log::warn!("worker exit."),
+            Err(e) => log::error!("failed in worker: {:?}", e),
         }
         thread::sleep(Duration::from_secs(10));
     });
@@ -91,7 +92,7 @@ fn config_file() -> PathBuf {
 
 fn parse_config() -> Result<env::Config> {
     let file = config_file();
-    info!("load config from file {}", file.display());
+    log::info!("load config from file {}", file.display());
     let mut file = fs::File::open(file)?;
     let mut buf = Vec::new();
     file.read_to_end(&mut buf)?;

@@ -1,5 +1,6 @@
 use chrono::Utc;
 use diesel::{insert_into, prelude::*, update};
+use log;
 use mustache;
 use serde::ser::Serialize;
 
@@ -66,7 +67,7 @@ pub fn t<S: Serialize>(db: &Db, lang: &String, code: &String, args: &Option<S>) 
     match tr(db, lang, code, args) {
         Ok(msg) => msg,
         Err(e) => {
-            error!("{:?}", e);
+            log::error!("{:?}", e);
             format!("{}.{}", lang, code)
         }
     }

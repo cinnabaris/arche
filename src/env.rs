@@ -32,7 +32,6 @@ pub struct Config {
     pub queue: queue::Config,
     pub storage: storage::Config,
     pub elasticsearch: ElasticSearch,
-    #[cfg(any(feature = "ch-aws", feature = "st-aws", feature = "mq-aws"))]
     pub aws: Aws,
 }
 
@@ -68,7 +67,6 @@ pub struct Http {
     pub theme: String,
 }
 
-#[cfg(any(feature = "ch-aws", feature = "st-aws", feature = "mq-aws"))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Aws {
     #[serde(rename = "accesskeyid")]

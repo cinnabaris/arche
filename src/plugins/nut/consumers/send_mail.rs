@@ -7,6 +7,7 @@ use lettre::{
     EmailTransport, SmtpTransport,
 };
 use lettre_email::EmailBuilder;
+use log;
 use mime;
 use serde_json;
 
@@ -60,7 +61,7 @@ pub fn handle(ctx: &Context, payload: &[u8]) -> Result<()> {
             Ok(())
         }
         _ => {
-            debug!("send email to {}: {}\n{}", it.to, it.subject, it.body);
+            log::debug!("send email to {}: {}\n{}", it.to, it.subject, it.body);
             Ok(())
         }
     }

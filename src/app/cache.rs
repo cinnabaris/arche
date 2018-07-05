@@ -1,4 +1,6 @@
-use super::super::{cache::Provider, context::Context, errors::Result};
+use log;
+
+use super::super::{context::Context, errors::Result};
 
 pub fn list() -> Result<()> {
     let ctx = Context::new(&super::parse_config()?)?;
@@ -13,6 +15,6 @@ pub fn list() -> Result<()> {
 pub fn clear() -> Result<()> {
     let ctx = Context::new(&super::parse_config()?)?;
     let cnt = ctx.cache.clear()?;
-    info!("remove {} items from cache", cnt);
+    log::info!("remove {} items from cache", cnt);
     Ok(())
 }

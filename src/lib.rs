@@ -1,7 +1,10 @@
+#![feature(plugin, use_extern_macros)]
+#![plugin(rocket_codegen)]
 #![recursion_limit = "1024"]
+extern crate rocket;
 #[macro_use]
 extern crate error_chain;
-#[macro_use]
+#[macro_use(log)]
 pub extern crate log;
 #[macro_use]
 extern crate serde_derive;
@@ -13,10 +16,9 @@ extern crate diesel;
 extern crate validator_derive;
 #[macro_use]
 extern crate juniper;
-// #[macro_use]
-// extern crate lazy_static;
+#[macro_use]
+extern crate lazy_static;
 
-#[cfg(feature = "mq-rabbit")]
 extern crate amqp;
 extern crate base64;
 extern crate byteorder;
@@ -42,22 +44,16 @@ extern crate md5;
 extern crate mime;
 extern crate mustache;
 extern crate r2d2;
-#[cfg(feature = "ch-redis")]
 extern crate r2d2_redis;
-#[cfg(feature = "ch-redis")]
 extern crate redis;
 extern crate regex;
 extern crate robots_txt;
+extern crate rocket_cors;
 extern crate rss;
-#[cfg(any(feature = "ch-aws", feature = "st-aws", feature = "mq-aws"))]
 extern crate rusoto_core;
-#[cfg(feature = "ch-aws")]
 extern crate rusoto_elasticache;
-#[cfg(feature = "st-aws")]
 extern crate rusoto_s3;
-#[cfg(feature = "mq-aws")]
 extern crate rusoto_sns;
-#[cfg(feature = "mq-aws")]
 extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
