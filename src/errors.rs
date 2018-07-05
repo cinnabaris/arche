@@ -25,5 +25,6 @@ error_chain!{
         Hyper(::hyper::Error);
         RocketConfig(::rocket::config::ConfigError);
         RocketLaunch(::rocket::error::LaunchError);
+        Rss(::rss::Error);
     }
 }

@@ -88,3 +88,9 @@ pub mod settings;
 pub mod storage;
 pub mod sys;
 pub mod utils;
+
+use chrono::NaiveDateTime;
+use sitemap::structs::ChangeFreq;
+
+pub type SitemapItem = (String, f32, ChangeFreq, NaiveDateTime);
+pub type RssItem = (String, String, String, NaiveDateTime);

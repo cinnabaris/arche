@@ -1,61 +1,42 @@
-use http::{
-    header::{AsHeaderName, AUTHORIZATION, HOST, ORIGIN},
-    request::Parts,
-    HeaderMap,
+use hyper::header::{Authorization, Bearer, Header, Host, Raw};
+use rocket::{
+    http::Status,
+    request::{self, FromRequest},
+    Outcome, Request,
 };
 
-pub fn locale(parts: &Parts) -> Option<String> {
-    if let Some(v) = get(&parts.headers, HOST) {
-        return Some(v);
-    }
-    None
-}
-pub fn host(parts: &Parts) -> Option<String> {
-    if let Some(v) = get(&parts.headers, HOST) {
-        return Some(v);
-    }
-    None
-}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Home(pub String);
 
-pub fn origin(parts: &Parts) -> Option<String> {
-    if let Some(v) = get(&parts.headers, ORIGIN) {
-        return Some(v);
-    }
-    None
-}
+impl<'a, 'r> FromRequest<'a, 'r> for Home {
+    type Error = ();
 
-// https://jwt.io/introduction/
-const BEARER: &'static str = "Bearer ";
-pub fn token(parts: &Parts) -> Option<String> {
-    if let Some(v) = get(&parts.headers, AUTHORIZATION) {
-        if v.starts_with(BEARER) {
-            return Some((&v[BEARER.len()..]).to_string());
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, ()> {
+        let scheme = req.headers().get_one("X-Forwarded-Proto").unwrap_or("http");
+        if let Some(host) = req.headers().get_one(Host::header_name()) {
+            return Outcome::Success(Home(format!("{}://{}", scheme, host)));
         }
+        return Outcome::Failure((Status::BadRequest, ()));
     }
-    None
 }
 
-pub fn client_ip(parts: &Parts) -> Option<String> {
-    if let Some(ip) = get(&parts.headers, "X-Forwarded-For") {
-        let ip: Vec<&str> = ip.split(',').collect();
-        if let Some(ip) = ip.first() {
-            return Some(ip.trim().to_string());
-        }
-    }
-    if let Some(ip) = get(&parts.headers, "X-Real-IP") {
-        return Some(ip.to_string());
-    }
-    if let Some(ip) = get(&parts.headers, "X-Appengine-Remote-Addr") {
-        return Some(ip.to_string());
-    }
-    None
-}
+//-----------------------------------------------------------------------------
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Token(pub Option<String>);
 
-fn get<K: AsHeaderName>(m: &HeaderMap, k: K) -> Option<String> {
-    if let Some(v) = m.get(k) {
-        if let Ok(v) = v.to_str() {
-            return Some(v.to_string());
+impl<'a, 'r> FromRequest<'a, 'r> for Token {
+    type Error = ();
+
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, ()> {
+        if let Some(auth) = req
+            .headers()
+            .get_one(Authorization::<Bearer>::header_name())
+        {
+            if let Ok(auth) = Authorization::<Bearer>::parse_header(&Raw::from(auth)) {
+                let Authorization::<Bearer>(bearer) = auth;
+                return Outcome::Success(Token(Some(bearer.token)));
+            }
         }
+        Outcome::Success(Token(None))
     }
-    None
 }

@@ -1,12 +1,29 @@
+use std::ops::Deref;
 use std::path::{Path, PathBuf};
+use std::result::Result as StdResult;
 
-use rocket::{http::Status, response::NamedFile, Catcher, Route, State};
+use chrono::{DateTime, FixedOffset, Utc};
+use robots_txt::Robots;
+use rocket::{
+    http::Status,
+    response::{content::Xml, NamedFile},
+    Catcher, Route, State,
+};
+use rss::{ChannelBuilder, ItemBuilder};
+use sitemap::{structs::UrlEntry, writer::SiteMapWriter, Error as SitemapError};
 
-use super::{env::Config, errors::Result, plugins::nut};
+use super::{
+    env::Config,
+    errors::Result,
+    orm::PooledConnection as Db,
+    plugins::{forum, nut},
+    request::Home,
+};
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();
     items.push(nut::routes());
+    items.push(forum::routes());
     items.push((
         "/",
         routes![
@@ -53,19 +70,109 @@ fn upload(file: PathBuf) -> Result<NamedFile> {
     Ok(NamedFile::open(Path::new("tmp").join("upload").join(file))?)
 }
 
+// https://en.wikipedia.org/wiki/Robots_exclusion_standard
 #[get("/robots.txt")]
-fn robots_txt() -> &'static str {
-    "robots"
+fn robots_txt(home: Home) -> Result<String> {
+    let Home(home) = home;
+    Ok(format!(
+        "{}",
+        Robots::start_build()
+            .host(home.clone())
+            .start_section_for("*")
+            .disallow("/my/")
+            .sitemap((home + "/sitemap.xml").parse()?)
+            .end_section()
+            .finalize()
+    ))
 }
 
-#[get("/sitemap.xml.gz")]
-fn sitemap_xml_gz() -> &'static str {
-    "sitemap"
+fn build_sitemap(home: &String, buf: &mut Vec<u8>) -> StdResult<(), SitemapError> {
+    let srt = SiteMapWriter::new(buf);
+    let mut urt = srt.start_urlset()?;
+    let fix = FixedOffset::east(0);
+
+    for items in vec![nut::sitemap(), forum::sitemap()] {
+        for (loc, priority, changefreq, lastmod) in items {
+            urt.url(
+                UrlEntry::builder()
+                    .loc(format!("{}{}", home, loc))
+                    .priority(priority)
+                    .changefreq(changefreq)
+                    .lastmod(DateTime::<Utc>::from_utc(lastmod, Utc).with_timezone(&fix)),
+            )?;
+        }
+    }
+
+    urt.end()?;
+    Ok(())
 }
+
+// https://en.wikipedia.org/wiki/Site_map
+// https://www.sitemaps.org/protocol.html
+#[get("/sitemap.xml")]
+fn sitemap_xml_gz(home: Home) -> Result<Xml<Vec<u8>>> {
+    let Home(home) = home;
+    let mut buf = Vec::new();
+    match build_sitemap(&home, &mut buf) {
+        Ok(_) => Ok(Xml(buf)),
+        Err(e) => Err(format!("{:?}", e).into()),
+    }
+}
+// fn sitemap_xml_gz<'r>() -> response::Result<'r> {
+//     let mut buf = Cursor::new(Vec::new());
+//     match build_sitemap(&mut buf) {
+//         Ok(_) => Response::build()
+//             .sized_body(buf)
+//             .header(ContentType::XML)
+//             .header(ContentType::new("application", "x-gzip"))
+//             .header(Header::from(ContentEncoding(vec![Encoding::Gzip])))
+//             .header(Header::from(ContentDisposition {
+//                 disposition: DispositionType::Attachment,
+//                 parameters: vec![DispositionParam::Filename(
+//                     Charset::Us_Ascii,
+//                     None,
+//                     b"sitemap.xml.gz".to_vec(),
+//                 )],
+//             }))
+//             .ok(),
+//         Err(e) => {
+//             log::error!("{:?}", e);
+//             Err(Status::InternalServerError)
+//         }
+//     }
+// }
 
 #[get("/rss/<lang>")]
-fn rss_atom(lang: String) -> &'static str {
-    "rss"
+fn rss_atom(db: Db, home: Home, lang: String) -> Result<Xml<Vec<u8>>> {
+    let Home(home) = home;
+    let db = db.deref();
+    let mut fields = Vec::new();
+    for items in vec![nut::rss(&lang), forum::rss(&lang)] {
+        for (url, title, desc, last) in items {
+            fields.push(
+                ItemBuilder::default()
+                    .link(format!("{}{}", home, url))
+                    .title(title)
+                    .description(desc)
+                    .pub_date(DateTime::<Utc>::from_utc(last, Utc).to_rfc3339())
+                    .build()?,
+            );
+        }
+    }
+    let mut buf = Vec::new();
+    let ch = ChannelBuilder::default()
+        .link(home.clone())
+        .language(lang.clone())
+        .pub_date(Utc::now().to_rfc3339())
+        .title(t!(db, &lang, "site.title"))
+        .description(t!(db, &lang, "site.description"))
+        .copyright(t!(db, &lang, "site.copyright"))
+        .items(fields)
+        .build()?;
+
+    ch.write_to(&mut buf)?;
+
+    Ok(Xml(buf))
 }
 
 #[error(404)]

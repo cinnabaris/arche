@@ -9,7 +9,10 @@ pub fn server(ctx: Arc<Context>) -> Result<()> {
     for (k, v) in router::routes() {
         app = app.mount(k, v);
     }
-    app = app.manage(ctx.config.clone()).catch(router::catchers());
+    app = app
+        .manage(ctx.db.clone())
+        .manage(ctx.config.clone())
+        .catch(router::catchers());
     Err(app.launch().into())
 }
 
