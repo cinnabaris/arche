@@ -87,6 +87,11 @@ default-features = false
 version = "0.6"
 features = ["v4"]
 
+[dependencies.rocket_contrib]
+version = "*"
+default-features = false
+features = ["json", "uuid", "handlebars_templates"]
+
 [dependencies.rocket_cors]
 git = "https://github.com/lawliet89/rocket_cors"
 
