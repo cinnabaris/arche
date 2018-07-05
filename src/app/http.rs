@@ -21,11 +21,10 @@ pub fn routes() -> Result<()> {
     for (k, v) in router::routes() {
         app = app.mount(k, v);
     }
-    app = app.catch(router::catchers());
-    println!("{}\t{} {}", "METHOD", "RANK", "PATH");
+    println!("{}\t{}\t{}", "METHOD", "RANK", "PATH");
     let items = app.routes();
     for it in items {
-        println!("{}\t{} {}", it.method, it.rank, it.base);
+        println!("{}\t{}\t{}", it.method, it.rank, it.uri);
     }
     Ok(())
 }
