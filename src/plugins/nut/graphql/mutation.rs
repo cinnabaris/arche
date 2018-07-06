@@ -7,6 +7,7 @@ use super::super::super::super::{
     errors::{Error, Result},
     graphql::context::Context,
     i18n,
+    orm::schema::*,
 };
 use super::super::dao;
 

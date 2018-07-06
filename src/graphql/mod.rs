@@ -19,16 +19,16 @@ pub mod query;
 pub mod schema;
 
 use std::net::SocketAddr;
+use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use juniper_rocket;
 use rocket::{response::content::Html, Route, State};
 
 use super::{
-    env::Config,
+    context::Context,
     orm::PooledConnection as Db,
     request::{Home, Locale, Token},
-    utils::Encryptor,
 };
 
 pub fn routes() -> (&'static str, Vec<Route>) {
@@ -47,10 +47,9 @@ fn handler(
     locale: Locale,
     remote: SocketAddr,
     token: Token,
-    config: State<Config>,
     request: juniper_rocket::GraphQLRequest,
     schema: State<schema::Schema>,
-    encryptor: State<Encryptor>,
+    ctx: State<Arc<Context>>,
 ) -> juniper_rocket::GraphQLResponse {
     let Locale(locale) = locale;
     let Home(home) = home;
@@ -60,10 +59,9 @@ fn handler(
         &schema,
         &context::Context {
             db: db,
+            app: Arc::clone(&ctx),
             home: home,
             locale: locale,
-            config: config.clone(),
-            encryptor: encryptor.clone(),
             token: match token {
                 Some(t) => Some(t),
                 None => None,

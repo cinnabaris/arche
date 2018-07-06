@@ -1,9 +1,11 @@
+use std::sync::Arc;
+
 use juniper;
 use rocket::http::Status;
 
 use super::super::{
-    env::Config, errors::Result, orm::PooledConnection as Db, plugins::nut::dao::Role,
-    utils::Encryptor,
+    context::Context as AppContext, errors::Result, orm::PooledConnection as Db,
+    plugins::nut::dao::Role,
 };
 
 pub struct Context {
@@ -11,9 +13,8 @@ pub struct Context {
     pub locale: String,
     pub token: Option<String>,
     pub client_ip: String,
-    pub encryptor: Encryptor,
+    pub app: Arc<AppContext>,
     pub db: Db,
-    pub config: Config,
 }
 
 impl juniper::Context for Context {}

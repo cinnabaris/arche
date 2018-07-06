@@ -12,8 +12,7 @@ pub fn server(ctx: Arc<Context>) -> Result<()> {
     }
     app = app
         .manage(ctx.db.clone())
-        .manage(ctx.config.clone())
-        .manage(ctx.encryptor.clone())
+        .manage(Arc::clone(&ctx))
         .manage(graphql::schema::Schema::new(
             graphql::query::Query,
             graphql::mutation::Mutation,

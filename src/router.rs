@@ -1,6 +1,7 @@
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
+use std::sync::Arc;
 
 use chrono::{DateTime, FixedOffset, Utc};
 use robots_txt::Robots;
@@ -13,7 +14,7 @@ use rss::{ChannelBuilder, ItemBuilder};
 use sitemap::{structs::UrlEntry, writer::SiteMapWriter, Error as SitemapError};
 
 use super::{
-    env::Config,
+    context::Context,
     errors::Result,
     graphql,
     orm::PooledConnection as Db,
@@ -53,10 +54,10 @@ fn global(file: PathBuf) -> Result<NamedFile> {
 }
 
 #[get("/assets/<file..>")]
-fn assets(file: PathBuf, cfg: State<Config>) -> Result<NamedFile> {
+fn assets(file: PathBuf, ctx: State<Arc<Context>>) -> Result<NamedFile> {
     Ok(NamedFile::open(
         Path::new("themes")
-            .join(cfg.http.theme.clone())
+            .join(ctx.config.http.theme.clone())
             .join("assets")
             .join(file),
     )?)

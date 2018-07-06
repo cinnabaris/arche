@@ -43,8 +43,8 @@ pub fn get_site_info(ctx: &Context) -> Result<SiteInfo> {
             &String::from("site.copyright"),
             &None::<String>,
         ),
-        author: settings::get(&db, &ctx.encryptor, &String::from("site.author"))?,
-        oauth: Oauth::new(&ctx.config.oauth),
+        author: settings::get(&db, &ctx.app.encryptor, &String::from("site.author"))?,
+        oauth: Oauth::new(&ctx.app.config.oauth),
     })
 }
 

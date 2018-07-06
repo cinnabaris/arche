@@ -8,7 +8,7 @@ use super::{
 pub struct Context {
     pub db: orm::Pool,
     pub cache: Cache,
-    pub queue: Producer,
+    pub producer: Producer,
     pub storage: Storage,
     pub encryptor: Encryptor,
     pub config: Config,
@@ -20,7 +20,7 @@ impl Context {
         Ok(Self {
             db: cfg.database.open()?,
             cache: cfg.cache.open()?,
-            queue: Producer::new(cfg.queue.clone()),
+            producer: Producer::new(cfg.queue.clone()),
             encryptor: Encryptor::new(cfg.secret_key()?.as_slice())?,
             storage: Storage::new(cfg.storage.clone()),
             jwt: Jwt::new(cfg.secret_key.clone(), Algorithm::HS512),

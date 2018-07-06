@@ -3,12 +3,28 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use amqp::{self, Basic};
 use log;
 use mime;
+use serde::ser::Serialize;
 use serde_json;
 use uuid::Uuid;
 
 use super::{context::Context, errors::Result};
 
 pub const BAD_PROVIDER: &'static str = "bad messing queue provider";
+
+pub fn push<T: Serialize>(
+    producer: &Producer,
+    type_: &String,
+    priority: u8,
+    payload: &T,
+) -> Result<()> {
+    producer.push(
+        &Uuid::new_v4().to_string(),
+        type_,
+        &format!("{}", mime::APPLICATION_JSON),
+        priority,
+        serde_json::to_vec(payload)?.as_slice(),
+    )
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
@@ -72,8 +88,14 @@ impl Producer {
         Self { cfg: cfg }
     }
 
-    pub fn push(&self, type_: &String, priority: u8, payload: &serde_json::Value) -> Result<()> {
-        let id = Uuid::new_v4().to_string();
+    pub fn push(
+        &self,
+        id: &String,
+        type_: &String,
+        content_type: &String,
+        priority: u8,
+        payload: &[u8],
+    ) -> Result<()> {
         log::info!("push task into queue {}@{}", id, self.cfg.name);
         if let Some(ref cfg) = self.cfg.rabbitmq {
             return cfg.open(self.cfg.name.clone(), move |ch, qu| {
@@ -83,14 +105,14 @@ impl Producer {
                     true,
                     false,
                     amqp::protocol::basic::BasicProperties {
-                        content_type: Some(format!("{}", mime::APPLICATION_JSON)),
+                        content_type: Some(content_type.clone()),
                         _type: Some(type_.clone()),
                         priority: Some(priority),
                         timestamp: Some(SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs()),
                         message_id: Some(id.clone()),
                         ..Default::default()
                     },
-                    serde_json::to_vec(payload)?,
+                    payload.to_vec(),
                 )?;
                 Ok(())
             });

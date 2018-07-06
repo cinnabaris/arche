@@ -2,7 +2,6 @@ use sodiumoxide::crypto::secretbox;
 
 use super::errors::Result;
 
-#[derive(Clone)]
 pub struct Encryptor {
     key: secretbox::Key,
 }
