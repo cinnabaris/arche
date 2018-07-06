@@ -13,6 +13,7 @@ class CreateUsers < ActiveRecord::Migration[5.2]
       t.string :current_sign_in_ip, limit: 39
       t.datetime :last_sign_in_at
       t.string :last_sign_in_ip, limit: 39
+      t.datetime :confirmed_at
       t.datetime :locked_at
       t.datetime :deleted_at
       t.timestamps

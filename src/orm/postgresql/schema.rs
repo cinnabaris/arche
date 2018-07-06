@@ -285,6 +285,7 @@ table! {
         current_sign_in_ip -> Nullable<Varchar>,
         last_sign_in_at -> Nullable<Timestamp>,
         last_sign_in_ip -> Nullable<Varchar>,
+        confirmed_at -> Nullable<Timestamp>,
         locked_at -> Nullable<Timestamp>,
         deleted_at -> Nullable<Timestamp>,
         created_at -> Timestamp,
