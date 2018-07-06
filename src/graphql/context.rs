@@ -1,15 +1,19 @@
-use std::sync::Arc;
-
 use juniper;
 use rocket::http::Status;
 
-use super::super::{context, errors::Result, plugins::nut::dao::Role};
+use super::super::{
+    env::Config, errors::Result, orm::PooledConnection as Db, plugins::nut::dao::Role,
+    utils::Encryptor,
+};
 
 pub struct Context {
+    pub home: String,
     pub locale: String,
     pub token: Option<String>,
     pub client_ip: String,
-    pub state: Arc<context::Context>,
+    pub encryptor: Encryptor,
+    pub db: Db,
+    pub config: Config,
 }
 
 impl juniper::Context for Context {}

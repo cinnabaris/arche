@@ -6,8 +6,8 @@ use sitemap::structs::ChangeFreq;
 
 use super::super::{RssItem, SitemapItem};
 
-pub fn routes() -> (&'static str, Vec<Route>) {
-    ("/forum", routes![controllers::home])
+pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
+    vec![("/forum", routes![controllers::home])]
 }
 
 pub fn sitemap() -> Vec<SitemapItem> {

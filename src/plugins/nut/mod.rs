@@ -9,8 +9,8 @@ use sitemap::structs::ChangeFreq;
 
 use super::super::{RssItem, SitemapItem};
 
-pub fn routes() -> (&'static str, Vec<Route>) {
-    ("/", routes![controllers::home])
+pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
+    vec![("/", routes![controllers::home])]
 }
 
 pub fn sitemap() -> Vec<SitemapItem> {

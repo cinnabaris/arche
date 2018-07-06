@@ -35,6 +35,7 @@ extern crate hex;
 extern crate http;
 extern crate hyper;
 extern crate ini;
+extern crate juniper_rocket;
 extern crate language_tags;
 extern crate lettre;
 extern crate lettre_email;

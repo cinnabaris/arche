@@ -10,8 +10,7 @@ use super::super::super::super::{
 use super::models::{Locale, Oauth, SiteInfo};
 
 pub fn get_site_info(ctx: &Context) -> Result<SiteInfo> {
-    let db = ctx.state.db.get()?;
-    let db = db.deref();
+    let db = ctx.db.deref();
     Ok(SiteInfo {
         locale: ctx.locale.clone(),
         title: i18n::t(
@@ -44,8 +43,8 @@ pub fn get_site_info(ctx: &Context) -> Result<SiteInfo> {
             &String::from("site.copyright"),
             &None::<String>,
         ),
-        author: settings::get(&db, &ctx.state.encryptor, &String::from("site.author"))?,
-        oauth: Oauth::new(&ctx.state.config.oauth),
+        author: settings::get(&db, &ctx.encryptor, &String::from("site.author"))?,
+        oauth: Oauth::new(&ctx.config.oauth),
     })
 }
 
@@ -55,11 +54,12 @@ pub struct ListLocaleByLang {
     #[validate(length(min = "2", max = "8"))]
     pub lang: String,
 }
+
 impl ListLocaleByLang {
     pub fn call(&self, ctx: &Context) -> Result<Vec<Locale>> {
         self.validate()?;
-        let db = ctx.state.db.get()?;
-        let db = db.deref();
+
+        let db = ctx.db.deref();
 
         let items = locales::dsl::locales
             .select((

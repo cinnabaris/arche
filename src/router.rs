@@ -15,6 +15,7 @@ use sitemap::{structs::UrlEntry, writer::SiteMapWriter, Error as SitemapError};
 use super::{
     env::Config,
     errors::Result,
+    graphql,
     orm::PooledConnection as Db,
     plugins::{forum, nut},
     request::Home,
@@ -22,8 +23,9 @@ use super::{
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();
-    items.push(nut::routes());
-    items.push(forum::routes());
+    items.extend_from_slice(&nut::routes());
+    items.extend_from_slice(&forum::routes());
+    items.push(graphql::routes());
     items.push((
         "/",
         routes![

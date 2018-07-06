@@ -16,11 +16,10 @@ impl<'a, 'r> FromRequest<'a, 'r> for Home {
         if let Some(host) = req.headers().get_one(Host::header_name()) {
             return Outcome::Success(Home(format!("{}://{}", scheme, host)));
         }
-        return Outcome::Failure((Status::BadRequest, ()));
+        Outcome::Failure((Status::BadRequest, ()))
     }
 }
 
-//-----------------------------------------------------------------------------
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Token(pub Option<String>);
 
@@ -38,5 +37,21 @@ impl<'a, 'r> FromRequest<'a, 'r> for Token {
             }
         }
         Outcome::Success(Token(None))
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Locale(pub String);
+
+impl<'a, 'r> FromRequest<'a, 'r> for Locale {
+    type Error = ();
+
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, ()> {
+        // let scheme = req.headers().get_one("X-Forwarded-Proto").unwrap_or("http");
+        // if let Some(host) = req.headers().get_one(Host::header_name()) {
+        //     return Outcome::Success(Home(format!("{}://{}", scheme, host)));
+        // }
+        // return Outcome::Failure((Status::BadRequest, ()));
+        Outcome::Success(Locale("en-US".to_string()))
     }
 }

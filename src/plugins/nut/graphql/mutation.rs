@@ -18,8 +18,7 @@ pub struct SignUpUser {
 impl SignUpUser {
     pub fn call(&self, ctx: &Context) -> Result<String> {
         self.validate()?;
-        let db = ctx.state.db.get()?;
-        let db = db.deref();
+        let db = ctx.db.deref();
         let user = dao::add_user_by_email(db, &self.name, &self.email, &self.password)?;
         l!(
             db,
@@ -65,8 +64,7 @@ impl UpdateLocale {
     pub fn call(&self, ctx: &Context) -> Result<String> {
         self.validate()?;
         ctx.admin()?;
-        let db = ctx.state.db.get()?;
-        let db = db.deref();
+        let db = ctx.db.deref();
         let id = i18n::set(db, &self.lang, &self.code, &self.message)?;
         Ok(id.to_string())
     }

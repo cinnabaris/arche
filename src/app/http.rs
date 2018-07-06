@@ -3,7 +3,7 @@ use std::sync::Arc;
 use rocket;
 use rocket_contrib::Template;
 
-use super::super::{context::Context, errors::Result, router};
+use super::super::{context::Context, errors::Result, graphql, router};
 
 pub fn server(ctx: Arc<Context>) -> Result<()> {
     let mut app = rocket::custom(ctx.config.rocket()?, false);
@@ -13,6 +13,11 @@ pub fn server(ctx: Arc<Context>) -> Result<()> {
     app = app
         .manage(ctx.db.clone())
         .manage(ctx.config.clone())
+        .manage(ctx.encryptor.clone())
+        .manage(graphql::schema::Schema::new(
+            graphql::query::Query,
+            graphql::mutation::Mutation,
+        ))
         .attach(Template::fairing())
         .catch(router::catchers());
     Err(app.launch().into())
