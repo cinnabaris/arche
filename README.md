@@ -1,6 +1,6 @@
 # arche
 
-A complete open source e-commerce solution built with Rust language(STILL IN DEVELOPMENT).
+A complete open source Office-Automation solution(By Rust and React, STILL UNDER DEVELOPMENT).
 
 ## Install
 

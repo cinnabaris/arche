@@ -2,7 +2,7 @@
 name = "arche"
 version = "0.1.0"
 authors = ["Jeremy Zheng <jitang.zheng@gmail.com>"]
-description = "A complete open source e-commerce solution."
+description = "A complete open source Office-Automation solution."
 homepage = "https://github.com/cinnabaris/arche"
 license = "MIT"
 
