@@ -11,7 +11,7 @@ api:
 
 www:
 	cd dashboard && npm run build
-	-cp -r dashboard/dist $(dist)/dashboard
+	-cp -r dashboard/build $(dist)/dashboard
 
 schema:
 	DATABASE_URL="postgres://postgres:@localhost:5432/arche" diesel print-schema > src/orm/postgresql/schema.rs
@@ -19,4 +19,4 @@ schema:
 
 clean:
 	cargo clean
-	-rm -r $(dist) $(dist).tar.xz dashboard/dist
+	-rm -r $(dist) $(dist).tar.xz dashboard/build
