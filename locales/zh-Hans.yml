@@ -4,9 +4,28 @@ languages:
   zh-Hant:                 繁體中文
 
 nut:
+  emails:
+    user:
+      confirm:
+        success:           激活成功，请继续登录。
+        subject:           激活信息
+        body:              你可以通过点击如下链接来激活账户：<br/> <a href="{{home}}/users/confirm/{{token}}">激活我的账户</a>
+      unlock:
+        success:           解锁成功，请继续登录。
+        subject:           解锁信息
+        body:              您可以通过点击如下链接来解锁账户：<br/> <a href="{{home}}/users/unlock/{{token}}">解锁我的账户</a> 你的账户由于多次未成功的登录而被锁定
+      reset-password:
+        success:           密码重置成功，请继续登录。
+        subject:           重置密码信息
+        body:              有人申请了重置密码，你可以点击如下链接继续： <br/> <a href="{{home}}/my/users/reset-password/{{token}}">重置我的密码</a><br/>如果此申请不是您发起的，请忽略本邮件。只有您提交了新的密码才会修改。
   errors:
     user:
       email-already-exist: 该邮件账户已经存在
+    database-not-empty:    数据库非空
   logs:
     user:
       sign-up:             账户注册
+      confirm:             激活账户
+    role:
+      apply:               应用权限{name}@{type}/{id}?ttl={ttl}
+      deny:                禁止权限{name}@{type}/{id}
