@@ -59,6 +59,7 @@ extern crate rusoto_sns;
 extern crate rusoto_sqs;
 extern crate serde;
 extern crate serde_xml_rs;
+extern crate serde_yaml;
 extern crate sha2;
 extern crate sitemap;
 extern crate sodiumoxide;

@@ -2,6 +2,7 @@ pub mod cache;
 pub mod db;
 pub mod generate;
 pub mod http;
+pub mod i18n;
 pub mod worker;
 
 use log;
@@ -34,6 +35,17 @@ pub fn main() -> Result<()> {
     let cache_clear = clap::SubCommand::with_name("cache:clear").about("Clear all cache items");
     let cache_list = clap::SubCommand::with_name("cache:list").about("List all cache items");
 
+    let i18n_sync = clap::SubCommand::with_name("i18n:sync")
+        .about("Sync locales to database")
+        .arg(
+            clap::Arg::with_name("dir")
+                .short("d")
+                .long("dir")
+                .value_name("DIRECTORY")
+                .help("Locale's directory")
+                .takes_value(true),
+        );
+
     let matches = clap::App::new(env::NAME)
         .version(env::VERSION)
         .author(env::AUTHORS)
@@ -46,6 +58,7 @@ pub fn main() -> Result<()> {
         .subcommand(cache_list)
         .subcommand(cache_clear)
         .subcommand(routes)
+        .subcommand(i18n_sync)
         .get_matches();
 
     if let Some(_) = matches.subcommand_matches("generate:config") {
@@ -65,6 +78,10 @@ pub fn main() -> Result<()> {
     }
     if let Some(_) = matches.subcommand_matches("cache:list") {
         return cache::list();
+    }
+    if let Some(_) = matches.subcommand_matches("i18n:sync") {
+        let dir = matches.value_of("dir").unwrap_or("locales");
+        return i18n::sync(Path::new(dir).to_path_buf());
     }
 
     // main entry;

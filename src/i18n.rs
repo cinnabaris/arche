@@ -1,5 +1,6 @@
 use chrono::Utc;
 use diesel::{insert_into, prelude::*, update};
+
 use log;
 use mustache;
 use serde::ser::Serialize;
@@ -41,6 +42,7 @@ pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<i6
                     locales::dsl::lang.eq(lang),
                     locales::dsl::code.eq(code),
                     locales::dsl::message.eq(message),
+                    locales::dsl::created_at.eq(&now),
                     locales::dsl::updated_at.eq(&now),
                 ))
                 .returning(locales::dsl::id)

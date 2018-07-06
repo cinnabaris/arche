@@ -32,11 +32,11 @@ impl SignUpUser {
                     &user,
                     &ctx.client_ip,
                     &ctx.locale,
-                    "nut.logs.user-sign-up"
+                    "nut.logs.user.sign-up"
                 )?;
                 return Ok(user.to_string());
             }
-            Err(t!(db, &ctx.locale, "nut.errors.user-email-already-exist").into())
+            Err(t!(db, &ctx.locale, "nut.errors.user.email-already-exist").into())
         })
     }
 }

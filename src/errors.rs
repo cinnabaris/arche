@@ -26,5 +26,6 @@ error_chain!{
         RocketConfig(::rocket::config::ConfigError);
         RocketLaunch(::rocket::error::LaunchError);
         Rss(::rss::Error);
+        SerdeYaml(::serde_yaml::Error);
     }
 }
