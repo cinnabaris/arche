@@ -5,7 +5,7 @@ use rocket::http::Status;
 
 use super::super::{
     context::Context as AppContext, errors::Result, orm::PooledConnection as Db,
-    plugins::nut::dao::Role,
+    plugins::nut::dao::role::Role,
 };
 
 pub struct Context {

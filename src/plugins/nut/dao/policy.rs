@@ -1,15 +1,16 @@
-use std::fmt;
 use std::ops::Add;
 
 use chrono::{Duration, NaiveDate, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
-use uuid::Uuid;
 
-use super::super::super::{
+use super::super::super::super::{
     errors::Result,
-    orm::{schema::*, Connection as Db},
-    utils,
+    orm::{
+        schema::{policies, roles},
+        Connection as Db,
+    },
 };
+
 pub fn can(
     db: &Db,
     user: &i64,
@@ -123,96 +124,6 @@ pub fn apply(
                 .returning(policies::dsl::id)
                 .get_result::<i64>(db)?;
             Ok(id)
-        }
-    }
-}
-
-pub fn add_log(db: &Db, user: &i64, ip: &String, message: &String) -> Result<i64> {
-    let now = Utc::now().naive_utc();
-    let id = insert_into(logs::dsl::logs)
-        .values((
-            logs::dsl::user_id.eq(user),
-            logs::dsl::ip.eq(ip),
-            logs::dsl::message.eq(message),
-            logs::dsl::created_at.eq(&now),
-        ))
-        .returning(logs::dsl::id)
-        .get_result::<i64>(db)?;
-    Ok(id)
-}
-
-pub fn add_user_by_email(
-    db: &Db,
-    name: &String,
-    email: &String,
-    password: &String,
-) -> Result<Option<i64>> {
-    let now = Utc::now().naive_utc();
-    match users::dsl::users
-        .select(users::dsl::id)
-        .filter(users::dsl::email.eq(email))
-        .first::<i64>(db)
-    {
-        Ok(_) => Ok(None),
-        Err(_) => {
-            let password = utils::hash::sum(password.as_bytes())?;
-            let id = insert_into(users::dsl::users)
-                .values((
-                    users::dsl::email.eq(email),
-                    users::dsl::name.eq(name),
-                    users::dsl::password.eq(&Some(password)),
-                    users::dsl::provider_type.eq(&format!("{}", UserType::Email)),
-                    users::dsl::provider_id.eq(email),
-                    users::dsl::uid.eq(&Uuid::new_v4().to_string()),
-                    users::dsl::sign_in_count.eq(0),
-                    users::dsl::updated_at.eq(&now),
-                    users::dsl::created_at.eq(&now),
-                ))
-                .returning(users::dsl::id)
-                .get_result::<i64>(db)?;
-            Ok(Some(id))
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum Role {
-    Admin,
-    Root,
-    Member,
-    By(String),
-}
-
-impl fmt::Display for Role {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Role::Admin => fmt.write_str("admin"),
-            Role::Root => fmt.write_str("root"),
-            Role::Member => fmt.write_str("member"),
-            Role::By(n) => fmt.write_str(&n),
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum UserType {
-    Google,
-    Facebook,
-    Line,
-    Github,
-    WeChat,
-    Email,
-}
-
-impl fmt::Display for UserType {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            UserType::Google => fmt.write_str("google"),
-            UserType::Facebook => fmt.write_str("facebook"),
-            UserType::Github => fmt.write_str("github"),
-            UserType::WeChat => fmt.write_str("wechat"),
-            UserType::Line => fmt.write_str("line"),
-            UserType::Email => fmt.write_str("email"),
         }
     }
 }

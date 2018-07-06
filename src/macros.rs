@@ -4,7 +4,7 @@ macro_rules! l {
         l!($d, $u, $i, $l, $c, &None::<String>)
     };
     ($d:expr, $u:expr, $i:expr, $l:expr, $c:expr, $a:expr) => {
-        ::plugins::nut::dao::add_log($d, $u, $i, &t!($d, $l, &$c.to_string(), $a))
+        ::plugins::nut::dao::log::add($d, $u, $i, &t!($d, $l, &$c.to_string(), $a))
     };
 }
 

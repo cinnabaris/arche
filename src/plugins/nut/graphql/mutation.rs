@@ -7,9 +7,40 @@ use super::super::super::super::{
     errors::{Error, Result},
     graphql::context::Context,
     i18n,
-    orm::schema::*,
 };
 use super::super::dao;
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct Install {
+    #[validate(length(min = "1", max = "32"))]
+    pub name: String,
+    #[validate(length(min = "2", max = "64"))]
+    pub email: String,
+    #[validate(length(min = "1"))]
+    pub password: String,
+}
+
+impl Install {
+    pub fn call(&self, ctx: &Context) -> Result<String> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        db.transaction::<_, Error, _>(|| {
+            if let Some(user) =
+                dao::user::add_by_email(db, &self.name, &self.email, &self.password)?
+            {
+                l!(
+                    db,
+                    &user,
+                    &ctx.client_ip,
+                    &ctx.locale,
+                    "nut.logs.user.sign-up"
+                )?;
+                return Ok(user.to_string());
+            }
+            Err(t!(db, &ctx.locale, "nut.errors.user.email-already-exist").into())
+        })
+    }
+}
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct SignUpUser {
@@ -26,7 +57,8 @@ impl SignUpUser {
         self.validate()?;
         let db = ctx.db.deref();
         db.transaction::<_, Error, _>(|| {
-            if let Some(user) = dao::add_user_by_email(db, &self.name, &self.email, &self.password)?
+            if let Some(user) =
+                dao::user::add_by_email(db, &self.name, &self.email, &self.password)?
             {
                 l!(
                     db,
