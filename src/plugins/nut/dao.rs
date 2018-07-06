@@ -141,14 +141,19 @@ pub fn add_log(db: &Db, user: &i64, ip: &String, message: &String) -> Result<i64
     Ok(id)
 }
 
-pub fn add_user_by_email(db: &Db, name: &String, email: &String, password: &String) -> Result<i64> {
+pub fn add_user_by_email(
+    db: &Db,
+    name: &String,
+    email: &String,
+    password: &String,
+) -> Result<Option<i64>> {
     let now = Utc::now().naive_utc();
     match users::dsl::users
         .select(users::dsl::id)
         .filter(users::dsl::email.eq(email))
         .first::<i64>(db)
     {
-        Ok(_) => Err("email already exist".into()),
+        Ok(_) => Ok(None),
         Err(_) => {
             let password = utils::hash::sum(password.as_bytes())?;
             let id = insert_into(users::dsl::users)
@@ -165,7 +170,7 @@ pub fn add_user_by_email(db: &Db, name: &String, email: &String, password: &Stri
                 ))
                 .returning(users::dsl::id)
                 .get_result::<i64>(db)?;
-            Ok(id)
+            Ok(Some(id))
         }
     }
 }

@@ -1,8 +1,13 @@
 use std::ops::Deref;
 
+use diesel::Connection;
 use validator::Validate;
 
-use super::super::super::super::{errors::Result, graphql::context::Context, i18n};
+use super::super::super::super::{
+    errors::{Error, Result},
+    graphql::context::Context,
+    i18n,
+};
 use super::super::dao;
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
@@ -19,15 +24,20 @@ impl SignUpUser {
     pub fn call(&self, ctx: &Context) -> Result<String> {
         self.validate()?;
         let db = ctx.db.deref();
-        let user = dao::add_user_by_email(db, &self.name, &self.email, &self.password)?;
-        l!(
-            db,
-            &user,
-            &ctx.client_ip,
-            &ctx.locale,
-            "nut.logs.user-sign-up"
-        )?;
-        Ok(user.to_string())
+        db.transaction::<_, Error, _>(|| {
+            if let Some(user) = dao::add_user_by_email(db, &self.name, &self.email, &self.password)?
+            {
+                l!(
+                    db,
+                    &user,
+                    &ctx.client_ip,
+                    &ctx.locale,
+                    "nut.logs.user-sign-up"
+                )?;
+                return Ok(user.to_string());
+            }
+            Err(t!(db, &ctx.locale, "nut.errors.user-email-already-exist").into())
+        })
     }
 }
 
