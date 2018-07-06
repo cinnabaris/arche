@@ -27,7 +27,7 @@ pub struct Mail {
     pub to: String,
     pub subject: String,
     pub body: String,
-    pub attachments: BTreeMap<PathBuf, String>,
+    pub attachments: Option<BTreeMap<PathBuf, String>>,
 }
 
 pub const NAME: &'static str = "send-mail";
@@ -55,8 +55,10 @@ impl queue::Consumer for Consumer {
                     .from(&cfg.user[..])
                     .subject(it.subject)
                     .html(it.body);
-                for (file, name) in it.attachments {
-                    email.set_attachment(file.as_path(), Some(&name[..]), &mime::TEXT_PLAIN)?;
+                if let Some(files) = it.attachments {
+                    for (file, name) in files {
+                        email.set_attachment(file.as_path(), Some(&name[..]), &mime::TEXT_PLAIN)?;
+                    }
                 }
                 let email = email.build()?;
 

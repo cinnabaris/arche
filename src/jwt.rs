@@ -1,6 +1,6 @@
 use std::ops::Add;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use chrono::{Duration, Utc};
 use frank_jwt::{decode, encode, Algorithm};
 use serde_json::Value;
 
@@ -20,10 +20,10 @@ impl Jwt {
     }
 
     pub fn sum(&self, payload: &mut Value, ttl: Duration) -> Result<String> {
-        let nbf = SystemTime::now().duration_since(UNIX_EPOCH)?;
+        let nbf = Utc::now().naive_utc();
         let exp = nbf.add(ttl);
-        payload["nbf"] = json!(nbf.as_secs());
-        payload["exp"] = json!(exp.as_secs());
+        payload["nbf"] = json!(nbf.timestamp());
+        payload["exp"] = json!(exp.timestamp());
         match encode(json!({}), &self.key, payload, self.alg) {
             Ok(t) => Ok(t),
             Err(_) => Err("generate jwt failed".into()),
@@ -32,9 +32,9 @@ impl Jwt {
 
     pub fn parse(&self, token: &String) -> Result<Value> {
         if let Ok((_header, payload)) = decode(token, &self.key, self.alg) {
-            if let Some(nbf) = payload["nbf"].as_u64() {
-                if let Some(exp) = payload["exp"].as_u64() {
-                    let now = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
+            if let Some(nbf) = payload["nbf"].as_i64() {
+                if let Some(exp) = payload["exp"].as_i64() {
+                    let now = Utc::now().naive_utc().timestamp();
                     if now >= nbf && now <= exp {
                         return Ok(payload);
                     }

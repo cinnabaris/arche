@@ -13,13 +13,13 @@ pub const BAD_PROVIDER: &'static str = "bad messing queue provider";
 
 pub fn push<T: Serialize>(
     producer: &Producer,
-    type_: &String,
+    type_: &'static str,
     priority: u8,
     payload: &T,
 ) -> Result<()> {
     producer.push(
         &Uuid::new_v4().to_string(),
-        type_,
+        &type_.to_string(),
         &format!("{}", mime::APPLICATION_JSON),
         priority,
         serde_json::to_vec(payload)?.as_slice(),

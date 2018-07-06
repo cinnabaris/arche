@@ -52,7 +52,7 @@ pub fn set(db: &Db, lang: &String, code: &String, message: &String) -> Result<i6
     }
 }
 
-fn tr<S: Serialize>(db: &Db, lang: &String, code: &String, args: &Option<S>) -> Result<String> {
+pub fn tr<S: Serialize>(db: &Db, lang: &String, code: &String, args: &Option<S>) -> Result<String> {
     let msg = get(db, lang, code)?;
     if let Some(args) = args {
         let tpl = mustache::compile_str(&msg)?;

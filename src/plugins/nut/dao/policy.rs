@@ -10,17 +10,19 @@ use super::super::super::super::{
         Connection as Db,
     },
 };
+use super::role::Role;
 
 pub fn can(
     db: &Db,
     user: &i64,
-    role: &String,
+    role: &Role,
     resource_type: &Option<String>,
     resource_id: &Option<i64>,
 ) -> bool {
+    let role = format!("{}", role);
     if let Ok(role) = roles::dsl::roles
         .select(roles::dsl::id)
-        .filter(roles::dsl::name.eq(role))
+        .filter(roles::dsl::name.eq(&role))
         .filter(roles::dsl::resource_type.eq(resource_type))
         .filter(roles::dsl::resource_id.eq(resource_id))
         .first::<i64>(db)
@@ -41,13 +43,14 @@ pub fn can(
 pub fn deny(
     db: &Db,
     user: &i64,
-    role: &String,
+    role: &Role,
     resource_type: &Option<String>,
     resource_id: &Option<i64>,
 ) -> Result<()> {
+    let role = format!("{}", role);
     if let Ok(role) = roles::dsl::roles
         .select(roles::dsl::id)
-        .filter(roles::dsl::name.eq(role))
+        .filter(roles::dsl::name.eq(&role))
         .filter(roles::dsl::resource_type.eq(resource_type))
         .filter(roles::dsl::resource_id.eq(resource_id))
         .first::<i64>(db)
@@ -63,18 +66,19 @@ pub fn deny(
 pub fn apply(
     db: &Db,
     user: &i64,
-    role: &String,
+    role: &Role,
     resource_type: &Option<String>,
     resource_id: &Option<i64>,
     ttl: Duration,
 ) -> Result<i64> {
+    let role = format!("{}", role);
     let now = Utc::now().naive_utc();
     let nbf = now.date();
     let exp = now.add(ttl).date();
 
     let role = match roles::dsl::roles
         .select(roles::dsl::id)
-        .filter(roles::dsl::name.eq(role))
+        .filter(roles::dsl::name.eq(&role))
         .filter(roles::dsl::resource_type.eq(resource_type))
         .filter(roles::dsl::resource_id.eq(resource_id))
         .first::<i64>(db)
@@ -83,7 +87,7 @@ pub fn apply(
         Err(_) => {
             let id = insert_into(roles::dsl::roles)
                 .values((
-                    roles::dsl::name.eq(role),
+                    roles::dsl::name.eq(&role),
                     roles::dsl::resource_type.eq(resource_type),
                     roles::dsl::resource_id.eq(resource_id),
                     roles::dsl::created_at.eq(&now),
