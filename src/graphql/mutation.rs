@@ -8,7 +8,7 @@ pub struct Mutation;
 graphql_object!(
     Mutation: Context | &self | {
         field updateLocale(&executor, code: String, message: String) -> FieldResult<H> {
-            gq!(executor, nut::graphql::mutation::UpdateLocale{                
+            gq!(executor, nut::graphql::mutation::UpdateLocale{
                 code: code,
                 message: message,
             })
@@ -16,14 +16,14 @@ graphql_object!(
         field signUpUser(&executor, name: String, email:String, password:String) -> FieldResult<H> {
             gq!(executor, nut::graphql::mutation::SignUpUser{
                 name: name,
-                email: email,
+                email: email.to_lowercase(),
                 password: password,
             })
         }
         field install(&executor, name: String, email:String, password:String) -> FieldResult<H> {
             gq!(executor, nut::graphql::mutation::Install{
                 name: name,
-                email: email,
+                email: email.to_lowercase(),
                 password: password,
             })
         }

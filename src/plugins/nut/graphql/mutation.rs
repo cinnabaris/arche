@@ -84,7 +84,7 @@ impl SignUpUser {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let db = ctx.db.deref();
-        db.transaction::<_, Error, _>(|| {
+        let (_id, uid) = db.transaction::<_, Error, _>(|| {
             if dao::user::is_email_exist(db, &self.email)? {
                 return Err(t!(db, &ctx.locale, "nut.errors.user.email-already-exist").into());
             }
@@ -96,18 +96,19 @@ impl SignUpUser {
                 &ctx.locale,
                 "nut.logs.user.sign-up"
             )?;
-            send_email(
-                db,
-                &ctx.home,
-                &ctx.app.jwt,
-                &ctx.app.producer,
-                ACT_CONFIRM,
-                &ctx.locale,
-                &self.email,
-                &uid,
-            )?;
-            Ok(H::new())
-        })
+            Ok((id, uid))
+        })?;
+        send_email(
+            db,
+            &ctx.home,
+            &ctx.app.jwt,
+            &ctx.app.producer,
+            ACT_CONFIRM,
+            &ctx.locale,
+            &self.email,
+            &uid,
+        )?;
+        Ok(H::new())
     }
 }
 const ACT_CONFIRM: &'static str = "user.confirm";
