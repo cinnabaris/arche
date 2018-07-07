@@ -15,7 +15,7 @@ attributes:
 validations:
   email:                   不是正确的邮件地址
   required:                不能为空
-  password:                密码长度应该在{}和{}之间
+  password:                密码长度应该在6位和32位之间
   password-confirmation:   两次密码输入不一致
 nut:
   home:
