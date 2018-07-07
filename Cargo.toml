@@ -91,7 +91,7 @@ features = ["v4"]
 [dependencies.rocket_contrib]
 version = "*"
 default-features = false
-features = ["json", "uuid", "handlebars_templates"]
+features = ["json", "uuid", "tera_templates"]
 
 [dependencies.rocket_cors]
 git = "https://github.com/lawliet89/rocket_cors"
