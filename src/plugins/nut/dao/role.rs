@@ -11,10 +11,10 @@ pub enum Role {
 impl fmt::Display for Role {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Role::Admin => fmt.write_str("admin"),
-            Role::Root => fmt.write_str("root"),
-            Role::Member => fmt.write_str("member"),
-            Role::By(n) => fmt.write_str(&n),
+            Role::Admin => write!(fmt, "admin"),
+            Role::Root => write!(fmt, "root"),
+            Role::Member => write!(fmt, "member"),
+            Role::By(n) => write!(fmt, "{}", &n),
         }
     }
 }

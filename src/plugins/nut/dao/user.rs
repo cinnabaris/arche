@@ -2,6 +2,8 @@ use std::fmt;
 
 use chrono::Utc;
 use diesel::{insert_into, prelude::*, update};
+use hex;
+use md5::{self, Digest};
 use uuid::Uuid;
 
 use super::super::super::super::{
@@ -9,6 +11,16 @@ use super::super::super::super::{
     orm::{schema::users, Connection as Db},
     utils,
 };
+
+// https://en.gravatar.com/site/implement/hash/
+pub fn gravatar_logo(email: &String) -> String {
+    let mut h = md5::Md5::new();
+    h.input(email.to_lowercase().trim().as_bytes());
+    format!(
+        "https://www.gravatar.com/avatar/{}.png",
+        hex::encode(h.result().as_slice())
+    )
+}
 
 pub fn lock(db: &Db, id: &i64, un: bool) -> Result<()> {
     let now = Utc::now().naive_utc();
@@ -64,6 +76,7 @@ pub fn add_by_email(
             users::dsl::provider_type.eq(&format!("{}", Type::Email)),
             users::dsl::provider_id.eq(email),
             users::dsl::uid.eq(&uid),
+            users::dsl::logo.eq(&uid),
             users::dsl::sign_in_count.eq(0),
             users::dsl::updated_at.eq(&now),
             users::dsl::created_at.eq(&now),

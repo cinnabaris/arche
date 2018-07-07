@@ -13,8 +13,12 @@ graphql_object!(
         field signUpUser(&executor, form: nut::graphql::mutation::SignUpUser) -> FieldResult<H> {
             gq!(executor, form)
         }
-        field install(&executor, form: nut::graphql::mutation::Install) -> FieldResult<H> {
-            gq!(executor, form)
+        field install(&executor, name: String, email:String, password:String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::mutation::Install{
+                name: name,
+                email: email,
+                password: password,
+            })
         }
     }
 );

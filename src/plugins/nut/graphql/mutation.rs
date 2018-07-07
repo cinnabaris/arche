@@ -30,7 +30,7 @@ impl Install {
         let db = ctx.db.deref();
         db.transaction::<_, Error, _>(|| {
             if dao::user::count(db)? > 0 {
-                return Err(t!(db, &ctx.locale, "nut.errors.user.database-not-empty").into());
+                return Err(t!(db, &ctx.locale, "nut.errors.database-not-empty").into());
             }
             let (user, _) = dao::user::add_by_email(db, &self.name, &self.email, &self.password)?;
             l!(
@@ -58,7 +58,7 @@ impl Install {
                     &ctx.locale,
                     "nut.logs.role.apply",
                     &Some(json!({
-                            "name":it,
+                            "name":format!("{}", it),
                             "type": None::<String>,
                             "id": None::<i64>,
                             "ttl": format!("{}", ttl)
