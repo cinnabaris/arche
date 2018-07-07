@@ -10,12 +10,12 @@ use super::super::super::super::{
         Connection as Db,
     },
 };
-use super::role::Role;
+use super::role::Type as RoleType;
 
 pub fn can(
     db: &Db,
     user: &i64,
-    role: &Role,
+    role: &RoleType,
     resource_type: &Option<String>,
     resource_id: &Option<i64>,
 ) -> bool {
@@ -43,7 +43,7 @@ pub fn can(
 pub fn deny(
     db: &Db,
     user: &i64,
-    role: &Role,
+    role: &RoleType,
     resource_type: &Option<String>,
     resource_id: &Option<i64>,
 ) -> Result<()> {
@@ -66,7 +66,7 @@ pub fn deny(
 pub fn apply(
     db: &Db,
     user: &i64,
-    role: &Role,
+    role: &RoleType,
     resource_type: &Option<String>,
     resource_id: &Option<i64>,
     ttl: Duration,

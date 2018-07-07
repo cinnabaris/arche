@@ -48,7 +48,7 @@ impl Install {
                 &ctx.locale,
                 "nut.logs.user.confirm"
             )?;
-            for it in vec![dao::role::Role::Admin, dao::role::Role::Root] {
+            for it in vec![dao::role::Type::Admin, dao::role::Type::Root] {
                 let ttl = Duration::weeks(1 << 12);
                 dao::policy::apply(db, &user, &it, &None, &None, ttl)?;
                 l!(
@@ -170,8 +170,6 @@ impl SignInByLine {
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct UpdateLocale {
-    #[validate(length(min = "2", max = "8"))]
-    pub lang: String,
     #[validate(length(min = "1", max = "255"))]
     pub code: String,
     #[validate(length(min = "1"))]
@@ -183,7 +181,7 @@ impl UpdateLocale {
         self.validate()?;
         ctx.admin()?;
         let db = ctx.db.deref();
-        i18n::set(db, &self.lang, &self.code, &self.message)?;
+        i18n::set(db, &ctx.locale, &self.code, &self.message)?;
         Ok(H::new())
     }
 }

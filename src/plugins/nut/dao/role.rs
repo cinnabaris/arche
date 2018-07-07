@@ -1,20 +1,20 @@
 use std::fmt;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum Role {
+pub enum Type {
     Admin,
     Root,
     Member,
     By(String),
 }
 
-impl fmt::Display for Role {
+impl fmt::Display for Type {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Role::Admin => write!(fmt, "admin"),
-            Role::Root => write!(fmt, "root"),
-            Role::Member => write!(fmt, "member"),
-            Role::By(n) => write!(fmt, "{}", &n),
+            Type::Admin => write!(fmt, "admin"),
+            Type::Root => write!(fmt, "root"),
+            Type::Member => write!(fmt, "member"),
+            Type::By(n) => write!(fmt, "{}", &n),
         }
     }
 }

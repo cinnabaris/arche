@@ -31,6 +31,8 @@ use super::{
     request::{Home, Locale, Token},
 };
 
+pub const UID: &'static str = "uid";
+
 pub fn routes() -> (&'static str, Vec<Route>) {
     ("/", routes![doc, handler])
 }
