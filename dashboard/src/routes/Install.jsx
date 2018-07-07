@@ -3,11 +3,11 @@ import PropTypes from 'prop-types'
 import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
-import {Form, Input, message, notification} from 'antd'
+import {Form, Input, message} from 'antd'
 
 import Application from '../layouts/Application'
 import {Submit, formItemLayout} from '../components/form'
-import {client, INSTALL} from '../request'
+import {client, INSTALL, failed} from '../request'
 
 const FormItem = Form.Item
 
@@ -21,11 +21,7 @@ class Widget extends Component {
         client.request(INSTALL, values).then((rst) => {
           message.info(formatMessage({id: "flashes.success"}))
           push('/users/sign-in')
-        }).catch((err) => notification.error({
-          message: formatMessage({id: "flashes.failed"}),
-          description: JSON.stringify(err.response),
-          duration: 30
-        }))
+        }).catch(failed)
       }
     })
   }
@@ -76,7 +72,9 @@ class Widget extends Component {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({id: "validations.required"})
+                  max: 30,
+                  min: 6,
+                  message: formatMessage({id: "validations.password"})
                 }
               ]
             })(<Input type="password"/>)

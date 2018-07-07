@@ -1,4 +1,5 @@
 import {GraphQLClient} from 'graphql-request'
+import {notification} from 'antd'
 
 export const client = new GraphQLClient('/graphql', {
   headers: {
@@ -6,6 +7,12 @@ export const client = new GraphQLClient('/graphql', {
   },
   credentials: 'include',
   mode: 'cors'
+})
+
+export const failed = (err) => notification.error({
+  // message: '',
+  description: JSON.stringify(err.response),
+  duration: 30
 })
 
 export const INSTALL = `mutation form($name: String!, $email: String!, $password: String!){
