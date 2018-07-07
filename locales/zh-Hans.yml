@@ -2,8 +2,40 @@ languages:
   en-US:                   English
   zh-Hans:                 简体中文
   zh-Hant:                 繁體中文
-
+flashes:
+  success:                 操作成功
+  failed:                  操作失败
+buttons:
+  submit:                  提交
+attributes:
+  username:                用户名
+  email:                   邮箱
+  password:                密码
+  password-confirmation:   密码确认
+validations:
+  email:                   不是正确的邮件地址
+  required:                不能为空
+  password:                密码长度应该在{}和{}之间
+  password-confirmation:   两次密码输入不一致
 nut:
+  home:
+    title:                 主页
+  install:
+    title:                 初始化安装
+  users:
+    sign-in:
+      title:               登录
+    sign-up:
+      title:               注册
+    forgot-password:
+      title:               忘记密码？
+    confirm:
+      title:               没有收到激活邮件？
+    unlock:
+      title:               没有收到解锁邮件？
+  leave-words:
+    new:
+      title:               给我们留言
   emails:
     user:
       confirm:
@@ -27,5 +59,5 @@ nut:
       sign-up:             账户注册
       confirm:             激活账户
     role:
-      apply:               应用权限{name}@{type}/{id}?ttl={ttl}
-      deny:                禁止权限{name}@{type}/{id}
+      apply:               应用权限{{name}}@{{type}}/{{id}}?ttl={{ttl}}
+      deny:                禁止权限{{name}}@{{type}}/{{id}}
