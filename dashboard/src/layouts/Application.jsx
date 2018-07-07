@@ -11,10 +11,14 @@ import {
   Layout,
   Avatar,
   List,
+  Menu,
   Icon
 } from 'antd'
+import DocumentTitle from 'react-document-title'
 
-const {Content} = Layout;
+import Footer from './Footer'
+
+const {Header, Content} = Layout;
 
 class Widget extends Component {
   constructor(props) {
@@ -49,34 +53,54 @@ class Widget extends Component {
       ]
     }
   }
+  handleMenuClick = (e) => {
+    switch (e.key) {
+      case 'home':
+        window.open("/", "_blank")
+        break;
+      default:
+    }
+  }
   render() {
     const {children, title} = this.props
-    return (<Layout>
-      <Content >
-        <Row gutter={16}>
-          <Col xs={{
-              span: 22,
-              offset: 1
-            }} lg={{
-              span: 12,
-              offset: 6
-            }}>
-            <br/>
-            <Card title={<FormattedMessage id = {
-                title
-              } />} extra={(<a href="/" target="_blank">
-                <Icon type="home"/></a>)}>
-              {children}
-            </Card>
-            <br/>
-            <List bordered={true} size="small" itemLayout="horizontal" dataSource={this.state.items} renderItem={it => (<List.Item>
-                <List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={<Link to = {{pathname:it.to}} > <FormattedMessage id={it.label}/></Link>}/>
-              </List.Item>)}/>
-            <br/>
-          </Col>
-        </Row>
-      </Content>
-    </Layout>);
+    const {formatMessage} = this.props.intl
+    return (<DocumentTitle title={`${formatMessage({
+        id: title})}-${formatMessage({id: 'site.title'})}`}>
+      <Layout>
+        <Content >
+          <Header>
+            <Menu onClick={this.handleMenuClick} theme="dark" mode="horizontal" style={{
+                lineHeight: '64px'
+              }}>
+              <Menu.Item key="home"><FormattedMessage id="site.title"/></Menu.Item>
+            </Menu>
+          </Header>
+          <Row>
+            <Col xs={{
+                span: 22,
+                offset: 1
+              }} lg={{
+                span: 12,
+                offset: 6
+              }}>
+              <br/>
+              <Card title={<FormattedMessage id = {
+                  title
+                } />} extra={(<a href="/" target="_blank">
+                  <Icon type="home"/></a>)}>
+                {children}
+              </Card>
+              <br/>
+              <List bordered={true} size="small" itemLayout="horizontal" dataSource={this.state.items} renderItem={it => (<List.Item>
+                  <List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={<Link to = {{pathname:it.to}} > <FormattedMessage id={it.label}/></Link>}/>
+                </List.Item>)}/>
+              <br/>
+            </Col>
+          </Row>
+        </Content>
+        <Footer/>
+      </Layout>
+    </DocumentTitle>);
   }
 }
 
