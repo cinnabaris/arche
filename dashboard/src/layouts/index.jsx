@@ -6,6 +6,6 @@ import {Spin} from 'antd'
 export const createLoading = (loader) => {
   return Loadable({
     loader: loader,
-    loading: () => (<Spin/>)
+    loading: () => (<Spin size="large"/>)
   })
 }

@@ -1,93 +1,76 @@
-import React, {
-  Component
-} from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {
-  injectIntl,
-  intlShape,
-  FormattedMessage
-} from 'react-intl'
-import {
-  connect
-} from 'react-redux'
-import {
-  push
-} from 'react-router-redux'
-import {
-  Link
-} from "react-router-dom";
+import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
+import {connect} from 'react-redux'
+import {push} from 'react-router-redux'
+import {Link} from "react-router-dom";
 import {
   Row,
   Col,
   Card,
-  Button,
-  Divider,
   Layout,
   Avatar,
-  List
+  List,
+  Icon
 } from 'antd'
 
-const {
-  Content
-} = Layout;
+const {Content} = Layout;
 
 class Widget extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      items: [{
-        icon: 'login',
-        label: 'nut.users.sign-in.title',
-        to: '/users/sign-in'
-      }, {
-        icon: 'user-add',
-        label: 'nut.users.sign-up.title',
-        to: '/users/sign-up'
-      }, {
-        icon: 'retweet',
-        label: 'nut.users.forgot-password.title',
-        to: '/users/forgot-password'
-      }, {
-        icon: 'check',
-        label: 'nut.users.confirm.title',
-        to: '/users/confirm'
-      }, {
-        icon: 'unlock',
-        label: 'nut.users.unlock.title',
-        to: '/users/unlock'
-      }, {
-        icon: 'message',
-        label: 'nut.leave-words.new.title',
-        to: '/leave-words/new'
-      }]
+      items: [
+        {
+          icon: 'login',
+          label: 'nut.users.sign-in.title',
+          to: '/users/sign-in'
+        }, {
+          icon: 'user-add',
+          label: 'nut.users.sign-up.title',
+          to: '/users/sign-up'
+        }, {
+          icon: 'retweet',
+          label: 'nut.users.forgot-password.title',
+          to: '/users/forgot-password'
+        }, {
+          icon: 'check',
+          label: 'nut.users.confirm.title',
+          to: '/users/confirm'
+        }, {
+          icon: 'unlock',
+          label: 'nut.users.unlock.title',
+          to: '/users/unlock'
+        }, {
+          icon: 'message',
+          label: 'nut.leave-words.new.title',
+          to: '/leave-words/new'
+        }
+      ]
     }
   }
   render() {
-    const {
-      children,
-      title,
-      submit
-    } = this.props
+    const {children, title} = this.props
     return (<Layout>
       <Content >
         <Row gutter={16}>
           <Col xs={{
               span: 22,
               offset: 1
-          }} lg={{
+            }} lg={{
               span: 12,
               offset: 6
-          }}>
+            }}>
             <br/>
-            <Card title={<FormattedMessage id={title}/>} extra={(<a href="/" target="_blank">
-            More</a>)}>
+            <Card title={<FormattedMessage id = {
+                title
+              } />} extra={(<a href="/" target="_blank">
+                <Icon type="home"/></a>)}>
               {children}
-              <Divider/>
-              <Button onClick={submit} type="primary">Primary</Button>
             </Card>
             <br/>
             <List bordered={true} size="small" itemLayout="horizontal" dataSource={this.state.items} renderItem={it => (<List.Item>
-                <List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={<Link to={{pathname:it.to}}><FormattedMessage id={it.label}/></Link>}/>
+                <List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={<Link to = {{pathname:it.to}} > <FormattedMessage id={it.label}/></Link>}/>
               </List.Item>)}/>
             <br/>
           </Col>
@@ -101,12 +84,7 @@ Widget.propTypes = {
   children: PropTypes.node.isRequired,
   push: PropTypes.func.isRequired,
   intl: intlShape.isRequired,
-  title: PropTypes.string.isRequired,
-  submit: PropTypes.func.isRequired
+  title: PropTypes.string.isRequired
 }
 
-const WidgetI = injectIntl(Widget)
-
-export default connect(state => ({}), {
-  push
-})(WidgetI)
+export default connect(state => ({}), {push})(injectIntl(Widget))

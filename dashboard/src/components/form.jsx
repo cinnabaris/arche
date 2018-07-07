@@ -1,3 +1,11 @@
+import React, {Component} from 'react'
+import {Form, Button} from 'antd'
+import {FormattedMessage} from 'react-intl'
+
+const FormItem = Form.Item
+
+export const DATE_FORMAT = "YYYY-MM-DD"
+
 export const formItemLayout = {
   labelCol: {
     xs: {
@@ -16,6 +24,7 @@ export const formItemLayout = {
     }
   }
 }
+
 export const tailFormItemLayout = {
   wrapperCol: {
     xs: {
@@ -26,5 +35,17 @@ export const tailFormItemLayout = {
       span: 16,
       offset: 8
     }
+  }
+}
+
+export class Submit extends Component {
+  render() {
+    const {children} = this.props
+    return (<FormItem {...tailFormItemLayout}>
+      <Button type="primary" htmlType="submit">
+        <FormattedMessage id="buttons.submit"/>
+      </Button>
+      {children}
+    </FormItem>);
   }
 }

@@ -1,71 +1,35 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {
-  Route
-} from "react-router"
-import {
-  createStore,
-  combineReducers,
-  applyMiddleware
-} from 'redux'
-import {
-  Provider
-} from 'react-redux'
+import {Route} from "react-router"
+import {createStore, combineReducers, applyMiddleware} from 'redux'
+import {Provider} from 'react-redux'
 import createHistory from 'history/createBrowserHistory'
-import {
-  Switch
-} from 'react-router-dom'
-import {
-  ConnectedRouter,
-  routerReducer,
-  routerMiddleware
-} from 'react-router-redux'
-import {
-  addLocaleData,
-  IntlProvider
-} from 'react-intl'
-import {
-  LocaleProvider
-} from 'antd'
-import {
-  request
-} from 'graphql-request'
+import {Switch} from 'react-router-dom'
+import {ConnectedRouter, routerReducer, routerMiddleware} from 'react-router-redux'
+import {addLocaleData, IntlProvider} from 'react-intl'
+import {LocaleProvider} from 'antd'
 import Exception from 'ant-design-pro/lib/Exception'
 
 import './main.css';
 import Dashboard from './layouts/dashboard'
 import reducers from './reducers'
-import {
-  get as detectLocale
-} from './intl'
-import {
-  BACKEND
-} from './config'
+import {get as detectLocale} from './intl'
+import {client, LIST_LOCALES_BY_LANG} from './request'
 
-import {
-  createLoading
-} from './layouts'
+import {createLoading} from './layouts'
 
 const main = (id) => {
   const user = detectLocale()
   addLocaleData(user.data)
 
-  const history = createHistory({
-    basename: '/my'
-  })
+  const history = createHistory({basename: '/my'})
   const middleware = routerMiddleware(history)
   const store = createStore(combineReducers({
     ...reducers,
     router: routerReducer
   }), applyMiddleware(middleware))
 
-  request(BACKEND, `
-{
-  listLocalesByLang(lang:"${user.locale}") {
-    code, message
-  }
-}
-  `).then((rst) => {
+  client.request(LIST_LOCALES_BY_LANG, {lang: user.locale}).then((rst) => {
     user.messages = rst.listLocalesByLang.reduce((ar, it) => {
       ar[it.code] = it.message
       return ar
