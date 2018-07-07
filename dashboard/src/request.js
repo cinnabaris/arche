@@ -15,6 +15,12 @@ export const failed = (err) => notification.error({
   duration: 30
 })
 
+export const USERS_SIGN_UP = `mutation form($name: String!, $email: String!, $password: String!){
+  signUpUser(name: $name, email: $email, password: $password) {
+    createdAt
+  }
+}`
+
 export const INSTALL = `mutation form($name: String!, $email: String!, $password: String!){
   install(name: $name, email: $email, password: $password) {
     createdAt

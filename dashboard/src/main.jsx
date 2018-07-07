@@ -14,7 +14,7 @@ import './main.css';
 import Dashboard from './layouts/dashboard'
 import reducers from './reducers'
 import {get as detectLocale} from './intl'
-import {client, LIST_LOCALES_BY_LANG} from './request'
+import {client, failed, LIST_LOCALES_BY_LANG} from './request'
 
 import {createLoading} from './layouts'
 
@@ -56,7 +56,7 @@ const main = (id) => {
         </Provider>
       </IntlProvider>
     </LocaleProvider>), document.getElementById(id))
-  })
+  }).catch(failed)
 }
 
 export default main;
