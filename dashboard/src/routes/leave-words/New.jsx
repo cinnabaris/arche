@@ -2,7 +2,7 @@ import React, {
   Component
 } from 'react'
 
-import Application from '../layouts/Application'
+import Application from '../../layouts/Application'
 
 class Widget extends Component {
   handleSubmit = (e) => {
@@ -10,8 +10,8 @@ class Widget extends Component {
     console.log('aaa')
   }
   render() {
-    return (<Application title="install.title" submit={this.handleSubmit}>
-      install
+    return (<Application title="nut.leave-words.new.title" submit={this.handleSubmit}>
+      leave-words.new
     </Application>);
   }
 }
