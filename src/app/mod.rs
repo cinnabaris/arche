@@ -11,7 +11,6 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::thread;
-use std::time::Duration;
 
 use clap;
 use sodiumoxide;
@@ -91,12 +90,9 @@ pub fn main() -> Result<()> {
 
     let que = cfg.queue.clone();
     let wrk = Arc::clone(&ctx);
-    thread::spawn(move || {
-        match worker::start(&que, Arc::clone(&wrk)) {
-            Ok(_) => log::warn!("worker exit."),
-            Err(e) => log::error!("failed in worker: {:?}", e),
-        }
-        thread::sleep(Duration::from_secs(10));
+    thread::spawn(move || match worker::start(&que, Arc::clone(&wrk)) {
+        Ok(_) => log::warn!("worker exit."),
+        Err(e) => log::error!("failed in worker: {:?}", e),
     });
 
     http::server(Arc::clone(&ctx))

@@ -53,6 +53,12 @@ impl RabbitMQ {
             ..Default::default()
         }
     }
+    // fn url(&self) -> String {
+    //     format!(
+    //         "amqp://{}:{}@{}:{}/{}",
+    //         self.user, self.password, self.host, self.port, self.virtual_
+    //     )
+    // }
 
     pub fn open<F>(&self, queue: String, f: F) -> Result<()>
     where
