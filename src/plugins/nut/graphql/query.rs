@@ -11,9 +11,34 @@ use super::super::super::super::{
     rfc::Utc as ToUtc,
 };
 use super::{
-    models::Locale,
+    models::{Locale, Log},
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
 };
+
+pub fn list_log(ctx: &Context) -> Result<Vec<Log>> {
+    let user = ctx.current_user()?;
+    let db = ctx.db.deref();
+    let items = logs::dsl::logs
+        .select((
+            logs::dsl::id,
+            logs::dsl::message,
+            logs::dsl::ip,
+            logs::dsl::created_at,
+        ))
+        .order(logs::dsl::created_at.desc())
+        .filter(logs::dsl::user_id.eq(&user.id))
+        .load::<(i64, String, String, NaiveDateTime)>(db)?;
+
+    Ok(items
+        .iter()
+        .map(|(id, msg, ip, ts)| Log {
+            id: id.to_string(),
+            message: msg.clone(),
+            ip: ip.clone(),
+            created_at: ts.to_utc(),
+        })
+        .collect())
+}
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct ForgotUserPassword {
@@ -117,9 +142,7 @@ pub struct ListLocaleByLang {
 impl ListLocaleByLang {
     pub fn call(&self, ctx: &Context) -> Result<Vec<Locale>> {
         self.validate()?;
-
         let db = ctx.db.deref();
-
         let items = locales::dsl::locales
             .select((
                 locales::dsl::id,

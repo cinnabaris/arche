@@ -1,5 +1,6 @@
-use super::super::super::super::oauth::{self, Oauth as OauthUrl};
 use chrono::{DateTime, Utc};
+
+use super::super::super::super::oauth::{self, Oauth as OauthUrl};
 
 #[derive(GraphQLObject, Debug, Deserialize, Serialize)]
 pub struct Author {
@@ -24,6 +25,14 @@ impl Oauth {
         }
         items
     }
+}
+
+#[derive(GraphQLObject, Debug, Serialize)]
+pub struct Log {
+    pub id: String,
+    pub message: String,
+    pub ip: String,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(GraphQLObject, Debug, Serialize)]

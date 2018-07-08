@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use chrono::{Duration, NaiveDateTime, Utc};
-use diesel::{prelude::*, update, Connection};
+use diesel::{insert_into, prelude::*, update, Connection};
 use rocket::http::Status;
 use validator::Validate;
 
@@ -10,11 +10,35 @@ use super::super::super::super::{
     graphql::{context::Context, ACT, H, UID},
     i18n,
     jwt::Jwt,
-    orm::{schema::users, Connection as Db},
+    orm::{schema::*, Connection as Db},
     queue, utils,
 };
 use super::super::{consumers, dao};
 use super::models::SignIn;
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct CreateLeaveWord {
+    #[validate(length(min = "1"))]
+    pub media_type: String,
+    #[validate(length(min = "1"))]
+    pub body: String,
+}
+
+impl CreateLeaveWord {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        let now = Utc::now().naive_utc();
+        insert_into(leave_words::dsl::leave_words)
+            .values((
+                leave_words::dsl::media_type.eq(&self.media_type),
+                leave_words::dsl::body.eq(&self.body),
+                leave_words::dsl::created_at.eq(&now),
+            ))
+            .execute(db)?;
+        Ok(H::new())
+    }
+}
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct SignInUserByEmail {

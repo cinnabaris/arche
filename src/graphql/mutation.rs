@@ -13,6 +13,12 @@ graphql_object!(
                 message: message,
             })
         }
+        field createLeaveWord(&executor, media_type: String, body: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::mutation::CreateLeaveWord{
+                media_type: media_type,
+                body: body,
+            })
+        }
         field signInUserByEmail(&executor, email: String, password: String) -> FieldResult<nut::graphql::models::SignIn> {
             gq!(executor, nut::graphql::mutation::SignInUserByEmail{
                 email: email,

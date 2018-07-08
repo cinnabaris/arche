@@ -11,9 +11,12 @@ graphql_object!(Query: Context |&self| {
         VERSION
     }
 
-    //--------------------nut-----------------------    
+    //--------------------nut-----------------------
     field listLocalesByLang(&executor, lang: String) -> FieldResult<Vec<nut::graphql::models::Locale>> {
         gq!(executor, nut::graphql::query::ListLocaleByLang{lang: lang})
+    }
+    field listLog(&executor) -> FieldResult<Vec<nut::graphql::models::Log>> {
+        ge!(nut::graphql::query::list_log(executor.context()))
     }
     field forgotUserPassword(&executor, email:String) -> FieldResult<H> {
         gq!(executor, nut::graphql::query::ForgotUserPassword{

@@ -23,6 +23,8 @@ attributes:
   keywords:                关键字
   description:             说明信息
   copyright:               版权信息
+  content:                 内容
+  body:                    正文
 validations:
   email:                   不是正确的邮件地址
   required:                不能为空
@@ -52,6 +54,7 @@ nut:
   leave-words:
     new:
       title:               给我们留言
+      body-helper:         请留下联系方式以便我们回复
   emails:
     user:
       confirm:
