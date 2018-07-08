@@ -5,6 +5,12 @@ languages:
 flashes:
   success:                 操作成功
   failed:                  操作失败
+site:
+  title:                   标题
+  subhead:                 副标题
+  keywords:                关键字
+  description:             说明信息
+  copyright:               版权信息
 buttons:
   submit:                  提交
 attributes:
@@ -12,6 +18,11 @@ attributes:
   email:                   邮箱
   password:                密码
   password-confirmation:   密码确认
+  title:                   标题
+  subhead:                 副标题
+  keywords:                关键字
+  description:             说明信息
+  copyright:               版权信息
 validations:
   email:                   不是正确的邮件地址
   required:                不能为空
@@ -24,15 +35,18 @@ nut:
     title:                 初始化安装
   users:
     sign-in:
-      title:               登录
+      title:               现有账户登录
     sign-up:
-      title:               注册
+      title:               新用户注册
     forgot-password:
       title:               忘记密码？
+      success:             您将会在几分钟内收到密码重置邮件
     confirm:
       title:               没有收到激活邮件？
+      success:             您将会在几分钟内收到激活邮件
     unlock:
       title:               没有收到解锁邮件？
+      success:             您将会在几分钟内收到解锁邮件
   leave-words:
     new:
       title:               给我们留言
@@ -53,6 +67,10 @@ nut:
   errors:
     user:
       email-already-exist: 该邮件账户已经存在
+      is-confirmed:        账户已经被激活
+      not-confirmed:       账户未激活
+      is-locked:           账户被锁定
+      not-locked:          账户没有被锁定
     database-not-empty:    数据库非空
   logs:
     user:
