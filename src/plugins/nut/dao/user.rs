@@ -1,6 +1,6 @@
 use std::fmt;
 
-use chrono::Utc;
+use chrono::{NaiveDateTime, Utc};
 use diesel::{insert_into, prelude::*, update};
 use hex;
 use md5::{self, Digest};
@@ -11,6 +11,30 @@ use super::super::super::super::{
     orm::{schema::users, Connection as Db},
     utils,
 };
+
+pub fn sign_in(db: &Db, id: &i64, ip: &String) -> Result<()> {
+    let now = Utc::now().naive_utc();
+    let it = users::dsl::users.filter(users::dsl::id.eq(id));
+    let (current_sign_in_at, current_sign_in_ip, sign_in_count) = users::dsl::users
+        .select((
+            users::dsl::current_sign_in_at,
+            users::dsl::current_sign_in_ip,
+            users::dsl::sign_in_count,
+        ))
+        .filter(users::dsl::id.eq(id))
+        .first::<(Option<NaiveDateTime>, Option<String>, i64)>(db)?;
+    update(it)
+        .set((
+            users::dsl::current_sign_in_at.eq(&now),
+            users::dsl::current_sign_in_ip.eq(ip),
+            users::dsl::last_sign_in_at.eq(&current_sign_in_at),
+            users::dsl::last_sign_in_ip.eq(&current_sign_in_ip),
+            users::dsl::sign_in_count.eq(&(sign_in_count + 1)),
+            users::dsl::updated_at.eq(&now),
+        ))
+        .execute(db)?;
+    Ok(())
+}
 
 // https://en.gravatar.com/site/implement/hash/
 pub fn gravatar_logo(email: &String) -> String {
@@ -33,6 +57,7 @@ pub fn lock(db: &Db, id: &i64, un: bool) -> Result<()> {
         .execute(db)?;
     Ok(())
 }
+
 pub fn confirm(db: &Db, id: &i64) -> Result<()> {
     let now = Utc::now().naive_utc();
     let it = users::dsl::users.filter(users::dsl::id.eq(id));

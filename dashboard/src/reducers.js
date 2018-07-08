@@ -1,7 +1,7 @@
 import jwtDecode from 'jwt-decode'
 import moment from 'moment'
 
-import {USERS_SIGN_IN, USERS_SIGN_OUT, SITE_REFRESH, TOKEN} from './actions'
+import {USERS_SIGN_IN, USERS_SIGN_OUT, TOKEN} from './actions'
 
 const currentUser = (state = {}, action) => {
   switch (action.type) {
@@ -24,26 +24,4 @@ const currentUser = (state = {}, action) => {
   }
 }
 
-const siteInfo = (state = {
-  languages: [],
-  links: []
-}, action) => {
-  switch (action.type) {
-    case SITE_REFRESH:
-      // TODO using react-helmet
-      // set title
-      document.title = action.info.subhead + '|' + action.info.title
-      // set favicon
-      var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-      link.type = 'image/x-icon';
-      link.rel = 'shortcut icon';
-      link.href = action.info.favicon;
-      document.getElementsByTagName('head')[0].appendChild(link);
-
-      return Object.assign({}, action.info)
-    default:
-      return state;
-  }
-}
-
-export default {currentUser, siteInfo}
+export default {currentUser}

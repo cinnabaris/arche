@@ -4,6 +4,12 @@ import moment from 'moment'
 
 import {TOKEN} from './actions'
 
+export const USERS_SIGN_IN = `mutation form($email: String!, $password: String!){
+  signInUserByEmail(email: $email, password: $password) {
+    token
+  }
+}`
+
 export const USERS_RESET_PASSWORD = `mutation form($token: String!, $password: String!){
   resetUserPassword(token: $token, password: $password) {
     createdAt

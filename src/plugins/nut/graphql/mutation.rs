@@ -11,9 +11,79 @@ use super::super::super::super::{
     i18n,
     jwt::Jwt,
     orm::{schema::users, Connection as Db},
-    queue,
+    queue, utils,
 };
 use super::super::{consumers, dao};
+use super::models::SignIn;
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct SignInUserByEmail {
+    #[validate(length(min = "1"))]
+    pub email: String,
+    #[validate(length(min = "6", max = "32"))]
+    pub password: String,
+}
+
+impl SignInUserByEmail {
+    pub fn call(&self, ctx: &Context) -> Result<SignIn> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        if let Ok((id, uid, password, confirmed_at, locked_at)) = users::dsl::users
+            .select((
+                users::dsl::id,
+                users::dsl::uid,
+                users::dsl::password,
+                users::dsl::confirmed_at,
+                users::dsl::locked_at,
+            ))
+            .filter(users::dsl::email.eq(&self.email))
+            .first::<(
+                i64,
+                String,
+                Option<Vec<u8>>,
+                Option<NaiveDateTime>,
+                Option<NaiveDateTime>,
+            )>(db)
+        {
+            // check password
+            if let Some(password) = password {
+                if utils::hash::verify(&password, self.password.as_bytes()) {
+                    // check is confirm
+                    if None == confirmed_at {
+                        return Err(t!(db, &ctx.locale, "nut.errors.user.not-confirmed").into());
+                    }
+                    // check is not lock
+                    if let Some(_) = locked_at {
+                        return Err(t!(db, &ctx.locale, "nut.errors.user.is-locked").into());
+                    }
+                    // set sign in
+                    db.transaction::<_, Error, _>(|| {
+                        dao::user::sign_in(db, &id, &ctx.client_ip)?;
+                        l!(
+                            db,
+                            &id,
+                            &ctx.client_ip,
+                            &ctx.locale,
+                            "nut.logs.user.sign-in"
+                        )?;
+                        Ok(())
+                    })?;
+                    // sum token
+                    return Ok(SignIn {
+                        token: ctx.app.jwt.sum(
+                            &mut json!({
+                                UID: uid,
+                                "admin": dao::policy::is(db, &id, &dao::role::Type::Admin),
+                            }),
+                            Duration::days(7),
+                        )?,
+                    });
+                }
+            }
+        }
+        Err(t!(db, &ctx.locale, "nut.errors.user.bad-password").into())
+    }
+}
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct ResetUserPassword {
@@ -243,7 +313,7 @@ pub fn send_email(
 
 // https://developers.line.me/en/docs/line-login/web/integrate-line-login/
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct SignInByLine {
+pub struct SignInUserByLine {
     #[validate(length(min = "2", max = "8"))]
     pub lang: String,
     #[validate(length(min = "1", max = "255"))]
@@ -252,7 +322,7 @@ pub struct SignInByLine {
     pub message: String,
 }
 
-impl SignInByLine {
+impl SignInUserByLine {
     pub fn call(&self, _ctx: &Context) -> Result<String> {
         self.validate()?;
         // TODO

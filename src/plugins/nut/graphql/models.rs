@@ -27,6 +27,11 @@ impl Oauth {
 }
 
 #[derive(GraphQLObject, Debug, Serialize)]
+pub struct SignIn {
+    pub token: String,
+}
+
+#[derive(GraphQLObject, Debug, Serialize)]
 #[graphql(description = "Message for translate")]
 pub struct Locale {
     pub id: String,

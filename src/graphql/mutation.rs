@@ -13,6 +13,12 @@ graphql_object!(
                 message: message,
             })
         }
+        field signInUserByEmail(&executor, email: String, password: String) -> FieldResult<nut::graphql::models::SignIn> {
+            gq!(executor, nut::graphql::mutation::SignInUserByEmail{
+                email: email,
+                password: password,
+            })
+        }
         field resetUserPassword(&executor, token: String, password: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::mutation::ResetUserPassword{
                 token: token,

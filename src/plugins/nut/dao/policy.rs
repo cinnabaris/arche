@@ -12,6 +12,10 @@ use super::super::super::super::{
 };
 use super::role::Type as RoleType;
 
+pub fn is(db: &Db, user: &i64, role: &RoleType) -> bool {
+    can(db, user, role, &None, &None)
+}
+
 pub fn can(
     db: &Db,
     user: &i64,
