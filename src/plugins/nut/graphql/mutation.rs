@@ -1,8 +1,8 @@
 use std::ops::Deref;
 
-use chrono::{Duration, NaiveDateTime};
-use diesel::prelude::*;
-use diesel::Connection;
+use chrono::{Duration, NaiveDateTime, Utc};
+use diesel::{prelude::*, update, Connection};
+use rocket::http::Status;
 use validator::Validate;
 
 use super::super::super::super::{
@@ -16,95 +16,92 @@ use super::super::super::super::{
 use super::super::{consumers, dao};
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct ForgotUserPassword {
-    #[validate(length(min = "2", max = "64"))]
-    pub email: String,
+pub struct ResetUserPassword {
+    #[validate(length(min = "1"))]
+    pub token: String,
+    #[validate(length(min = "6", max = "32"))]
+    pub password: String,
 }
 
-impl ForgotUserPassword {
+impl ResetUserPassword {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
+        let uid = parse_token(&ctx.app.jwt, &self.token, ACT_RESET_PASSWORD)?;
         let db = ctx.db.deref();
-        let uid = users::dsl::users
-            .select(users::dsl::uid)
-            .filter(users::dsl::email.eq(&self.email))
-            .first::<String>(db)?;
-        send_email(
-            db,
-            &ctx.home,
-            &ctx.app.jwt,
-            &ctx.app.producer,
-            ACT_RESET_PASSWORD,
-            &ctx.locale,
-            &self.email,
-            &uid,
-        )?;
+        let id = users::dsl::users
+            .select(users::dsl::id)
+            .filter(users::dsl::uid.eq(&uid))
+            .first::<i64>(db)?;
+        dao::user::set_password(db, &id, &self.password)?;
         Ok(H::new())
     }
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct UnlockUser {
-    #[validate(length(min = "2", max = "64"))]
-    pub email: String,
+    #[validate(length(min = "1"))]
+    pub token: String,
 }
 
 impl UnlockUser {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
+        let uid = parse_token(&ctx.app.jwt, &self.token, ACT_UNLOCK)?;
         let db = ctx.db.deref();
-        let (uid, locked_at) = users::dsl::users
-            .select((users::dsl::uid, users::dsl::locked_at))
-            .filter(users::dsl::email.eq(&self.email))
-            .first::<(String, Option<NaiveDateTime>)>(db)?;
-        // check is lock
+        let (id, locked_at) = users::dsl::users
+            .select((users::dsl::id, users::dsl::locked_at))
+            .filter(users::dsl::uid.eq(&uid))
+            .first::<(i64, Option<NaiveDateTime>)>(db)?;
         if let None = locked_at {
             return Err(t!(db, &ctx.locale, "nut.errors.user.not-locked").into());
         }
-        send_email(
-            db,
-            &ctx.home,
-            &ctx.app.jwt,
-            &ctx.app.producer,
-            ACT_UNLOCK,
-            &ctx.locale,
-            &self.email,
-            &uid,
-        )?;
+        let now = Utc::now().naive_utc();
+        let it = users::dsl::users.filter(users::dsl::id.eq(id));
+        update(it)
+            .set((
+                users::dsl::locked_at.eq(&None::<NaiveDateTime>),
+                users::dsl::updated_at.eq(&now),
+            ))
+            .execute(db)?;
         Ok(H::new())
     }
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct ConfirmUser {
-    #[validate(length(min = "2", max = "64"))]
-    pub email: String,
+    #[validate(length(min = "1"))]
+    pub token: String,
 }
 
 impl ConfirmUser {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
+        let uid = parse_token(&ctx.app.jwt, &self.token, ACT_CONFIRM)?;
         let db = ctx.db.deref();
-        let (uid, confirmed_at) = users::dsl::users
-            .select((users::dsl::uid, users::dsl::confirmed_at))
-            .filter(users::dsl::email.eq(&self.email))
-            .first::<(String, Option<NaiveDateTime>)>(db)?;
-        // check is not confirm
+        let (id, confirmed_at) = users::dsl::users
+            .select((users::dsl::id, users::dsl::confirmed_at))
+            .filter(users::dsl::uid.eq(&uid))
+            .first::<(i64, Option<NaiveDateTime>)>(db)?;
         if let Some(_) = confirmed_at {
             return Err(t!(db, &ctx.locale, "nut.errors.user.is-confirmed").into());
         }
-        send_email(
-            db,
-            &ctx.home,
-            &ctx.app.jwt,
-            &ctx.app.producer,
-            ACT_CONFIRM,
-            &ctx.locale,
-            &self.email,
-            &uid,
-        )?;
+        dao::user::confirm(db, &id)?;
         Ok(H::new())
     }
+}
+
+fn parse_token(jwt: &Jwt, token: &String, action: &'static str) -> Result<String> {
+    let payload = jwt.parse(token)?;
+    if let Some(uid) = payload.get(UID.to_string()) {
+        if let Some(act) = payload.get(ACT.to_string()) {
+            if act == action {
+                if let Some(uid) = uid.as_str() {
+                    return Ok(uid.to_string());
+                }
+            }
+        }
+    }
+    return Err(Status::BadRequest.reason.into());
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
@@ -113,7 +110,7 @@ pub struct Install {
     pub name: String,
     #[validate(email, length(min = "2", max = "64"))]
     pub email: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = "6", max = "32"))]
     pub password: String,
 }
 
@@ -169,7 +166,7 @@ pub struct SignUpUser {
     pub name: String,
     #[validate(email, length(min = "2", max = "64"))]
     pub email: String,
-    #[validate(length(min = "1"))]
+    #[validate(length(min = "6", max = "32"))]
     pub password: String,
 }
 
@@ -205,10 +202,10 @@ impl SignUpUser {
     }
 }
 pub const ACT_SIGN_IN: &'static str = "user.sign-in";
-const ACT_CONFIRM: &'static str = "user.confirm";
-const ACT_UNLOCK: &'static str = "user.unlock";
-const ACT_RESET_PASSWORD: &'static str = "user.reset-password";
-fn send_email(
+pub const ACT_CONFIRM: &'static str = "user.confirm";
+pub const ACT_UNLOCK: &'static str = "user.unlock";
+pub const ACT_RESET_PASSWORD: &'static str = "user.reset-password";
+pub fn send_email(
     db: &Db,
     home: &String,
     jwt: &Jwt,

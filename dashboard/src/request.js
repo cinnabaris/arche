@@ -4,19 +4,37 @@ import moment from 'moment'
 
 import {TOKEN} from './actions'
 
-export const USERS_FORGOT_PASSWORD = `mutation form($email: String!){
+export const USERS_RESET_PASSWORD = `mutation form($token: String!, $password: String!){
+  resetUserPassword(token: $token, password: $password) {
+    createdAt
+  }
+}`
+
+export const USERS_UNLOCK_TOKEN = `mutation form($token: String!){
+  unlockUser(token: $token) {
+    createdAt
+  }
+}`
+
+export const USERS_CONFIRM_TOKEN = `mutation form($token: String!){
+  confirmUser(token: $token) {
+    createdAt
+  }
+}`
+
+export const USERS_FORGOT_PASSWORD = `query form($email: String!){
   forgotUserPassword(email: $email) {
     createdAt
   }
 }`
 
-export const USERS_UNLOCK = `mutation form($email: String!){
+export const USERS_UNLOCK = `query form($email: String!){
   unlockUser(email: $email) {
     createdAt
   }
 }`
 
-export const USERS_CONFIRM = `mutation form($email: String!){
+export const USERS_CONFIRM = `query form($email: String!){
   confirmUser(email: $email) {
     createdAt
   }

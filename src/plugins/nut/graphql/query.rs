@@ -5,47 +5,106 @@ use diesel::prelude::*;
 use validator::Validate;
 
 use super::super::super::super::{
-    errors::Result, graphql::context::Context, i18n, orm::schema::*, rfc::Utc as ToUtc, settings,
+    errors::Result,
+    graphql::{context::Context, H},
+    orm::schema::*,
+    rfc::Utc as ToUtc,
 };
-use super::models::{Locale, Oauth, SiteInfo};
+use super::{
+    models::Locale,
+    mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
+};
 
-pub fn site_info(ctx: &Context) -> Result<SiteInfo> {
-    let db = ctx.db.deref();
-    Ok(SiteInfo {
-        locale: ctx.locale.clone(),
-        title: i18n::t(
-            &db,
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct ForgotUserPassword {
+    #[validate(length(min = "2", max = "64"))]
+    pub email: String,
+}
+
+impl ForgotUserPassword {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        let uid = users::dsl::users
+            .select(users::dsl::uid)
+            .filter(users::dsl::email.eq(&self.email))
+            .first::<String>(db)?;
+        send_email(
+            db,
+            &ctx.home,
+            &ctx.app.jwt,
+            &ctx.app.producer,
+            ACT_RESET_PASSWORD,
             &ctx.locale,
-            &String::from("site.title"),
-            &None::<String>,
-        ),
-        subhead: i18n::t(
-            &db,
+            &self.email,
+            &uid,
+        )?;
+        Ok(H::new())
+    }
+}
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct UnlockUser {
+    #[validate(length(min = "2", max = "64"))]
+    pub email: String,
+}
+
+impl UnlockUser {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        let (uid, locked_at) = users::dsl::users
+            .select((users::dsl::uid, users::dsl::locked_at))
+            .filter(users::dsl::email.eq(&self.email))
+            .first::<(String, Option<NaiveDateTime>)>(db)?;
+        // check is lock
+        if let None = locked_at {
+            return Err(t!(db, &ctx.locale, "nut.errors.user.not-locked").into());
+        }
+        send_email(
+            db,
+            &ctx.home,
+            &ctx.app.jwt,
+            &ctx.app.producer,
+            ACT_UNLOCK,
             &ctx.locale,
-            &String::from("site.subhead"),
-            &None::<String>,
-        ),
-        keywords: i18n::t(
-            &db,
+            &self.email,
+            &uid,
+        )?;
+        Ok(H::new())
+    }
+}
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct ConfirmUser {
+    #[validate(length(min = "2", max = "64"))]
+    pub email: String,
+}
+
+impl ConfirmUser {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        let (uid, confirmed_at) = users::dsl::users
+            .select((users::dsl::uid, users::dsl::confirmed_at))
+            .filter(users::dsl::email.eq(&self.email))
+            .first::<(String, Option<NaiveDateTime>)>(db)?;
+        // check is not confirm
+        if let Some(_) = confirmed_at {
+            return Err(t!(db, &ctx.locale, "nut.errors.user.is-confirmed").into());
+        }
+        send_email(
+            db,
+            &ctx.home,
+            &ctx.app.jwt,
+            &ctx.app.producer,
+            ACT_CONFIRM,
             &ctx.locale,
-            &String::from("site.keywords"),
-            &None::<String>,
-        ),
-        description: i18n::t(
-            &db,
-            &ctx.locale,
-            &String::from("site.description"),
-            &None::<String>,
-        ),
-        copyright: i18n::t(
-            &db,
-            &ctx.locale,
-            &String::from("site.copyright"),
-            &None::<String>,
-        ),
-        author: settings::get(&db, &ctx.app.encryptor, &String::from("site.author"))?,
-        oauth: Oauth::new(&ctx.app.config.oauth),
-    })
+            &self.email,
+            &uid,
+        )?;
+        Ok(H::new())
+    }
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]

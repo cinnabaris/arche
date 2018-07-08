@@ -1,18 +1,6 @@
 use super::super::super::super::oauth::{self, Oauth as OauthUrl};
 use chrono::{DateTime, Utc};
 
-#[derive(GraphQLObject, Debug, Serialize)]
-pub struct SiteInfo {
-    pub locale: String,
-    pub title: String,
-    pub subhead: String,
-    pub keywords: String,
-    pub description: String,
-    pub copyright: String,
-    pub author: Author,
-    pub oauth: Vec<Oauth>,
-}
-
 #[derive(GraphQLObject, Debug, Deserialize, Serialize)]
 pub struct Author {
     pub name: String,
@@ -30,6 +18,7 @@ impl Oauth {
         if let Some(ref c) = cfg.line {
             items.push(Self {
                 name: c.name().to_string(),
+                // TODO
                 url: c.authorization_url(&"".to_string(), &"".to_string()),
             });
         }

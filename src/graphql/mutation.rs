@@ -13,19 +13,20 @@ graphql_object!(
                 message: message,
             })
         }
-        field forgotUserPassword(&executor, email:String) -> FieldResult<H> {
-            gq!(executor, nut::graphql::mutation::ForgotUserPassword{
-                email: email.to_lowercase(),
+        field resetUserPassword(&executor, token: String, password: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::mutation::ResetUserPassword{
+                token: token,
+                password: password,
             })
         }
-        field unlockUser(&executor, email:String) -> FieldResult<H> {
+        field unlockUser(&executor, token: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::mutation::UnlockUser{
-                email: email.to_lowercase(),
+                token: token,
             })
         }
-        field confirmUser(&executor, email:String) -> FieldResult<H> {
+        field confirmUser(&executor, token: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::mutation::ConfirmUser{
-                email: email.to_lowercase(),
+                token: token,
             })
         }
         field signUpUser(&executor, name: String, email:String, password:String) -> FieldResult<H> {

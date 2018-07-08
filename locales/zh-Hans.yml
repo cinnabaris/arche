@@ -47,6 +47,8 @@ nut:
     unlock:
       title:               没有收到解锁邮件？
       success:             您将会在几分钟内收到解锁邮件
+    reset-password:
+      title:               重置密码
   leave-words:
     new:
       title:               给我们留言
@@ -55,11 +57,11 @@ nut:
       confirm:
         success:           激活成功，请继续登录。
         subject:           激活信息
-        body:              你可以通过点击如下链接来激活账户：<br/> <a href="{{home}}/users/confirm/{{token}}">激活我的账户</a>
+        body:              你可以通过点击如下链接来激活账户：<br/> <a href="{{home}}/my/users/confirm/{{token}}">激活我的账户</a>
       unlock:
         success:           解锁成功，请继续登录。
         subject:           解锁信息
-        body:              您可以通过点击如下链接来解锁账户：<br/> <a href="{{home}}/users/unlock/{{token}}">解锁我的账户</a> 你的账户由于多次未成功的登录而被锁定
+        body:              您可以通过点击如下链接来解锁账户：<br/> <a href="{{home}}/my/users/unlock/{{token}}">解锁我的账户</a> 你的账户由于多次未成功的登录而被锁定
       reset-password:
         success:           密码重置成功，请继续登录。
         subject:           重置密码信息

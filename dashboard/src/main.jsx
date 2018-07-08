@@ -47,6 +47,8 @@ const main = (id) => {
               <Route exact={true} path="/users/confirm" component={createLoading(() => import ('./routes/users/Confirm'))}/>
               <Route exact={true} path="/users/unlock" component={createLoading(() => import ('./routes/users/Unlock'))}/>
               <Route exact={true} path="/users/forgot-password" component={createLoading(() => import ('./routes/users/ForgotPassword'))}/>
+              <Route exact={true} path="/users/confirm/:token" component={createLoading(() => import ('./routes/users/ConfirmToken'))}/>
+              <Route exact={true} path="/users/unlock/:token" component={createLoading(() => import ('./routes/users/UnlockToken'))}/>
               <Route exact={true} path="/users/reset-password/:token" component={createLoading(() => import ('./routes/users/ResetPassword'))}/>
               <Route exact={true} path="/leave-words/new" component={createLoading(() => import ('./routes/leave-words/New'))}/>
               <Route path="/" component={Dashboard}/>

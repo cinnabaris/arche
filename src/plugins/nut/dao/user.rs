@@ -58,6 +58,19 @@ pub fn is_email_exist(db: &Db, email: &String) -> Result<bool> {
     Ok(cnt > 0)
 }
 
+pub fn set_password(db: &Db, id: &i64, password: &String) -> Result<()> {
+    let now = Utc::now().naive_utc();
+    let password = utils::hash::sum(password.as_bytes())?;
+    let it = users::dsl::users.filter(users::dsl::id.eq(id));
+    update(it)
+        .set((
+            users::dsl::password.eq(&password),
+            users::dsl::updated_at.eq(&now),
+        ))
+        .execute(db)?;
+    Ok(())
+}
+
 pub fn add_by_email(
     db: &Db,
     name: &String,
