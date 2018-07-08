@@ -1,19 +1,8 @@
-import React, {
-  Component
-} from 'react'
+import React from 'react'
 
-import Application from '../../layouts/Application'
+import EmailForm from './EmailForm'
+import {USERS_FORGOT_PASSWORD} from '../../request'
 
-class Widget extends Component {
-  handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('aaa')
-  }
-  render() {
-    return (<Application title="nut.users.forgot-password.title" submit={this.handleSubmit}>
-      users.forgot-password
-    </Application>);
-  }
-}
+const Widget = () => (<EmailForm action="forgot-password" query={USERS_FORGOT_PASSWORD}/>)
 
-export default Widget;
+export default Widget

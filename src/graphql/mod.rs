@@ -32,6 +32,7 @@ use super::{
 };
 
 pub const UID: &'static str = "uid";
+pub const ACT: &'static str = "act";
 
 pub fn routes() -> (&'static str, Vec<Route>) {
     ("/", routes![doc, handler])

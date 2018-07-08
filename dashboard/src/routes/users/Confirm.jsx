@@ -1,19 +1,8 @@
-import React, {
-  Component
-} from 'react'
+import React from 'react'
 
-import Application from '../../layouts/Application'
+import EmailForm from './EmailForm'
+import {USERS_CONFIRM} from '../../request'
 
-class Widget extends Component {
-  handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('aaa')
-  }
-  render() {
-    return (<Application title="nut.users.confirm.title" submit={this.handleSubmit}>
-      users.confirm
-    </Application>);
-  }
-}
+const Widget = () => (<EmailForm action="confirm" query={USERS_CONFIRM}/>)
 
-export default Widget;
+export default Widget

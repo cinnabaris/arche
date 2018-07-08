@@ -12,22 +12,6 @@ use super::super::super::super::{
     utils,
 };
 
-pub fn get_by_uid(db: &Db, uid: &String) -> Result<i64> {
-    let id = users::dsl::users
-        .select(users::dsl::id)
-        .filter(users::dsl::uid.eq(&uid))
-        .first::<i64>(db)?;
-    Ok(id)
-}
-
-pub fn get_by_email(db: &Db, email: &String) -> Result<i64> {
-    let id = users::dsl::users
-        .select(users::dsl::id)
-        .filter(users::dsl::email.eq(&email))
-        .first::<i64>(db)?;
-    Ok(id)
-}
-
 // https://en.gravatar.com/site/implement/hash/
 pub fn gravatar_logo(email: &String) -> String {
     let mut h = md5::Md5::new();

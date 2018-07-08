@@ -9,7 +9,7 @@ use super::super::super::super::{
 };
 use super::models::{Locale, Oauth, SiteInfo};
 
-pub fn get_site_info(ctx: &Context) -> Result<SiteInfo> {
+pub fn site_info(ctx: &Context) -> Result<SiteInfo> {
     let db = ctx.db.deref();
     Ok(SiteInfo {
         locale: ctx.locale.clone(),

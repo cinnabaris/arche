@@ -1,19 +1,8 @@
-import React, {
-  Component
-} from 'react'
+import React from 'react'
 
-import Application from '../../layouts/Application'
+import EmailForm from './EmailForm'
+import {USERS_UNLOCK} from '../../request'
 
-class Widget extends Component {
-  handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('aaa')
-  }
-  render() {
-    return (<Application title="nut.users.unlock.title" submit={this.handleSubmit}>
-      users.unlock
-    </Application>);
-  }
-}
+const Widget = () => (<EmailForm action="unlock" query={USERS_UNLOCK}/>)
 
-export default Widget;
+export default Widget
