@@ -3,25 +3,26 @@ import PropTypes from 'prop-types'
 import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
-import {Link} from "react-router-dom"
 import Exception from 'ant-design-pro/lib/Exception'
 import {Route} from "react-router"
-import {
-  Row,
-  Col,
-  Card,
-  Layout,
-  Avatar,
-  Menu,
-  Icon
-} from 'antd'
+import {Row, Col, Layout, Menu} from 'antd'
 
 import Footer from './Footer'
 import createLoading from '../loading'
 import {routes} from '../router'
 import {Switch} from 'react-router-dom'
+import Authorized, {TOKEN} from '../Authorized'
+import {signIn} from '../actions'
 
-const {Header, Content} = Layout;
+const {Header, Content} = Layout
+
+const show = (it) => {
+  let Children = createLoading(it.component)
+  if (it.authority) {
+    return() => (<Authorized authority={it.authority} noMatch={(<Exception type="403"/>)}><Children/></Authorized>)
+  }
+  return Children
+}
 
 class Widget extends Component {
   constructor(props) {
@@ -39,10 +40,15 @@ class Widget extends Component {
     }
   }
   componentDidMount() {
-    console.log('init application')
+    const {user, signIn} = this.props
+    if (!user.uid) {
+      let token = localStorage.getItem(TOKEN)
+      if (token) {
+        signIn(token)
+      }
+    }
   }
   render() {
-    const {formatMessage} = this.props.intl
     return (<Layout>
       <Content >
         <Header>
@@ -62,7 +68,7 @@ class Widget extends Component {
             }}>
             <br/>
             <Switch>
-              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={createLoading(it.component)}/>))}
+              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={show(it)}/>))}
               <Route component={() => (<Exception type="404"/>)}/>
             </Switch>
             <br/>
@@ -77,7 +83,9 @@ class Widget extends Component {
 Widget.propTypes = {
   push: PropTypes.func.isRequired,
   intl: intlShape.isRequired,
-  title: PropTypes.object.isRequired
+  title: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  signIn: PropTypes.func.isRequired
 }
 
-export default connect(state => ({title: state.pageTitle}), {push})(injectIntl(Widget))
+export default connect(state => ({title: state.pageTitle, user: state.currentUser}), {push, signIn})(injectIntl(Widget))

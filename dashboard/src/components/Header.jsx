@@ -1,8 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {Link} from "react-router-dom"
 import {Helmet} from "react-helmet"
-import {intlShape, injectIntl, FormattedMessage} from 'react-intl'
+import {intlShape, injectIntl} from 'react-intl'
 
 class Widget extends Component {
   render() {

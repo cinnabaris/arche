@@ -9,12 +9,13 @@ import {Submit, formItemLayout} from '../../components/form'
 import {client, USERS_SIGN_IN, failed} from '../../request'
 import {TOKEN} from '../../Authorized'
 import Layout from './Layout'
+import {signIn} from '../../actions'
 
 const FormItem = Form.Item
 
 class Widget extends Component {
   handleSubmit = (e) => {
-    const {push} = this.props
+    const {push, signIn} = this.props
     const {formatMessage} = this.props.intl
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
@@ -23,7 +24,8 @@ class Widget extends Component {
           var token = rst.signInUserByEmail.token
           message.info(formatMessage({id: "flashes.success"}))
           localStorage.setItem(TOKEN, token)
-          push('/dashboard/users/logs')
+          signIn(token)
+          push('/users/logs')
         }).catch(failed)
       }
     })
@@ -70,7 +72,8 @@ class Widget extends Component {
 
 Widget.propTypes = {
   intl: intlShape.isRequired,
-  push: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired,
+  signIn: PropTypes.func.isRequired
 }
 
-export default connect(state => ({}), {push})(Form.create()(injectIntl(Widget)))
+export default connect(state => ({}), {push, signIn})(Form.create()(injectIntl(Widget)))

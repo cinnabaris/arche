@@ -2,8 +2,6 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import RenderAuthorized from 'ant-design-pro/lib/Authorized'
 import Exception from 'ant-design-pro/lib/Exception'
-import jwtDecode from 'jwt-decode'
-import moment from 'moment'
 
 export const ADMIN = 'admin'
 export const MEMBER = 'member'
@@ -13,24 +11,8 @@ export const TOKEN = "token"
 
 let Authorized = RenderAuthorized('nil')
 
-const parse = (token) => {
-  if (token) {
-    try {
-      var it = jwtDecode(token);
-      if (moment().isBetween(moment.unix(it.nbf), moment.unix(it.exp))) {
-        return it.admin
-          ? ADMIN
-          : MEMBER
-      }
-    } catch (e) {
-      console.log(e)
-    }
-  }
-  return NULL
-}
-
-export const reload = (token) => {
-  Authorized = RenderAuthorized(parse(token))
+export const reload = (role) => {
+  Authorized = RenderAuthorized(role)
 }
 
 class Widget extends Component {
