@@ -1,12 +1,10 @@
-import 'vuetify/dist/vuetify.min.css'
-import 'material-design-icons/iconfont/material-icons.css'
-import '@mdi/font/css/materialdesignicons.css'
+import 'element-ui/lib/theme-chalk/index.css';
 
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import VueI18n from 'vue-i18n'
-import Vuetify from 'vuetify'
+import ElementUI from 'element-ui';
 
 import routes from './plugins'
 import {locales} from './locales'
@@ -17,11 +15,14 @@ Vue.config.productionTip = false
 Vue.use(Vuex)
 Vue.use(VueRouter)
 Vue.use(VueI18n)
-Vue.use(Vuetify)
 
 const router = new VueRouter({base: '/my', mode: 'history', routes})
 const store = new Vuex.Store({})
 const i18n = new VueI18n(locales)
+
+Vue.use(ElementUI, {
+  i18n: (key, val) => i18n.t(key, val)
+})
 
 new Vue({
   router,
