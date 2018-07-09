@@ -22,7 +22,6 @@
     "react": "^16.4.1",
     "react-color": "^2.14.1",
     "react-copy-to-clipboard": "^5.0.1",
-    "react-document-title": "^2.0.3",
     "react-dom": "^16.4.1",
     "react-google-maps": "^9.4.5",
     "react-helmet": "^5.2.0",
