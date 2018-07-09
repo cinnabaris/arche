@@ -5,9 +5,11 @@ import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import {Form, Input, message} from 'antd'
 
-import Application from '../../layouts/Application'
+import SharedLinks from '../users/SharedLinks'
 import {Submit, formItemLayout} from '../../components/form'
 import {client, LEAVE_WORDS_NEW, failed} from '../../request'
+import {setPageTitle} from '../../actions'
+import Header from '../../components/Header'
 
 const FormItem = Form.Item
 
@@ -29,29 +31,33 @@ class Widget extends Component {
   render() {
     const {formatMessage} = this.props.intl
     const {getFieldDecorator} = this.props.form
-    return (<Application title="nut.leave-words.new.title" submit={this.handleSubmit}>
-      <Form onSubmit={this.handleSubmit}>
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.content" />} extra={<FormattedMessage id = "nut.leave-words.new.body-helper" />} hasFeedback={true}>
-          {
-            getFieldDecorator('body', {
-              rules: [
-                {
-                  required: true,
-                  message: formatMessage({id: "validations.required"})
-                }
-              ]
-            })(<Input.TextArea rows={8}/>)
-          }
-        </FormItem>
-        <Submit/>
-      </Form>
-    </Application>);
+    return (<Form onSubmit={this.handleSubmit}>
+      <Header title={{
+          id: 'nut.leave-words.new.title'
+        }}/>
+      <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.content" />} extra={<FormattedMessage id = "nut.leave-words.new.body-helper" />} hasFeedback={true}>
+        {
+          getFieldDecorator('body', {
+            rules: [
+              {
+                required: true,
+                message: formatMessage({id: "validations.required"})
+              }
+            ]
+          })(<Input.TextArea rows={8}/>)
+        }
+      </FormItem>
+      <Submit/>
+      <br/>
+      <SharedLinks/>
+    </Form>)
   }
 }
 
 Widget.propTypes = {
   intl: intlShape.isRequired,
-  push: PropTypes.func.isRequired
+  push: PropTypes.func.isRequired,
+  setPageTitle: PropTypes.func.isRequired
 }
 
-export default connect(state => ({}), {push})(Form.create()(injectIntl(Widget)))
+export default connect(state => ({}), {push, setPageTitle})(Form.create()(injectIntl(Widget)))

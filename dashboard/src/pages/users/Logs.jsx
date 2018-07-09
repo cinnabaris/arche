@@ -1,14 +1,12 @@
 import React, {Component} from 'react'
 import {Link} from "react-router-dom"
 
-import Authorized, {MEMBER, ADMIN} from '../../Authorized'
-
 class Widget extends Component {
   render() {
-    return (<Authorized authority={[MEMBER, ADMIN]}>
+    return (<div>
       users.logs
       <Link to="/users/profile">Profile</Link>
-    </Authorized>);
+    </div>);
   }
 }
 

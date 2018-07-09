@@ -1,32 +1,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Route} from "react-router"
 import {createStore, combineReducers, applyMiddleware} from 'redux'
 import {Provider} from 'react-redux'
 import createHistory from 'history/createBrowserHistory'
-import {Switch} from 'react-router-dom'
 import {ConnectedRouter, routerReducer, routerMiddleware} from 'react-router-redux'
 import {addLocaleData, IntlProvider} from 'react-intl'
+import {Route} from "react-router"
 import {LocaleProvider} from 'antd'
-import Exception from 'ant-design-pro/lib/Exception'
 
 import './main.css';
 import reducers from './reducers'
 import {get as detectLocale} from './intl'
 import {client, failed, LIST_LOCALES_BY_LANG} from './request'
-import createLoading from './loading'
-import {routes} from './router'
-
-const page = (it) => {
-  if (it.layout) {
-    return() => {
-      var Layout = createLoading(it.layout)
-      var Children = createLoading(it.component)
-      return (<Layout {...it.args}><Children/></Layout>)
-    }
-  }
-  return createLoading(it.component)
-}
+import Layout from './layout'
 
 const main = (id) => {
   const user = detectLocale()
@@ -49,10 +35,7 @@ const main = (id) => {
       <IntlProvider locale={user.locale} messages={user.messages}>
         <Provider store={store}>
           <ConnectedRouter history={history}>
-            <Switch>
-              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={page(it)}/>))}
-              <Route component={() => (<Exception type="404"/>)}/>
-            </Switch>
+            <Route path="/" component={Layout}/>
           </ConnectedRouter>
         </Provider>
       </IntlProvider>

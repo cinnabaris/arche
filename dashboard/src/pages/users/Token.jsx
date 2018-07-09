@@ -4,7 +4,6 @@ import {injectIntl, intlShape} from 'react-intl'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import {message} from 'antd'
-import DocumentTitle from 'react-document-title'
 import {withRouter} from 'react-router-dom'
 
 import {client, failed} from '../../request'
@@ -19,9 +18,7 @@ class Widget extends Component {
     }).catch(failed)
   }
   render() {
-    const {action} = this.props
-    const {formatMessage} = this.props.intl
-    return (<DocumentTitle title={formatMessage({id: `nut.users.${action}.title`})}><div/></DocumentTitle>);
+    return (<div/>);
   }
 }
 

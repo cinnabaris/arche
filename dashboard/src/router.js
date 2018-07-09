@@ -1,76 +1,70 @@
 import {ADMIN, MEMBER} from './Authorized'
 
-export const Application = () => import ('./layouts/Application')
-export const Dashboard = () => import ('./layouts/dashboard')
-
-const ALL = [ADMIN, MEMBER]
+export const ALL = [ADMIN, MEMBER]
 
 const items = [
   {
     path: "/",
-    component: () => import ('./pages/Home')
-  },
-  //{
-  //   path: "/install",
-  //   component: () => import ('./pages/Install')
-  // },
-  {
+    component: () => import ('./pages/Home'),
+    hidden: true
+  }, {
+    path: "/install",
+    component: () => import ('./pages/Install'),
+    hidden: true
+  }, {
     path: '/users',
-    layout: Application,
     children: [
       {
+        path: "/logs",
+        component: () => import ('./pages/users/Logs'),
+        authority: ALL
+      }, {
+        path: "/profile",
+        component: () => import ('./pages/users/Profile'),
+        authority: ALL
+      }, {
+        path: "/change-password",
+        component: () => import ('./pages/users/ChangePassword'),
+        authority: ALL
+      }, {
         path: "/sign-in",
         component: () => import ('./pages/users/SignIn'),
-        args: {
-          title: 'nut.users.sign-in.title'
-        }
+        hidden: true
       }, {
         path: "/sign-up",
         component: () => import ('./pages/users/SignUp'),
-        args: {
-          title: 'nut.users.sign-up.title'
-        }
+        hidden: true
       }, {
-        path: "/logs",
-        layout: Dashboard,
-        component: () => import ('./pages/users/Logs'),
-        authority: ALL,
-        args: {
-          title: 'nut.users.logs.title'
-        }
+        path: "/confirm",
+        component: () => import ('./pages/users/Confirm'),
+        hidden: true
       }, {
-        path: "/profile",
-        layout: Dashboard,
-        component: () => import ('./pages/users/Profile'),
-        authority: ALL,
-        args: {
-          title: 'nut.users.profile.title'
-        }
+        path: "/unlock",
+        component: () => import ('./pages/users/Unlock'),
+        hidden: true
+      }, {
+        path: "/forgot-password",
+        component: () => import ('./pages/users/ForgotPassword'),
+        hidden: true
+      }, {
+        path: "/confirm/:token",
+        component: () => import ('./pages/users/ConfirmToken'),
+        hidden: true
+      }, {
+        path: "/unlock/:token",
+        component: () => import ('./pages/users/UnlockToken'),
+        hidden: true
+      }, {
+        path: "/reset-password/:token",
+        component: () => import ('./pages/users/ResetPassword'),
+        hidden: true
       }
     ]
+  }, {
+    path: "/leave-words/new",
+    component: () => import ('./pages/leave-words/New'),
+    hidden: true
   }
-  // {
-  //   path: "/users/confirm",
-  //   component: () => import ('./pages/users/Confirm')
-  // }, {
-  //   path: "/users/unlock",
-  //   component: () => import ('./pages/users/Unlock')
-  // }, {
-  //   path: "/users/forgot-password",
-  //   component: () => import ('./pages/users/ForgotPassword')
-  // }, {
-  //   path: "/users/confirm/:token",
-  //   component: () => import ('./pages/users/ConfirmToken')
-  // }, {
-  //   path: "/users/unlock/:token",
-  //   component: () => import ('./pages/users/UnlockToken')
-  // }, {
-  //   path: "/users/reset-password/:token",
-  //   component: () => import ('./pages/users/ResetPassword')
-  // }, {
-  //   path: "/leave-words/new",
-  //   component: () => import ('./pages/leave-words/New')
-  // }
 ]
 
 export const routes = items.reduce((ar, it) => {
@@ -78,15 +72,11 @@ export const routes = items.reduce((ar, it) => {
     it.children
     ? it.children.map((jt) => {
       return {
-        layout: jt.layout
-          ? jt.layout
-          : it.layout,
         authority: jt.authority
           ? jt.authority
           : it.authority,
         path: it.path + jt.path,
-        component: jt.component,
-        args: jt.args
+        component: jt.component
       }
     })
     : [it])

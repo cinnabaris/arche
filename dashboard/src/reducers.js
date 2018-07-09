@@ -1,7 +1,7 @@
 import jwtDecode from 'jwt-decode'
 import moment from 'moment'
 
-import {USERS_SIGN_IN, USERS_SIGN_OUT} from './actions'
+import {USERS_SIGN_IN, PAGE_TITLE, USERS_SIGN_OUT} from './actions'
 import {TOKEN} from './Authorized'
 
 const currentUser = (state = {}, action) => {
@@ -26,4 +26,13 @@ const currentUser = (state = {}, action) => {
   }
 }
 
-export default {currentUser}
+const pageTitle = (state = {}, action) => {
+  switch (action.type) {
+    case PAGE_TITLE:
+      return {title: action.title}
+    default:
+      return state
+  }
+}
+
+export default {currentUser, pageTitle}

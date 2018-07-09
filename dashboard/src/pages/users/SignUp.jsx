@@ -7,6 +7,8 @@ import {Form, Input, message} from 'antd'
 
 import {Submit, formItemLayout} from '../../components/form'
 import {client, USERS_SIGN_UP, failed} from '../../request'
+import SharedLinks from './SharedLinks'
+import Header from '../../components/Header'
 
 const FormItem = Form.Item
 
@@ -37,6 +39,9 @@ class Widget extends Component {
     const {formatMessage} = this.props.intl
     const {getFieldDecorator} = this.props.form
     return (<Form onSubmit={this.handleSubmit}>
+      <Header title={{
+          id: "nut.users.sign-up.title"
+        }}/>
       <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.username" />} hasFeedback={true}>
         {
           getFieldDecorator('name', {
@@ -93,6 +98,8 @@ class Widget extends Component {
         }
       </FormItem>
       <Submit/>
+      <br/>
+      <SharedLinks/>
     </Form>)
   }
 }
