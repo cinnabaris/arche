@@ -5,10 +5,9 @@ import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import {Form, Input, message} from 'antd'
 
-import SharedLinks from './SharedLinks'
+import Layout from './Layout'
 import {Submit, formItemLayout} from '../../components/form'
 import {client, failed} from '../../request'
-import Header from '../../components/Header'
 
 const FormItem = Form.Item
 
@@ -30,29 +29,26 @@ class Widget extends Component {
     const {action} = this.props
     const {formatMessage} = this.props.intl
     const {getFieldDecorator} = this.props.form
-    return (<Form onSubmit={this.handleSubmit}>
-      <Header title={{
-          id: `nut.users.${action}.title`
-        }}/>
-      <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.email" />} hasFeedback={true}>
-        {
-          getFieldDecorator('email', {
-            rules: [
-              {
-                type: 'email',
-                message: formatMessage({id: "validations.email"})
-              }, {
-                required: true,
-                message: formatMessage({id: "validations.required"})
-              }
-            ]
-          })(<Input/>)
-        }
-      </FormItem>
-      <Submit/>
-      <br/>
-      <SharedLinks/>
-    </Form>);
+    return (<Layout title={`nut.users.${action}.title`}>
+      <Form onSubmit={this.handleSubmit}>
+        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.email" />} hasFeedback={true}>
+          {
+            getFieldDecorator('email', {
+              rules: [
+                {
+                  type: 'email',
+                  message: formatMessage({id: "validations.email"})
+                }, {
+                  required: true,
+                  message: formatMessage({id: "validations.required"})
+                }
+              ]
+            })(<Input/>)
+          }
+        </FormItem>
+        <Submit/>
+      </Form>
+    </Layout>);
   }
 }
 

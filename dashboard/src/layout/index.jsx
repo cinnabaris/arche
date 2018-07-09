@@ -61,16 +61,10 @@ class Widget extends Component {
               offset: 6
             }}>
             <br/>
-            <Card title={(<FormattedMessage id={"site.title"
-}/>)} extra={(<a href="/" target="_blank">
-                <Icon type="home"/></a>)}>
-              <Switch>
-                {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={createLoading(it.component)}/>))}
-                <Route component={() => (<Exception type="404"/>)}/>
-              </Switch>
-            </Card>
-            <br/>
-
+            <Switch>
+              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={createLoading(it.component)}/>))}
+              <Route component={() => (<Exception type="404"/>)}/>
+            </Switch>
             <br/>
           </Col>
         </Row>

@@ -5,11 +5,10 @@ import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import {Form, Input, message} from 'antd'
 
-import SharedLinks from '../users/SharedLinks'
+import Layout from '../users/Layout'
 import {Submit, formItemLayout} from '../../components/form'
 import {client, LEAVE_WORDS_NEW, failed} from '../../request'
 import {setPageTitle} from '../../actions'
-import Header from '../../components/Header'
 
 const FormItem = Form.Item
 
@@ -31,26 +30,23 @@ class Widget extends Component {
   render() {
     const {formatMessage} = this.props.intl
     const {getFieldDecorator} = this.props.form
-    return (<Form onSubmit={this.handleSubmit}>
-      <Header title={{
-          id: 'nut.leave-words.new.title'
-        }}/>
-      <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.content" />} extra={<FormattedMessage id = "nut.leave-words.new.body-helper" />} hasFeedback={true}>
-        {
-          getFieldDecorator('body', {
-            rules: [
-              {
-                required: true,
-                message: formatMessage({id: "validations.required"})
-              }
-            ]
-          })(<Input.TextArea rows={8}/>)
-        }
-      </FormItem>
-      <Submit/>
-      <br/>
-      <SharedLinks/>
-    </Form>)
+    return (<Layout title='nut.leave-words.new.title'>
+      <Form onSubmit={this.handleSubmit}>
+        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.content" />} extra={<FormattedMessage id = "nut.leave-words.new.body-helper" />} hasFeedback={true}>
+          {
+            getFieldDecorator('body', {
+              rules: [
+                {
+                  required: true,
+                  message: formatMessage({id: "validations.required"})
+                }
+              ]
+            })(<Input.TextArea rows={8}/>)
+          }
+        </FormItem>
+        <Submit/>
+      </Form>
+    </Layout>)
   }
 }
 
