@@ -5,7 +5,7 @@ class Widget extends Component {
   render() {
     return (<div>
       users.profile
-      <Link to="/dashboard/users/logs">logs</Link>
+      <Link to="/users/logs">logs</Link>
     </div>);
   }
 }

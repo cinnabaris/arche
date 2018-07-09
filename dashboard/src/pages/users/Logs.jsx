@@ -7,7 +7,7 @@ class Widget extends Component {
   render() {
     return (<Authorized authority={[MEMBER, ADMIN]}>
       users.logs
-      <Link to="/dashboard/users/profile">Profile</Link>
+      <Link to="/users/profile">Profile</Link>
     </Authorized>);
   }
 }

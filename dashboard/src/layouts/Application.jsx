@@ -61,6 +61,9 @@ class Widget extends Component {
       default:
     }
   }
+  componentDidMount() {
+    console.log('init application')
+  }
   render() {
     const {children, title} = this.props
     const {formatMessage} = this.props.intl

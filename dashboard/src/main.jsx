@@ -11,13 +11,22 @@ import {LocaleProvider} from 'antd'
 import Exception from 'ant-design-pro/lib/Exception'
 
 import './main.css';
-import Dashboard from './layouts/dashboard'
 import reducers from './reducers'
 import {get as detectLocale} from './intl'
 import {client, failed, LIST_LOCALES_BY_LANG} from './request'
+import createLoading from './loading'
+import {routes} from './router'
 
-import {createLoading} from './layouts'
-import routes from './routes'
+const page = (it) => {
+  if (it.layout) {
+    return() => {
+      var Layout = createLoading(it.layout)
+      var Children = createLoading(it.component)
+      return (<Layout {...it.args}><Children/></Layout>)
+    }
+  }
+  return createLoading(it.component)
+}
 
 const main = (id) => {
   const user = detectLocale()
@@ -41,9 +50,7 @@ const main = (id) => {
         <Provider store={store}>
           <ConnectedRouter history={history}>
             <Switch>
-              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={createLoading(it.component)}/>))}
-
-              <Route path="/dashboard" component={Dashboard}/>
+              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={page(it)}/>))}
               <Route component={() => (<Exception type="404"/>)}/>
             </Switch>
           </ConnectedRouter>

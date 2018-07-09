@@ -5,7 +5,6 @@ import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import {Form, Input, message} from 'antd'
 
-import Application from '../../layouts/Application'
 import {Submit, formItemLayout} from '../../components/form'
 import {client, USERS_SIGN_IN, failed} from '../../request'
 import {TOKEN} from '../../Authorized'
@@ -31,40 +30,38 @@ class Widget extends Component {
   render() {
     const {formatMessage} = this.props.intl
     const {getFieldDecorator} = this.props.form
-    return (<Application title="nut.users.sign-in.title" submit={this.handleSubmit}>
-      <Form onSubmit={this.handleSubmit}>
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.email" />} hasFeedback={true}>
-          {
-            getFieldDecorator('email', {
-              rules: [
-                {
-                  type: 'email',
-                  message: formatMessage({id: "validations.email"})
-                }, {
-                  required: true,
-                  message: formatMessage({id: "validations.required"})
-                }
-              ]
-            })(<Input/>)
-          }
-        </FormItem>
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.password" />} hasFeedback={true}>
-          {
-            getFieldDecorator('password', {
-              rules: [
-                {
-                  required: true,
-                  max: 30,
-                  min: 6,
-                  message: formatMessage({id: "validations.password"})
-                }
-              ]
-            })(<Input type="password"/>)
-          }
-        </FormItem>
-        <Submit/>
-      </Form>
-    </Application>);
+    return (<Form onSubmit={this.handleSubmit}>
+      <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.email" />} hasFeedback={true}>
+        {
+          getFieldDecorator('email', {
+            rules: [
+              {
+                type: 'email',
+                message: formatMessage({id: "validations.email"})
+              }, {
+                required: true,
+                message: formatMessage({id: "validations.required"})
+              }
+            ]
+          })(<Input/>)
+        }
+      </FormItem>
+      <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.password" />} hasFeedback={true}>
+        {
+          getFieldDecorator('password', {
+            rules: [
+              {
+                required: true,
+                max: 30,
+                min: 6,
+                message: formatMessage({id: "validations.password"})
+              }
+            ]
+          })(<Input type="password"/>)
+        }
+      </FormItem>
+      <Submit/>
+    </Form>)
   }
 }
 
