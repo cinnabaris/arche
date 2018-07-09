@@ -17,6 +17,7 @@ import {get as detectLocale} from './intl'
 import {client, failed, LIST_LOCALES_BY_LANG} from './request'
 
 import {createLoading} from './layouts'
+import routes from './routes'
 
 const main = (id) => {
   const user = detectLocale()
@@ -40,18 +41,9 @@ const main = (id) => {
         <Provider store={store}>
           <ConnectedRouter history={history}>
             <Switch>
-              <Route exact={true} path="/" component={createLoading(() => import ('./routes/Home'))}/>
-              <Route exact={true} path="/install" component={createLoading(() => import ('./routes/Install'))}/>
-              <Route exact={true} path="/users/sign-in" component={createLoading(() => import ('./routes/users/SignIn'))}/>
-              <Route exact={true} path="/users/sign-up" component={createLoading(() => import ('./routes/users/SignUp'))}/>
-              <Route exact={true} path="/users/confirm" component={createLoading(() => import ('./routes/users/Confirm'))}/>
-              <Route exact={true} path="/users/unlock" component={createLoading(() => import ('./routes/users/Unlock'))}/>
-              <Route exact={true} path="/users/forgot-password" component={createLoading(() => import ('./routes/users/ForgotPassword'))}/>
-              <Route exact={true} path="/users/confirm/:token" component={createLoading(() => import ('./routes/users/ConfirmToken'))}/>
-              <Route exact={true} path="/users/unlock/:token" component={createLoading(() => import ('./routes/users/UnlockToken'))}/>
-              <Route exact={true} path="/users/reset-password/:token" component={createLoading(() => import ('./routes/users/ResetPassword'))}/>
-              <Route exact={true} path="/leave-words/new" component={createLoading(() => import ('./routes/leave-words/New'))}/>
-              <Route path="/" component={Dashboard}/>
+              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={createLoading(it.component)}/>))}
+
+              <Route path="/dashboard" component={Dashboard}/>
               <Route component={() => (<Exception type="404"/>)}/>
             </Switch>
           </ConnectedRouter>

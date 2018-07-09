@@ -2,7 +2,7 @@ import {GraphQLClient} from 'graphql-request'
 import {notification} from 'antd'
 import moment from 'moment'
 
-import {TOKEN} from './actions'
+import {TOKEN} from './Authorized'
 
 export const LEAVE_WORDS_NEW = `mutation form($mediaType: String!, $body: String!){
   createLeaveWord(mediaType: $mediaType, body: $body) {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
 import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
-import {Link} from "react-router-dom";
+import {Link} from "react-router-dom"
 import {
   Row,
   Col,
@@ -65,7 +65,7 @@ class Widget extends Component {
     const {children, title} = this.props
     const {formatMessage} = this.props.intl
     return (<DocumentTitle title={`${formatMessage({
-        id: title})}-${formatMessage({id: 'site.title'})}`}>
+        id: title})} | ${formatMessage({id: 'site.title'})}`}>
       <Layout>
         <Content >
           <Header>
@@ -92,7 +92,9 @@ class Widget extends Component {
               </Card>
               <br/>
               <List bordered={true} size="small" itemLayout="horizontal" dataSource={this.state.items} renderItem={it => (<List.Item>
-                  <List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={<Link to = {{pathname:it.to}} > <FormattedMessage id={it.label}/></Link>}/>
+                  <List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={(<Link to={it.to
+}>
+                      <FormattedMessage id={it.label}/></Link>)}/>
                 </List.Item>)}/>
               <br/>
             </Col>

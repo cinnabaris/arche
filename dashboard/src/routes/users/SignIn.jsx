@@ -8,22 +8,22 @@ import {Form, Input, message} from 'antd'
 import Application from '../../layouts/Application'
 import {Submit, formItemLayout} from '../../components/form'
 import {client, USERS_SIGN_IN, failed} from '../../request'
-import {signIn, TOKEN} from '../../actions'
+import {TOKEN} from '../../Authorized'
 
 const FormItem = Form.Item
 
 class Widget extends Component {
   handleSubmit = (e) => {
-    const {push, signIn} = this.props
+    const {push} = this.props
     const {formatMessage} = this.props.intl
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
         client.request(USERS_SIGN_IN, values).then((rst) => {
+          var token = rst.signInUserByEmail.token
           message.info(formatMessage({id: "flashes.success"}))
-          localStorage.setItem(TOKEN, rst.token)
-          signIn(rst.token)
-          push('/users/logs')
+          localStorage.setItem(TOKEN, token)
+          push('/dashboard/users/logs')
         }).catch(failed)
       }
     })
@@ -73,4 +73,4 @@ Widget.propTypes = {
   push: PropTypes.func.isRequired
 }
 
-export default connect(state => ({}), {push, signIn})(Form.create()(injectIntl(Widget)))
+export default connect(state => ({}), {push})(Form.create()(injectIntl(Widget)))

@@ -6,7 +6,7 @@ rustup update
 cargo update
 cargo clean
 rustup component add rls-preview rust-analysis rust-src rustfmt-preview
-cargo install --force clippy
+# cargo install --force clippy
 cargo install --force diesel_cli
 cargo check
 cargo build

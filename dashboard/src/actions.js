@@ -1,8 +1,6 @@
 export const USERS_SIGN_IN = "users.sign-in"
 export const USERS_SIGN_OUT = "users.sign-out"
 
-export const TOKEN = "token"
-
 export const signOut = () => {
   return {type: USERS_SIGN_OUT}
 }
