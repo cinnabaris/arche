@@ -1,2 +1,7 @@
 @import '~antd/dist/antd.css';
 @import '~ant-design-pro/dist/ant-design-pro.css';
+.sider-logo {
+  height: 32px;
+  background: rgba(255, 255, 255, .2);
+  margin: 16px;
+}

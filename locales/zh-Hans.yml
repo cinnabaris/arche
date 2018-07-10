@@ -38,6 +38,14 @@ nut:
   install:
     title:                 初始化安装
   users:
+    dashboard:
+      title:               个人参数
+    profile:
+      title:               个人信息
+    logs:
+      title:               日志
+    change-password:
+      title:               修改密码
     sign-in:
       title:               现有账户登录
     sign-up:

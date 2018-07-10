@@ -11,51 +11,60 @@ const items = [
     hidden: true
   }, {
     path: '/users',
+    hidden: true,
+    children: [
+      {
+        path: "/sign-in",
+        component: () => import ('./pages/users/SignIn')
+      }, {
+        path: "/sign-up",
+        component: () => import ('./pages/users/SignUp')
+      }, {
+        path: "/confirm",
+        component: () => import ('./pages/users/Confirm')
+      }, {
+        path: "/unlock",
+        component: () => import ('./pages/users/Unlock')
+      }, {
+        path: "/forgot-password",
+        component: () => import ('./pages/users/ForgotPassword')
+      }, {
+        path: "/confirm/:token",
+        component: () => import ('./pages/users/ConfirmToken')
+      }, {
+        path: "/unlock/:token",
+        component: () => import ('./pages/users/UnlockToken')
+      }, {
+        path: "/reset-password/:token",
+        component: () => import ('./pages/users/ResetPassword')
+      }
+    ]
+  }, {
+    path: '/users',
+    icon: 'user',
+    label: {
+      id: 'nut.users.dashboard.title'
+    },
+    authority: ALL,
     children: [
       {
         path: "/logs",
         component: () => import ('./pages/users/Logs'),
-        authority: ALL
+        label: {
+          id: 'nut.users.logs.title'
+        }
       }, {
         path: "/profile",
         component: () => import ('./pages/users/Profile'),
-        authority: ALL
+        label: {
+          id: 'nut.users.profile.title'
+        }
       }, {
         path: "/change-password",
         component: () => import ('./pages/users/ChangePassword'),
-        authority: ALL
-      }, {
-        path: "/sign-in",
-        component: () => import ('./pages/users/SignIn'),
-        hidden: true
-      }, {
-        path: "/sign-up",
-        component: () => import ('./pages/users/SignUp'),
-        hidden: true
-      }, {
-        path: "/confirm",
-        component: () => import ('./pages/users/Confirm'),
-        hidden: true
-      }, {
-        path: "/unlock",
-        component: () => import ('./pages/users/Unlock'),
-        hidden: true
-      }, {
-        path: "/forgot-password",
-        component: () => import ('./pages/users/ForgotPassword'),
-        hidden: true
-      }, {
-        path: "/confirm/:token",
-        component: () => import ('./pages/users/ConfirmToken'),
-        hidden: true
-      }, {
-        path: "/unlock/:token",
-        component: () => import ('./pages/users/UnlockToken'),
-        hidden: true
-      }, {
-        path: "/reset-password/:token",
-        component: () => import ('./pages/users/ResetPassword'),
-        hidden: true
+        label: {
+          id: 'nut.users.change-password.title'
+        }
       }
     ]
   }, {
@@ -80,17 +89,20 @@ export const routes = items.reduce((ar, it) => {
     : [it])
 }, [])
 
-export const menus = items.filter((it) => it.children).reduce((ar, it) => {
-  return ar.concat(
-    it.children
-    ? it.children.map((jt) => {
+export const menus = items.filter((it) => it.children && !it.hidden).map((it) => {
+  return {
+    authority: it.authority,
+    icon: it.icon,
+    label: it.label,
+    key: it.path,
+    children: it.children.filter((it) => !it.hidden).map((jt) => {
       return {
+        key: it.path + jt.path,
+        label: jt.label,
         authority: jt.authority
           ? jt.authority
-          : it.authority,
-        path: it.path + jt.path,
-        component: jt.component
+          : it.authority
       }
     })
-    : [it])
-}, [])
+  }
+})

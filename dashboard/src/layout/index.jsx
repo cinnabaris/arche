@@ -5,20 +5,12 @@ import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import Exception from 'ant-design-pro/lib/Exception'
 import {Route} from "react-router"
-import {
-  Row,
-  Col,
-  Icon,
-  Layout,
-  Menu,
-  message,
-  Modal
-} from 'antd'
+import {Icon, Layout, Menu, message, Modal} from 'antd'
 import HeaderSearch from 'ant-design-pro/lib/HeaderSearch'
 import {Switch} from 'react-router-dom'
 
 import createLoading from '../loading'
-import {routes} from '../router'
+import {routes, menus} from '../router'
 import Authorized, {ALL, TOKEN} from '../Authorized'
 import {signIn, signOut} from '../actions'
 import {client, USERS_SIGN_OUT, failed} from '../request'
@@ -42,6 +34,10 @@ class Widget extends Component {
       title: null,
       collapsed: false
     }
+  }
+  handleSiderClick = (e) => {
+    const {push} = this.props
+    push(e.key)
   }
   handleHeaderClick = (e) => {
     const {push, signOut} = this.props
@@ -87,20 +83,21 @@ class Widget extends Component {
   render() {
     return (<Layout>
       <Sider breakpoint="lg" collapsedWidth="0" trigger={null} collapsible="collapsible" collapsed={this.state.collapsed}>
-        <div className="logo"/>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-          <Menu.Item key="1">
-            <Icon type="user"/>
-            <span>nav 1</span>
-          </Menu.Item>
-          <Menu.Item key="2">
-            <Icon type="video-camera"/>
-            <span>nav 2</span>
-          </Menu.Item>
-          <Menu.Item key="3">
-            <Icon type="upload"/>
-            <span>nav 3</span>
-          </Menu.Item>
+        <div className="sider-logo"/>
+        <Menu onClick={this.handleSiderClick} theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+          {
+            menus.map((it) => {
+              return Authorized.check(it.authority, (<Menu.SubMenu key={it.key} title={(<span><Icon type={it.icon}/><FormattedMessage {...it.label}/></span>)}>
+                {
+                  it.children.map((jt) => {
+                    return Authorized.check(jt.authority, (<Menu.Item key={jt.key}>
+                      <FormattedMessage {...jt.label}/>
+                    </Menu.Item>), null)
+                  })
+                }
+              </Menu.SubMenu>), null)
+            })
+          }
         </Menu>
       </Sider>
       <Layout>
