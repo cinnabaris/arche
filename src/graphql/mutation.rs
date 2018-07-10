@@ -13,6 +13,9 @@ graphql_object!(
                 message: message,
             })
         }
+        field signOutUser(&executor) -> FieldResult<H> {
+            ge!(nut::graphql::mutation::sign_out_user(executor.context()))
+        }
         field createLeaveWord(&executor, media_type: String, body: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::mutation::CreateLeaveWord{
                 media_type: media_type,

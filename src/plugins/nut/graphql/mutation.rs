@@ -16,6 +16,18 @@ use super::super::super::super::{
 use super::super::{consumers, dao};
 use super::models::SignIn;
 
+pub fn sign_out_user(ctx: &Context) -> Result<H> {
+    let it = ctx.current_user()?;
+    l!(
+        ctx.db.deref(),
+        &it.id,
+        &ctx.client_ip,
+        &ctx.locale,
+        "nut.logs.user.sign-out"
+    )?;
+    Ok(H::new())
+}
+
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct CreateLeaveWord {
     #[validate(length(min = "1"))]
@@ -97,6 +109,7 @@ impl SignInUserByEmail {
                         token: ctx.app.jwt.sum(
                             &mut json!({
                                 UID: uid,
+                                ACT: ACT_SIGN_IN,
                                 "admin": dao::policy::is(db, &id, &dao::role::Type::Admin),
                             }),
                             Duration::days(7),
