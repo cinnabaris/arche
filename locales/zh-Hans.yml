@@ -7,6 +7,9 @@ flashes:
   failed:                  操作失败
 helpers:
   are-you-sure:            你确定么？
+footer:
+  help:                    帮助
+  license:                 条款
 site:
   title:                   标题
   subhead:                 副标题

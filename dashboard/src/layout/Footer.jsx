@@ -9,8 +9,8 @@ class Widget extends Component {
     this.state = {
       items: [
         {
-          key: '帮助',
-          title: '帮助',
+          key: 'help',
+          title: <FormattedMessage id="footer.help"/>,
           href: 'https://github.com/cinnabaris/arche/blob/master/README.md'
         }, {
           key: 'github',
@@ -18,8 +18,8 @@ class Widget extends Component {
           href: 'https://github.com/cinnabaris/arche',
           blankTarget: true
         }, {
-          key: '条款',
-          title: '条款',
+          key: 'license',
+          title: <FormattedMessage id="footer.license"/>,
           href: 'https://github.com/cinnabaris/arche/blob/master/LICENSE',
           blankTarget: true
         }
