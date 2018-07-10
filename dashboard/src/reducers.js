@@ -2,7 +2,7 @@ import jwtDecode from 'jwt-decode'
 import moment from 'moment'
 
 import {USERS_SIGN_IN, PAGE_TITLE, USERS_SIGN_OUT} from './actions'
-import {ADMIN, MEMBER, reload as reloadAuthorized} from './Authorized'
+import {ADMIN, MEMBER, NULL, reload as reloadAuthorized} from './Authorized'
 
 const currentUser = (state = {}, action) => {
   switch (action.type) {
@@ -21,6 +21,7 @@ const currentUser = (state = {}, action) => {
       }
       return {}
     case USERS_SIGN_OUT:
+      reloadAuthorized(NULL)
       return {}
     default:
       return state

@@ -25,7 +25,7 @@ const main = (id) => {
     router: routerReducer
   }), applyMiddleware(middleware))
 
-  client.request(LIST_LOCALES_BY_LANG, {lang: user.locale}).then((rst) => {
+  client().request(LIST_LOCALES_BY_LANG, {lang: user.locale}).then((rst) => {
     user.messages = rst.listLocalesByLang.reduce((ar, it) => {
       ar[it.code] = it.message
       return ar

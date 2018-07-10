@@ -12,7 +12,7 @@ class Widget extends Component {
   componentDidMount() {
     const {push, action, query, match} = this.props
     const {formatMessage} = this.props.intl
-    client.request(query, match.params).then((rst) => {
+    client().request(query, match.params).then((rst) => {
       message.info(formatMessage({id: `nut.emails.user.${action}.success`}))
       push('/users/sign-in')
     }).catch(failed)

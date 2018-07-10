@@ -10,6 +10,12 @@ export const LEAVE_WORDS_NEW = `mutation form($mediaType: String!, $body: String
   }
 }`
 
+export const USERS_SIGN_OUT = `mutation form{
+  signOutUser {
+    createdAt
+  }
+}`
+
 export const USERS_SIGN_IN = `mutation form($email: String!, $password: String!){
   signInUserByEmail(email: $email, password: $password) {
     token
@@ -70,13 +76,15 @@ export const LIST_LOCALES_BY_LANG = `query locales($lang: String!){
   }
 }`
 
-export const client = new GraphQLClient('/graphql', {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem(TOKEN)}`
-  },
-  credentials: 'include',
-  mode: 'cors'
-})
+export const client = () => {
+  return new GraphQLClient('/graphql', {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN)}`
+    },
+    credentials: 'include',
+    mode: 'cors'
+  })
+}
 
 export const failed = (err) => notification.error({
   message: moment().format('ll LTS'),

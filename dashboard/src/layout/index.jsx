@@ -5,16 +5,27 @@ import {connect} from 'react-redux'
 import {push} from 'react-router-redux'
 import Exception from 'ant-design-pro/lib/Exception'
 import {Route} from "react-router"
-import {Row, Col, Layout, Menu} from 'antd'
+import {
+  Row,
+  Col,
+  Icon,
+  Layout,
+  Menu,
+  message,
+  Modal
+} from 'antd'
+import HeaderSearch from 'ant-design-pro/lib/HeaderSearch'
+import {Switch} from 'react-router-dom'
 
-import Footer from './Footer'
 import createLoading from '../loading'
 import {routes} from '../router'
-import {Switch} from 'react-router-dom'
-import Authorized, {TOKEN} from '../Authorized'
-import {signIn} from '../actions'
+import Authorized, {ALL, TOKEN} from '../Authorized'
+import {signIn, signOut} from '../actions'
+import {client, USERS_SIGN_OUT, failed} from '../request'
+import NoticeBar from './NoticeBar'
+import Footer from './Footer'
 
-const {Header, Content} = Layout
+const {Header, Sider, Content} = Layout
 
 const show = (it) => {
   let Children = createLoading(it.component)
@@ -28,15 +39,40 @@ class Widget extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      title: null
+      title: null,
+      collapsed: false
     }
   }
-  handleMenuClick = (e) => {
+  handleHeaderClick = (e) => {
+    const {push, signOut} = this.props
+    const {formatMessage} = this.props.intl
     switch (e.key) {
       case 'home':
         window.open("/", "_blank")
-        break;
+        return;
+      case 'doc':
+        window.open('https://github.com/cinnabaris/arche', "_blank")
+        return
+      case 'toggle':
+        this.setState({
+          collapsed: !this.state.collapsed
+        })
+        return
+      case 'sign-out':
+        Modal.confirm({
+          title: formatMessage({id: "helpers.are-you-sure"}),
+          onOk() {
+            client().request(USERS_SIGN_OUT, {}).then((rst) => {
+              push('/users/sign-in')
+              message.info(formatMessage({id: "flashes.success"}))
+              localStorage.removeItem(TOKEN)
+              signOut()
+            }).catch(failed)
+          }
+        })
+        return
       default:
+        console.log(e.key)
     }
   }
   componentDidMount() {
@@ -50,32 +86,67 @@ class Widget extends Component {
   }
   render() {
     return (<Layout>
-      <Content >
-        <Header>
-          <Menu onClick={this.handleMenuClick} theme="dark" mode="horizontal" style={{
-              lineHeight: '64px'
-            }}>
-            <Menu.Item key="home"><FormattedMessage id="site.title"/></Menu.Item>
+      <Sider breakpoint="lg" collapsedWidth="0" trigger={null} collapsible="collapsible" collapsed={this.state.collapsed}>
+        <div className="logo"/>
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+          <Menu.Item key="1">
+            <Icon type="user"/>
+            <span>nav 1</span>
+          </Menu.Item>
+          <Menu.Item key="2">
+            <Icon type="video-camera"/>
+            <span>nav 2</span>
+          </Menu.Item>
+          <Menu.Item key="3">
+            <Icon type="upload"/>
+            <span>nav 3</span>
+          </Menu.Item>
+        </Menu>
+      </Sider>
+      <Layout>
+        <Header style={{
+            background: '#fff',
+            padding: 0
+          }}>
+          <Menu onClick={this.handleHeaderClick} mode="horizontal">
+            <Menu.Item key='toggle'>
+              <Icon className="trigger" type={this.state.collapsed
+                  ? 'menu-unfold'
+                  : 'menu-fold'}/>
+            </Menu.Item>
+            <Menu.Item key="search">
+              <Authorized authority={ALL} noMatch={null}>
+                <HeaderSearch placeholder="站内搜索"/>
+              </Authorized>
+            </Menu.Item>
+            <Menu.Item key="doc">
+              <Icon type="question-circle-o"/>
+            </Menu.Item>
+            <Menu.Item>
+              <Authorized authority={ALL} noMatch={null}>
+                <NoticeBar/>
+              </Authorized>
+            </Menu.Item>
+            <Menu.Item key="sign-out">
+              <Authorized authority={ALL} noMatch={null}>
+                <Icon type="logout"/>
+              </Authorized>
+            </Menu.Item>
           </Menu>
         </Header>
-        <Row>
-          <Col xs={{
-              span: 22,
-              offset: 1
-            }} lg={{
-              span: 12,
-              offset: 6
-            }}>
-            <br/>
-            <Switch>
-              {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={show(it)}/>))}
-              <Route component={() => (<Exception type="404"/>)}/>
-            </Switch>
-            <br/>
-          </Col>
-        </Row>
-      </Content>
-      <Footer/>
+        <Content style={{
+            margin: '24px 16px',
+            padding: 24,
+            background: '#fff',
+            minHeight: 360
+          }}>
+          <Switch>
+            {routes.map((it, id) => (<Route key={it.path} exact={true} path={it.path} component={show(it)}/>))}
+            <Route component={() => (<Exception type="404"/>)}/>
+          </Switch>
+        </Content>
+        <Footer/>
+      </Layout>
     </Layout>)
   }
 }
@@ -85,7 +156,8 @@ Widget.propTypes = {
   intl: intlShape.isRequired,
   title: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
-  signIn: PropTypes.func.isRequired
+  signIn: PropTypes.func.isRequired,
+  signOut: PropTypes.func.isRequired
 }
 
-export default connect(state => ({title: state.pageTitle, user: state.currentUser}), {push, signIn})(injectIntl(Widget))
+export default connect(state => ({title: state.pageTitle, user: state.currentUser}), {push, signIn, signOut})(injectIntl(Widget))

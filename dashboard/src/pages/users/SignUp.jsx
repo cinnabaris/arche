@@ -18,7 +18,7 @@ class Widget extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client.request(USERS_SIGN_UP, values).then((rst) => {
+        client().request(USERS_SIGN_UP, values).then((rst) => {
           message.info(formatMessage({id: "nut.users.confirm.success"}))
           push('/users/sign-in')
         }).catch(failed)

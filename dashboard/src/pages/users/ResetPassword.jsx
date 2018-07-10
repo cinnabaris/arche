@@ -19,7 +19,7 @@ class Widget extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client.request(USERS_RESET_PASSWORD, {
+        client().request(USERS_RESET_PASSWORD, {
           token: match.params.token,
           password: values.password
         }).then((rst) => {

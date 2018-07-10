@@ -18,7 +18,7 @@ class Widget extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client.request(LEAVE_WORDS_NEW, {
+        client().request(LEAVE_WORDS_NEW, {
           body: values.body,
           mediaType: 'text'
         }).then((rst) => {

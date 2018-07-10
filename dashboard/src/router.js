@@ -1,6 +1,4 @@
-import {ADMIN, MEMBER} from './Authorized'
-
-export const ALL = [ADMIN, MEMBER]
+import {ALL} from './Authorized'
 
 const items = [
   {
@@ -68,6 +66,21 @@ const items = [
 ]
 
 export const routes = items.reduce((ar, it) => {
+  return ar.concat(
+    it.children
+    ? it.children.map((jt) => {
+      return {
+        authority: jt.authority
+          ? jt.authority
+          : it.authority,
+        path: it.path + jt.path,
+        component: jt.component
+      }
+    })
+    : [it])
+}, [])
+
+export const menus = items.filter((it) => it.children).reduce((ar, it) => {
   return ar.concat(
     it.children
     ? it.children.map((jt) => {

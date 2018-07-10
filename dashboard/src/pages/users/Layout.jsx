@@ -1,6 +1,13 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {List, Card, Avatar, Icon} from 'antd'
+import {
+  List,
+  Row,
+  Col,
+  Card,
+  Avatar,
+  Icon
+} from 'antd'
 import {Link} from "react-router-dom"
 import {FormattedMessage} from 'react-intl'
 
@@ -39,15 +46,28 @@ class Widget extends Component {
       ]
     }
   }
+  goHome = () => {
+    window.open("/", "_blank")
+  }
   render() {
     const {children, title} = this.props
-    return (<Card title={(<FormattedMessage id={title}/>)} extra={(<a href="/" target="_blank"><Icon type="home"/></a>)}>
-      {children}
-      <List bordered={true} size="small" itemLayout="horizontal" dataSource={this.state.items} renderItem={it => (<List.Item><List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={(<Link to={it.to}><FormattedMessage id={it.label}/></Link>)}/></List.Item>)}/>
-      <Header title={{
-          id: title
-        }}/>
-    </Card>)
+    return (<Row>
+      <Col xs={{
+          span: 22,
+          offset: 1
+        }} lg={{
+          span: 12,
+          offset: 6
+        }}>
+        <Card title={(<FormattedMessage id={title}/>)} extra={(<Icon onClick={this.goHome} type="home"/>)}>
+          {children}
+          <List bordered={true} size="small" itemLayout="horizontal" dataSource={this.state.items} renderItem={it => (<List.Item><List.Item.Meta avatar={(<Avatar icon={it.icon}/>)} description={(<Link to={it.to}><FormattedMessage id={it.label}/></Link>)}/></List.Item>)}/>
+          <Header title={{
+              id: title
+            }}/>
+        </Card>
+      </Col>
+    </Row>)
   }
 }
 

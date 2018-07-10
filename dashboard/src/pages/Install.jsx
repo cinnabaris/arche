@@ -18,7 +18,7 @@ class Widget extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client.request(INSTALL, values).then((rst) => {
+        client().request(INSTALL, values).then((rst) => {
           message.info(formatMessage({id: "flashes.success"}))
           push('/users/sign-in')
         }).catch(failed)

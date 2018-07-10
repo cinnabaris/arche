@@ -20,7 +20,7 @@ class Widget extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client.request(USERS_SIGN_IN, values).then((rst) => {
+        client().request(USERS_SIGN_IN, values).then((rst) => {
           var token = rst.signInUserByEmail.token
           message.info(formatMessage({id: "flashes.success"}))
           localStorage.setItem(TOKEN, token)
