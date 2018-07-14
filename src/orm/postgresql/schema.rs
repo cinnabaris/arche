@@ -38,6 +38,92 @@ table! {
 }
 
 table! {
+    caring_managers (id) {
+        id -> Int8,
+        topic_id -> Int8,
+        user_id -> Int8,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
+    caring_members (id) {
+        id -> Int8,
+        nick_name -> Varchar,
+        real_name -> Varchar,
+        phone -> Nullable<Varchar>,
+        email -> Nullable<Varchar>,
+        address -> Nullable<Varchar>,
+        line -> Nullable<Varchar>,
+        wechat -> Nullable<Varchar>,
+        weibo -> Nullable<Varchar>,
+        facebook -> Nullable<Varchar>,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    caring_posts (id) {
+        id -> Int8,
+        topic_id -> Int8,
+        member_id -> Int8,
+        who -> Varchar,
+        method -> Varchar,
+        address -> Varchar,
+        progress -> Int2,
+        timezone -> Varchar,
+        remind -> Nullable<Varchar>,
+        date -> Date,
+        begin -> Time,
+        end -> Time,
+        body -> Text,
+        media_type -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    caring_posts_members (id) {
+        id -> Int8,
+        post_id -> Int8,
+        member_id -> Int8,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
+    caring_tags (id) {
+        id -> Int8,
+        name -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    caring_topics (id) {
+        id -> Int8,
+        member_id -> Int8,
+        title -> Varchar,
+        body -> Text,
+        media_type -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    caring_topics_tags (id) {
+        id -> Int8,
+        topic_id -> Int8,
+        tag_id -> Int8,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
     forum_badges (id) {
         id -> Int8,
         body -> Text,
@@ -308,6 +394,13 @@ allow_tables_to_appear_in_same_query!(
     ar_internal_metadata,
     attachments,
     cards,
+    caring_managers,
+    caring_members,
+    caring_posts,
+    caring_posts_members,
+    caring_tags,
+    caring_topics,
+    caring_topics_tags,
     forum_badges,
     forum_categories,
     forum_posts,
