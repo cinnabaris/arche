@@ -16,6 +16,79 @@ use super::super::super::super::{
 use super::super::{consumers, dao};
 use super::models::SignIn;
 
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ChangeUserPassword {
+    pub current_password: String,
+    #[validate(length(min = "6", max = "32"))]
+    pub new_password: String,
+}
+
+impl ChangeUserPassword {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        let user = ctx.current_user()?;
+        let password = users::dsl::users
+            .select(users::dsl::password)
+            .filter(users::dsl::id.eq(&user.id))
+            .first::<Option<Vec<u8>>>(db)?;
+        if let Some(password) = password {
+            if utils::hash::verify(&password, self.current_password.as_bytes()) {
+                db.transaction::<_, Error, _>(|| {
+                    dao::user::set_password(db, &user.id, &self.new_password)?;
+                    l!(
+                        db,
+                        &user.id,
+                        &ctx.client_ip,
+                        &ctx.locale,
+                        "nut.logs.user.change-password"
+                    )?;
+                    Ok(())
+                })?;
+
+                return Ok(H::new());
+            }
+        }
+        Err(e!(db, &ctx.locale, "nut.errors.user.bad-password"))
+    }
+}
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct UpdateUserProfile {
+    #[validate(length(min = "1"))]
+    pub logo: String,
+    #[validate(length(min = "1"))]
+    pub name: String,
+}
+
+impl UpdateUserProfile {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        let user = ctx.current_user()?;
+        let now = Utc::now().naive_utc();
+        db.transaction::<_, Error, _>(|| {
+            let it = users::dsl::users.filter(users::dsl::id.eq(&user.id));
+            update(it)
+                .set((
+                    users::dsl::name.eq(&self.name),
+                    users::dsl::logo.eq(&self.logo),
+                    users::dsl::updated_at.eq(&now),
+                ))
+                .execute(db)?;
+            l!(
+                db,
+                &user.id,
+                &ctx.client_ip,
+                &ctx.locale,
+                "nut.logs.user.update-profile"
+            )?;
+            Ok(())
+        })?;
+        Ok(H::new())
+    }
+}
+
 pub fn sign_out_user(ctx: &Context) -> Result<H> {
     let it = ctx.current_user()?;
     l!(
@@ -135,11 +208,22 @@ impl ResetUserPassword {
         self.validate()?;
         let uid = parse_token(&ctx.app.jwt, &self.token, ACT_RESET_PASSWORD)?;
         let db = ctx.db.deref();
-        let id = users::dsl::users
-            .select(users::dsl::id)
-            .filter(users::dsl::uid.eq(&uid))
-            .first::<i64>(db)?;
-        dao::user::set_password(db, &id, &self.password)?;
+
+        db.transaction::<_, Error, _>(|| {
+            let id = users::dsl::users
+                .select(users::dsl::id)
+                .filter(users::dsl::uid.eq(&uid))
+                .first::<i64>(db)?;
+            dao::user::set_password(db, &id, &self.password)?;
+            l!(
+                db,
+                &id,
+                &ctx.client_ip,
+                &ctx.locale,
+                "nut.logs.user.change-password"
+            )?;
+            Ok(())
+        })?;
         Ok(H::new())
     }
 }

@@ -17,3 +17,13 @@ macro_rules! t {
         ::i18n::t($d, $l, &$c.to_string(), $a)
     };
 }
+
+#[macro_export]
+macro_rules! e {
+    ($d:expr, $l:expr, $c:expr) => {
+        e!($d, $l, $c, &None::<String>)
+    };
+    ($d:expr, $l:expr, $c:expr, $a:expr) => {
+        t!($d, $l, &$c.to_string(), $a).into()
+    };
+}

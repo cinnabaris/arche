@@ -7,6 +7,7 @@ import {ConnectedRouter, routerReducer, routerMiddleware} from 'react-router-red
 import {addLocaleData, IntlProvider} from 'react-intl'
 import {Route} from "react-router"
 import {LocaleProvider} from 'antd'
+import 'moment-timezone'
 
 import './main.css';
 import reducers from './reducers'

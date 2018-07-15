@@ -114,7 +114,7 @@ pub fn add_by_email(
             users::dsl::provider_type.eq(&format!("{}", Type::Email)),
             users::dsl::provider_id.eq(email),
             users::dsl::uid.eq(&uid),
-            users::dsl::logo.eq(&uid),
+            users::dsl::logo.eq(&gravatar_logo(email)),
             users::dsl::sign_in_count.eq(0),
             users::dsl::updated_at.eq(&now),
             users::dsl::created_at.eq(&now),

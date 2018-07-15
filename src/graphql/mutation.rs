@@ -13,6 +13,18 @@ graphql_object!(
                 message: message,
             })
         }
+        field updateUserProfile(&executor, name: String, logo: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::mutation::UpdateUserProfile{
+                name: name,
+                logo: logo,
+            })
+        }
+        field changeUserPassword(&executor, current_password: String, new_password: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::mutation::ChangeUserPassword{
+                current_password: current_password,
+                new_password: new_password,
+            })
+        }
         field signOutUser(&executor) -> FieldResult<H> {
             ge!(nut::graphql::mutation::sign_out_user(executor.context()))
         }

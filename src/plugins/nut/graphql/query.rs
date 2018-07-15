@@ -11,9 +11,23 @@ use super::super::super::super::{
     rfc::Utc as ToUtc,
 };
 use super::{
-    models::{Locale, Log},
+    models::{Locale, Log, Profile},
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
 };
+
+pub fn get_user_profile(ctx: &Context) -> Result<Profile> {
+    let user = ctx.current_user()?;
+    let db = ctx.db.deref();
+    let (name, email, logo) = users::dsl::users
+        .select((users::dsl::name, users::dsl::email, users::dsl::logo))
+        .filter(users::dsl::id.eq(&user.id))
+        .first::<(String, String, String)>(db)?;
+    Ok(Profile {
+        name: name,
+        email: email,
+        logo: logo,
+    })
+}
 
 pub fn list_log(ctx: &Context) -> Result<Vec<Log>> {
     let user = ctx.current_user()?;

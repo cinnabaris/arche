@@ -23,6 +23,8 @@ attributes:
   email:                   邮箱
   password:                密码
   password-confirmation:   密码确认
+  current-password:        当前密码
+  new-password:            新密码
   title:                   标题
   subhead:                 副标题
   keywords:                关键字
@@ -30,6 +32,10 @@ attributes:
   copyright:               版权信息
   content:                 内容
   body:                    正文
+  ip:                      IP地址
+  message:                 消息
+  createdAt:               创建时间
+  updatedAt:               修改时间
 validations:
   email:                   不是正确的邮件地址
   required:                不能为空
@@ -91,12 +97,18 @@ nut:
       not-locked:          账户没有被锁定
       bad-password:        密码错误
     database-not-empty:    数据库非空
+  attributes:
+    user:
+      logo:                头像
   logs:
     user:
       sign-in:             用户登录
       sign-out:            注销登录
       sign-up:             账户注册
       confirm:             激活账户
+      update-profile:      更新个人信息
+      change-password:     修改密码
+      reset-password:      重置密码
     role:
       apply:               应用权限{{name}}@{{type}}/{{id}}?ttl={{ttl}}
       deny:                禁止权限{{name}}@{{type}}/{{id}}

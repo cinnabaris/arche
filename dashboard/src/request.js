@@ -4,6 +4,35 @@ import moment from 'moment'
 
 import {TOKEN} from './Authorized'
 
+export const USERS_CHANGE_PASSWORD = `mutation form($currentPassword: String!, $newPassword: String!){
+  changeUserPassword(currentPassword: $currentPassword, newPassword: $newPassword) {
+    createdAt
+  }
+}`
+
+export const USERS_PROFILE_GET = `query info{
+  getUserProfile {
+    name,
+    logo,
+    email
+  }
+}`
+
+export const USERS_PROFILE_SET = `mutation info($name: String!, $logo: String!){
+  updateUserProfile(name: $name, logo: $logo) {
+    createdAt
+  }
+}`
+
+export const USERS_LOGS = `query logs{
+  listUserLog {
+    id,
+    ip,
+    message,
+    createdAt
+  }
+}`
+
 export const LEAVE_WORDS_NEW = `mutation form($mediaType: String!, $body: String!){
   createLeaveWord(mediaType: $mediaType, body: $body) {
     createdAt
