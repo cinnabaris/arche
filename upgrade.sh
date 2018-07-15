@@ -2,7 +2,8 @@
 
 set -e
 
-rustup update
+# rustup update
+rustup override set nightly-2018-07-11
 cargo update
 cargo clean
 rustup component add rls-preview rust-analysis rust-src rustfmt-preview
