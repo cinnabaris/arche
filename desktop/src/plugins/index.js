@@ -8,6 +8,6 @@ Vue.use(VueRouter)
 
 const routes = [].concat(nut).concat(forum)
 
-const router = new VueRouter({routes})
+const router = new VueRouter({mode: 'history', base: '/my/', routes})
 
 export default router
