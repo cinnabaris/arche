@@ -43,7 +43,7 @@ pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
 }
 
 pub fn catchers() -> Vec<Catcher> {
-    errors![not_found, forbidden, internal_server_error]
+    catchers![not_found, forbidden, internal_server_error]
 }
 
 #[get("/global/<file..>")]
@@ -178,17 +178,17 @@ fn rss_atom(db: Db, home: Home, lang: String) -> Result<Xml<Vec<u8>>> {
     Ok(Xml(buf))
 }
 
-#[error(404)]
+#[catch(404)]
 fn not_found() -> &'static str {
     Status::NotFound.reason
 }
 
-#[error(403)]
+#[catch(403)]
 fn forbidden() -> &'static str {
     Status::Forbidden.reason
 }
 
-#[error(500)]
+#[catch(500)]
 fn internal_server_error() -> &'static str {
     Status::InternalServerError.reason
 }
