@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {injectIntl, intlShape} from 'react-intl'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import {push} from 'connected-react-router'
 import {message} from 'antd'
 import {withRouter} from 'react-router-dom'
 

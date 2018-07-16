@@ -1,4 +1,4 @@
-import {ALL} from './Authorized'
+import {ALL, ADMIN} from './Authorized'
 
 const items = [
   {
@@ -64,6 +64,22 @@ const items = [
         component: () => import ('./pages/users/ChangePassword'),
         label: {
           id: 'nut.users.change-password.title'
+        }
+      }
+    ]
+  }, {
+    path: '/admin',
+    icon: 'setting',
+    label: {
+      id: 'nut.admin.dashboard.title'
+    },
+    authority: [ADMIN],
+    children: [
+      {
+        path: "/locales",
+        component: () => import ('./pages/admin/locales/Index'),
+        label: {
+          id: 'nut.admin.locales.index.title'
         }
       }
     ]

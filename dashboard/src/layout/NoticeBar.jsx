@@ -5,7 +5,7 @@ import moment from 'moment'
 import {Tag} from 'antd'
 import groupBy from 'lodash/groupBy'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import {push} from 'connected-react-router'
 
 class Widget extends Component {
   constructor(props) {

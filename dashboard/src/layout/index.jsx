@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import {push} from 'connected-react-router'
 import Exception from 'ant-design-pro/lib/Exception'
 import {Route} from "react-router"
 import {Icon, Layout, Menu, message, Modal} from 'antd'

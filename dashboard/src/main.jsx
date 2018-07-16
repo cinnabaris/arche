@@ -1,9 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {createStore, combineReducers, applyMiddleware} from 'redux'
+import {createStore, compose, applyMiddleware} from 'redux'
 import {Provider} from 'react-redux'
-import createHistory from 'history/createBrowserHistory'
-import {ConnectedRouter, routerReducer, routerMiddleware} from 'react-router-redux'
+import {createBrowserHistory} from 'history'
+import {connectRouter, routerMiddleware, ConnectedRouter} from 'connected-react-router'
 import {addLocaleData, IntlProvider} from 'react-intl'
 import {Route} from "react-router"
 import {LocaleProvider} from 'antd'
@@ -19,12 +19,12 @@ const main = (id) => {
   const user = detectLocale()
   addLocaleData(user.data)
 
-  const history = createHistory({basename: '/my'})
-  const middleware = routerMiddleware(history)
-  const store = createStore(combineReducers({
-    ...reducers,
-    router: routerReducer
-  }), applyMiddleware(middleware))
+  const history = createBrowserHistory({basename: '/my/'})
+  // const middleware = routerMiddleware(history)
+  // const store = createStore(combineReducers({
+  //   ...reducers
+  // }), applyMiddleware(middleware))
+  const store = createStore(connectRouter(history)(...reducers), {}, compose(applyMiddleware(routerMiddleware(history))))
 
   client().request(LIST_LOCALES_BY_LANG, {lang: user.locale}).then((rst) => {
     user.messages = rst.listLocalesByLang.reduce((ar, it) => {

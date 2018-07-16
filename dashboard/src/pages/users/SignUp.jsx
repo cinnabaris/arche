@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
 import {connect} from 'react-redux'
-import {push} from 'react-router-redux'
+import {push} from 'connected-react-router'
 import {Form, Input, message} from 'antd'
 
 import {Submit, formItemLayout} from '../../components/form'
