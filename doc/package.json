@@ -1,0 +1,18 @@
+{
+  "name": "pro-lite",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "documents of Pro-Lite api",
+  "repository": {
+    "type": "git",
+    "url": "eas@107.185.71.46:~/pl.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "swagger-ui-dist": "^3.17.4"
+  },
+  "license": "MIT"
+}
