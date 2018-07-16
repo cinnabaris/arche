@@ -18,6 +18,8 @@ site:
   copyright:               版权信息
 buttons:
   submit:                  提交
+  new:                     新增
+  edit:                    编辑
 attributes:
   username:                用户名
   email:                   邮箱
@@ -74,6 +76,12 @@ nut:
     new:
       title:               给我们留言
       body-helper:         请留下联系方式以便我们回复
+  admin:
+    dashboard:
+      title:               站点设置
+    locales:
+      index:
+        title:             国际化
   emails:
     user:
       confirm:
