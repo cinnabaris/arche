@@ -10,7 +10,6 @@
   "dependencies": {
     "element-ui": "^2.4.4",
     "js-cookie": "^2.2.0",
-    "material-design-icons-iconfont": "^3.0.3",
     "vue": "^2.5.16",
     "vue-i18n": "^8.0.0",
     "vue-router": "^3.0.1",
