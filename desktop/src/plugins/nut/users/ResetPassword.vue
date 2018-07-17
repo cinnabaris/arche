@@ -1,6 +1,5 @@
 <template>
-<application-layout>
-  <document-title :title="title" />
+<application-layout :title="title">
   <el-card :header="title">
     <el-form :rules="rules" ref="form" :model="form" label-width="80px">
       <el-form-item :label="$t('attributes.password')" prop="password">

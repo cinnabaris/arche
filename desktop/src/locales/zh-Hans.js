@@ -25,11 +25,24 @@ export default {
     password: '密码长度应该在6位和32位之间',
     'password-confirmation': '两次密码输入不一致'
   },
+  errors: {
+    forbidden: {
+      title: '禁止的访问',
+      button: '返回登录'
+    },
+    'not-found': {
+      title: '页面不存在',
+      button: '返回主页'
+    }
+  },
   nut: {
     install: {
       title: '初始化安装'
     },
     users: {
+      'logs': {
+        title: '日志'
+      },
       'sign-in': {
         title: '现有用户登录'
       },

@@ -16,10 +16,11 @@ const store = new Vuex.Store({
         if (moment().isBetween(moment.unix(it.nbf), moment.unix(it.exp))) {
           state.currentUser = {
             uid: it.uid,
-            admin: it.admin
+            groups: it.groups
           }
         }
       } catch (e) {
+        // eslint-disable-next-line
         console.error(e)
       }
     },
