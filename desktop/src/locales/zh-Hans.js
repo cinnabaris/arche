@@ -15,7 +15,9 @@ export default {
     email: '电子邮箱',
     username: '用户名',
     password: '密码',
-    'password-confirmation': '密码确认'
+    'password-confirmation': '密码确认',
+    body: '正文',
+    content: '内容'
   },
   validations: {
     email: '不是正确的邮件地址',
@@ -29,18 +31,24 @@ export default {
     },
     users: {
       'sign-in': {
-        title: '登录'
+        title: '现有用户登录'
       },
       'sign-up': {
         title: '新用户注册'
       },
       'confirm': {
         title: '没有收到激活邮件？',
-        success: '激活成功，请继续登录。'
+        success: '你将会收到一封激活邮件',
+        token: {
+          success: '激活成功，请继续登录。'
+        }
       },
       'unlock': {
         title: '没有收到解锁邮件？',
-        success: '解锁成功，请继续登录。'
+        success: '你将会收到一封解锁邮件',
+        token: {
+          success: '解锁成功，请继续登录。'
+        }
       },
       'forgot-password': {
         title: '忘记密码？',

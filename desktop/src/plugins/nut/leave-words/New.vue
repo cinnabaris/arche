@@ -3,11 +3,8 @@
   <document-title :title="title" />
   <el-card :header="title">
     <el-form :rules="rules" ref="form" :model="form" label-width="80px">
-      <el-form-item :label="$t('attributes.email')" prop="email">
-        <el-input v-model="form.email" clearable required/>
-      </el-form-item>
-      <el-form-item :label="$t('attributes.password')" prop="password">
-        <el-input type="password" v-model="form.password" clearable auto-complete="off" />
+      <el-form-item :label="$t('attributes.content')" prop="body">
+        <el-input type='textarea' v-model="form.body" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('form')">{{$t('buttons.submit')}}</el-button>
@@ -20,38 +17,25 @@
 </template>
 
 <script>
-import SharedLinks from './SharedLinks'
+import SharedLinks from '../users/SharedLinks'
 import {
   client,
   failed
 } from '@/request'
-import {
-  setToken
-} from '@/utils'
 
 export default {
-  name: 'UsersSignIn',
+  name: 'NewLeaveWord',
   components: {
     'shared-links': SharedLinks
   },
   data() {
     return {
-      title: this.$t('nut.users.sign-in.title'),
+      title: this.$t('nut.leave-words.new.title'),
       form: {
-        name: '',
-        password: ''
+        body: ''
       },
       rules: {
-        email: [{
-          required: true,
-          message: this.$t('validations.required'),
-          trigger: ['blur', 'change']
-        }, {
-          type: 'email',
-          message: this.$t('validations.email'),
-          trigger: ['blur', 'change']
-        }],
-        password: [{
+        body: [{
           required: true,
           message: this.$t('validations.required'),
           trigger: ['blur', 'change']
@@ -63,24 +47,19 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          client().request(`mutation form($email: String!, $password: String!){
-            signInUserByEmail(email: $email, password: $password) {
-              token
+          client().request(`mutation form($mediaType: String!, $body: String!){
+            createLeaveWord(mediaType: $mediaType, body: $body) {
+              createdAt
             }
           }`, {
-            email: this.form.email,
-            password: this.form.password
-          }).then((rst) => {
+            body: this.form.body,
+            mediaType: 'text'
+          }).then(() => {
             this.$message({
               type: 'success',
               message: this.$t("flashes.success")
             })
-            var token = rst.signInUserByEmail.token
-            setToken(token)
-            this.$store.commit('signIn', token)
-            this.$router.push({
-              name: 'users.logs'
-            })
+            this.form.body = ' '
           }).catch(failed)
         } else {
           return false;

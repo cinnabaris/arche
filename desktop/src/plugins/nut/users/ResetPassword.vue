@@ -3,12 +3,6 @@
   <document-title :title="title" />
   <el-card :header="title">
     <el-form :rules="rules" ref="form" :model="form" label-width="80px">
-      <el-form-item :label="$t('attributes.username')" prop="name">
-        <el-input v-model="form.name" clearable required/>
-      </el-form-item>
-      <el-form-item :label="$t('attributes.email')" prop="email">
-        <el-input v-model="form.email" clearable required/>
-      </el-form-item>
       <el-form-item :label="$t('attributes.password')" prop="password">
         <el-input type="password" v-model="form.password" clearable auto-complete="off" />
       </el-form-item>
@@ -33,7 +27,7 @@ import {
 } from '@/request'
 
 export default {
-  name: 'UsersSignUp',
+  name: 'UsersResetPassword',
   components: {
     'shared-links': SharedLinks
   },
@@ -46,28 +40,12 @@ export default {
       }
     };
     return {
-      title: this.$t('nut.users.sign-up.title'),
+      title: this.$t('nut.users.reset-password.title'),
       form: {
-        email: '',
-        name: '',
         password: '',
         passwordConfirmation: ''
       },
       rules: {
-        name: [{
-          required: true,
-          message: this.$t('validations.required'),
-          trigger: ['blur', 'change']
-        }],
-        email: [{
-          required: true,
-          message: this.$t('validations.required'),
-          trigger: ['blur', 'change']
-        }, {
-          type: 'email',
-          message: this.$t('validations.email'),
-          trigger: ['blur', 'change']
-        }],
         password: [{
           required: true,
           message: this.$t('validations.required'),
@@ -93,18 +71,17 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          client().request(`mutation form($name: String!, $email: String!, $password: String!){
-              signUpUser(name: $name, email: $email, password: $password) {
-                createdAt
-              }
-            }`, {
-            name: this.form.name,
-            email: this.form.email,
+          client().request(`mutation form($token: String!, $password: String!){
+            resetUserPassword(token: $token, password: $password) {
+              createdAt
+            }
+          }`, {
+            token: this.$route.params.token,
             password: this.form.password
           }).then(() => {
             this.$message({
               type: 'success',
-              message: this.$t("nut.users.confirm.success")
+              message: this.$t("nut.users.reset-password.success")
             })
             this.$router.push({
               name: 'users.sign-in'
