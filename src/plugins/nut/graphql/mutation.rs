@@ -183,7 +183,7 @@ impl SignInUserByEmail {
                             &mut json!({
                                 UID: uid,
                                 ACT: ACT_SIGN_IN,
-                                "admin": dao::policy::is(db, &id, &dao::role::Type::Admin),
+                                "groups": dao::policy::groups(db, &id)?,
                             }),
                             Duration::days(7),
                         )?,

@@ -12,6 +12,36 @@ use super::super::super::super::{
 };
 use super::role::Type as RoleType;
 
+pub fn groups(db: &Db, user: &i64) -> Result<Vec<String>> {
+    let today = Utc::now().naive_utc().date();
+    let mut items = Vec::new();
+    for (rid, nbf, exp) in policies::dsl::policies
+        .select((
+            policies::dsl::role_id,
+            policies::dsl::nbf,
+            policies::dsl::exp,
+        ))
+        .filter(policies::dsl::user_id.eq(&user))
+        .load::<(i64, NaiveDate, NaiveDate)>(db)?
+    {
+        if today.ge(&nbf) && today.le(&exp) {
+            let (name, rty, rid) = roles::dsl::roles
+                .select((
+                    roles::dsl::name,
+                    roles::dsl::resource_type,
+                    roles::dsl::resource_id,
+                ))
+                .filter(roles::dsl::id.eq(&rid))
+                .first::<(String, Option<String>, Option<i64>)>(db)?;
+            if None == rty && None == rid {
+                items.push(name);
+            }
+        }
+    }
+
+    Ok(items)
+}
+
 pub fn is(db: &Db, user: &i64, role: &RoleType) -> bool {
     can(db, user, role, &None, &None)
 }
