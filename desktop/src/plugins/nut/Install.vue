@@ -101,7 +101,7 @@ export default {
             name: this.form.name,
             email: this.form.email,
             password: this.form.password
-          }).then((rst) => {
+          }).then(() => {
             this.$message({
               type: 'success',
               message: this.$t("flashes.success")

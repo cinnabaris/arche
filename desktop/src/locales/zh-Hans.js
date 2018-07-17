@@ -35,13 +35,20 @@ export default {
         title: '新用户注册'
       },
       'confirm': {
-        title: '没有收到激活邮件？'
+        title: '没有收到激活邮件？',
+        success: '激活成功，请继续登录。'
       },
       'unlock': {
-        title: '没有收到解锁邮件？'
+        title: '没有收到解锁邮件？',
+        success: '解锁成功，请继续登录。'
       },
       'forgot-password': {
-        title: '忘记密码？'
+        title: '忘记密码？',
+        success: '您将会收到一封重置密码邮件。'
+      },
+      'reset-password': {
+        title: '重置密码',
+        success: '密码重置成功，请继续登录。'
       }
     },
     'leave-words': {
