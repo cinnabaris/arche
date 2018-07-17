@@ -4,6 +4,14 @@ const TOKEN = 'token'
 
 const LOCALE = 'locale'
 
+export const getToken = () => {
+  return localStorage.getItem(TOKEN)
+}
+
+export const setToken = (token) => {
+  localStorage.setItem(TOKEN, token)
+}
+
 export const getLocale = () => {
   return localStorage.getItem(LOCALE) || Cookies.get(LOCALE) || 'en-US'
 }

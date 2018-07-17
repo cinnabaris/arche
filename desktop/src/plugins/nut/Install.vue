@@ -26,14 +26,14 @@
 </template>
 
 <script>
-import SharedLinks from './SharedLinks'
+import SharedLinks from './users/SharedLinks'
 import {
   client,
   failed
 } from '@/request'
 
 export default {
-  name: 'UsersSignUp',
+  name: 'Install',
   components: {
     'shared-links': SharedLinks
   },
@@ -46,7 +46,7 @@ export default {
       }
     };
     return {
-      title: this.$t('nut.users.sign-up.title'),
+      title: this.$t('nut.install.title'),
       form: {
         email: '',
         name: '',
@@ -94,10 +94,10 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           client().request(`mutation form($name: String!, $email: String!, $password: String!){
-              signUpUser(name: $name, email: $email, password: $password) {
-                createdAt
-              }
-            }`, {
+            install(name: $name, email: $email, password: $password) {
+              createdAt
+            }
+          }`, {
             name: this.form.name,
             email: this.form.email,
             password: this.form.password

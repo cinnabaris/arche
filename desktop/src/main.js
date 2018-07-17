@@ -1,5 +1,6 @@
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import 'element-ui/lib/theme-chalk/index.css'
+// https://ant.design/docs/spec/download-cn
+import './assets/font_148784_y7rvx0pkve2buik9/iconfont.css'
 
 import Vue from 'vue'
 import ElementUI from 'element-ui'
