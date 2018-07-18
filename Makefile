@@ -4,7 +4,7 @@ build: api www
 	cd $(dist) && tar cfJ ../$(dist).tar.xz *
 
 api:
-	cargo build --release
+	GIT_HEAD=`git rev-parse --short HEAD` BUILD_TIME=`date -R` cargo build --release
 	strip -s target/release/arche
 	mkdir -p $(dist)/public $(dist)/tmp
 	-cp -r target/release/arche templates themes log4rs.yml package.json package-lock.json LICENSE README.md $(dist)/

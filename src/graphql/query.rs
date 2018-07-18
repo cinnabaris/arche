@@ -1,14 +1,14 @@
 use juniper::{self, FieldResult};
 
-use super::super::{env::VERSION, plugins::nut};
+use super::super::{env, plugins::nut};
 use super::{context::Context, H};
 
 pub struct Query;
 
 graphql_object!(Query: Context |&self| {
 
-    field apiVersion() -> &str {
-        VERSION
+    field apiVersion() -> String {
+        env::version()
     }
 
     //--------------------nut-----------------------

@@ -46,7 +46,7 @@ pub fn main() -> Result<()> {
         );
 
     let matches = clap::App::new(env::NAME)
-        .version(env::VERSION)
+        .version(&env::version()[..])
         .author(env::AUTHORS)
         .about(env::DESCRIPTION)
         .before_help(env::BANNER)
