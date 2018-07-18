@@ -1,6 +1,21 @@
 use super::super::super::super::super::oauth::{self, Oauth as OauthUrl};
 
 #[derive(GraphQLObject, Debug, Deserialize, Serialize)]
+pub struct Status {
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(GraphQLObject, Debug, Deserialize, Serialize)]
+pub struct Info {
+    pub title: String,
+    pub subhead: String,
+    pub keywords: String,
+    pub description: String,
+    pub copyright: String,
+}
+
+#[derive(GraphQLObject, Debug, Deserialize, Serialize)]
 pub struct Author {
     pub name: String,
     pub email: String,

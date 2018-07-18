@@ -10,6 +10,13 @@ use super::{
     orm::{schema::locales, Connection as Db},
 };
 
+pub fn languages(db: &Db) -> Result<Vec<String>> {
+    Ok(locales::dsl::locales
+        .select(locales::dsl::lang)
+        .distinct()
+        .load::<String>(db)?)
+}
+
 pub fn get(db: &Db, lang: &String, code: &String) -> Result<String> {
     let msg = locales::dsl::locales
         .select(locales::dsl::message)

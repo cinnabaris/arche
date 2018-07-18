@@ -27,6 +27,12 @@ export default {
     content: '内容',
     id: 'ID',
     ip: 'IP地址',
+    name: '名称',
+    title: '标题',
+    subhead: '副标题',
+    keywords: '关键字',
+    description: '说明信息',
+    copyright: '版权信息',
     createdAt: '创建时间',
     updatedAt: '修改时间'
   },
@@ -58,6 +64,40 @@ export default {
     admin: {
       dashboard: {
         title: '站点参数'
+      },
+      site: {
+        status: {
+          title: '当前状态',
+          os: '操作系统',
+          app: '应用'
+        },
+        info: {
+          title: '基本信息'
+        },
+        author: {
+          title: '作者信息'
+        },
+        seo: {
+          title: '搜索引擎'
+        },
+        smtp: {
+          title: '邮件发送'
+        }
+      },
+      'friend-links': {
+        index: {
+          title: '友情链接'
+        }
+      },
+      'links': {
+        index: {
+          title: '导航链接'
+        }
+      },
+      'cards': {
+        index: {
+          title: '卡片内容'
+        }
       },
       locales: {
         index: {
@@ -139,7 +179,7 @@ export default {
   },
   shop: {
     dashboard: {
-      title: '电子商城'
+      title: '网上商城'
     }
   },
   caring: {

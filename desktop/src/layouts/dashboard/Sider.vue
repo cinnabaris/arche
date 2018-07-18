@@ -55,8 +55,32 @@ export default {
           icon: 'setting',
           label: 'nut.admin.dashboard.title',
           children: [{
+            label: 'nut.admin.site.status.title',
+            to: 'admin.site.status'
+          }, {
+            label: 'nut.admin.site.info.title',
+            to: 'admin.site.info'
+          }, {
+            label: 'nut.admin.site.author.title',
+            to: 'admin.site.author'
+          }, {
+            label: 'nut.admin.site.seo.title',
+            to: 'admin.site.seo'
+          }, {
+            label: 'nut.admin.site.smtp.title',
+            to: 'admin.site.smtp'
+          }, {
             label: 'nut.admin.locales.index.title',
             to: 'admin.locales.index'
+          }, {
+            label: 'nut.admin.friend-links.index.title',
+            to: 'admin.friend-links.index'
+          }, {
+            label: 'nut.admin.links.index.title',
+            to: 'admin.links.index'
+          }, {
+            label: 'nut.admin.cards.index.title',
+            to: 'admin.cards.index'
           }]
         })
       }

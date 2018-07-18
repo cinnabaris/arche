@@ -7,6 +7,22 @@ pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        field updateSiteAuthor(&executor, name: String, email: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::site::mutation::UpdateAuthor{
+                name: name,
+                email: email,
+            })
+        }
+        field updateSiteInfo(&executor, title: String, subhead:String, keywords:String, description:String, copyright:String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::site::mutation::UpdateInfo{
+                title: title,
+                subhead: subhead,
+                keywords: keywords,
+                description: description,
+                copyright: copyright,
+            })
+        }
+
         field removeLocale(&executor, id: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::locales::Remove{
                 id: id,

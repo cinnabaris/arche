@@ -17,6 +17,9 @@ import Home from './Home'
 
 import AdminLocalesIndex from './admin/locales/Index'
 import AdminLocalesForm from './admin/locales/Form'
+import AdminSiteStatus from './admin/site/Status'
+import AdminSiteInfo from './admin/site/Info'
+import AdminSiteAuthor from './admin/site/Author'
 
 export default[
   {
@@ -27,6 +30,18 @@ export default[
     name: 'install',
     path: '/install',
     component: Install
+  }, {
+    name: 'admin.site.status',
+    path: '/admin/site/status',
+    component: AdminSiteStatus
+  }, {
+    name: 'admin.site.info',
+    path: '/admin/site/info',
+    component: AdminSiteInfo
+  }, {
+    name: 'admin.site.author',
+    path: '/admin/site/author',
+    component: AdminSiteAuthor
   }, {
     name: 'admin.locales.index',
     path: '/admin/locales',
