@@ -5,6 +5,8 @@
 <script>
 import moment from 'moment-timezone'
 
+const TZ = moment.tz.guess()
+
 export default {
   name: 'Timestamp',
   props: {
@@ -12,7 +14,7 @@ export default {
   },
   computed: {
     date() {
-      return moment(this.value).tz(moment.tz.guess()).format('llll zz')
+      return moment(this.value).tz(TZ).format('llll zz')
     }
   }
 }
