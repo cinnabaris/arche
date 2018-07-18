@@ -11,9 +11,17 @@ const store = new Vuex.Store({
     siderBar: {
       show: true,
       active: null
+    },
+    siteInfo: {
+      title: '',
+      subhead: '',
+      copyright: ''
     }
   },
   mutations: {
+    refresh(state, info) {
+      state.siteInfo = info
+    },
     selectSiderBar(state, key) {
       state.siderBar.active = key
     },
