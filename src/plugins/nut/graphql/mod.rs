@@ -1,3 +1,5 @@
-pub mod models;
-pub mod mutation;
-pub mod query;
+pub mod home;
+pub mod leave_words;
+pub mod locales;
+pub mod site;
+pub mod users;

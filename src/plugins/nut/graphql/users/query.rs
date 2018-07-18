@@ -4,48 +4,18 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use validator::Validate;
 
-use super::super::super::super::{
+use super::super::super::super::super::{
     errors::Result,
     graphql::{context::Context, H},
     orm::schema::*,
     rfc::Utc as ToUtc,
 };
 use super::{
-    models::{Locale, Log, Profile},
+    models::{Log, Profile},
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
 };
 
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct GetLocale {
-    #[validate(length(min = "1"))]
-    pub code: String,
-}
-
-impl GetLocale {
-    pub fn call(&self, ctx: &Context) -> Result<Locale> {
-        self.validate()?;
-        let db = ctx.db.deref();
-        let (id, message, updated_at) = locales::dsl::locales
-            .select((
-                locales::dsl::id,
-                locales::dsl::message,
-                locales::dsl::updated_at,
-            ))
-            .filter(locales::dsl::lang.eq(&ctx.locale))
-            .filter(locales::dsl::code.eq(&self.code))
-            .first::<(i64, String, NaiveDateTime)>(db)?;
-
-        Ok(Locale {
-            id: id.to_string(),
-            lang: ctx.locale.clone(),
-            code: self.code.clone(),
-            message: message.clone(),
-            updated_at: updated_at.to_utc(),
-        })
-    }
-}
-
-pub fn get_user_profile(ctx: &Context) -> Result<Profile> {
+pub fn get_profile(ctx: &Context) -> Result<Profile> {
     let user = ctx.current_user()?;
     let db = ctx.db.deref();
     let (name, email, logo) = users::dsl::users
@@ -85,12 +55,12 @@ pub fn list_log(ctx: &Context) -> Result<Vec<Log>> {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct ForgotUserPassword {
+pub struct ForgotPassword {
     #[validate(length(min = "2", max = "64"))]
     pub email: String,
 }
 
-impl ForgotUserPassword {
+impl ForgotPassword {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let db = ctx.db.deref();
@@ -113,12 +83,12 @@ impl ForgotUserPassword {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct UnlockUser {
+pub struct Unlock {
     #[validate(length(min = "2", max = "64"))]
     pub email: String,
 }
 
-impl UnlockUser {
+impl Unlock {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let db = ctx.db.deref();
@@ -145,12 +115,12 @@ impl UnlockUser {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct ConfirmUser {
+pub struct Confirm {
     #[validate(length(min = "2", max = "64"))]
     pub email: String,
 }
 
-impl ConfirmUser {
+impl Confirm {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let db = ctx.db.deref();
@@ -173,41 +143,5 @@ impl ConfirmUser {
             &uid,
         )?;
         Ok(H::new())
-    }
-}
-
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-#[graphql(description = "Query locales by lang")]
-pub struct ListLocaleByLang {
-    #[validate(length(min = "2", max = "8"))]
-    pub lang: String,
-}
-
-impl ListLocaleByLang {
-    pub fn call(&self, ctx: &Context) -> Result<Vec<Locale>> {
-        self.validate()?;
-        let db = ctx.db.deref();
-        let items = locales::dsl::locales
-            .select((
-                locales::dsl::id,
-                locales::dsl::lang,
-                locales::dsl::code,
-                locales::dsl::message,
-                locales::dsl::updated_at,
-            ))
-            .order(locales::dsl::code.asc())
-            .filter(locales::dsl::lang.eq(&self.lang))
-            .load::<(i64, String, String, String, NaiveDateTime)>(db)?;
-
-        Ok(items
-            .iter()
-            .map(|(i, l, c, m, u)| Locale {
-                id: i.to_string(),
-                lang: l.clone(),
-                code: c.clone(),
-                message: m.clone(),
-                updated_at: u.to_utc(),
-            })
-            .collect())
     }
 }

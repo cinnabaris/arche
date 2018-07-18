@@ -1,11 +1,11 @@
 use std::ops::Deref;
 
 use chrono::{Duration, NaiveDateTime, Utc};
-use diesel::{delete, insert_into, prelude::*, update, Connection};
+use diesel::{prelude::*, update, Connection};
 use rocket::http::Status;
 use validator::Validate;
 
-use super::super::super::super::{
+use super::super::super::super::super::{
     errors::{Error, Result},
     graphql::{context::Context, ACT, H, UID},
     i18n,
@@ -13,18 +13,18 @@ use super::super::super::super::{
     orm::{schema::*, Connection as Db},
     queue, utils,
 };
-use super::super::{consumers, dao};
+use super::super::super::{consumers, dao};
 use super::models::SignIn;
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ChangeUserPassword {
+pub struct ChangePassword {
     pub current_password: String,
     #[validate(length(min = "6", max = "32"))]
     pub new_password: String,
 }
 
-impl ChangeUserPassword {
+impl ChangePassword {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let db = ctx.db.deref();
@@ -54,14 +54,14 @@ impl ChangeUserPassword {
     }
 }
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct UpdateUserProfile {
+pub struct UpdateProfile {
     #[validate(length(min = "1"))]
     pub logo: String,
     #[validate(length(min = "1"))]
     pub name: String,
 }
 
-impl UpdateUserProfile {
+impl UpdateProfile {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let db = ctx.db.deref();
@@ -89,7 +89,7 @@ impl UpdateUserProfile {
     }
 }
 
-pub fn sign_out_user(ctx: &Context) -> Result<H> {
+pub fn sign_out(ctx: &Context) -> Result<H> {
     let it = ctx.current_user()?;
     l!(
         ctx.db.deref(),
@@ -102,38 +102,14 @@ pub fn sign_out_user(ctx: &Context) -> Result<H> {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct CreateLeaveWord {
-    #[validate(length(min = "1"))]
-    pub media_type: String,
-    #[validate(length(min = "1"))]
-    pub body: String,
-}
-
-impl CreateLeaveWord {
-    pub fn call(&self, ctx: &Context) -> Result<H> {
-        self.validate()?;
-        let db = ctx.db.deref();
-        let now = Utc::now().naive_utc();
-        insert_into(leave_words::dsl::leave_words)
-            .values((
-                leave_words::dsl::media_type.eq(&self.media_type),
-                leave_words::dsl::body.eq(&self.body),
-                leave_words::dsl::created_at.eq(&now),
-            ))
-            .execute(db)?;
-        Ok(H::new())
-    }
-}
-
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct SignInUserByEmail {
+pub struct SignInByEmail {
     #[validate(length(min = "1"))]
     pub email: String,
     #[validate(length(min = "6", max = "32"))]
     pub password: String,
 }
 
-impl SignInUserByEmail {
+impl SignInByEmail {
     pub fn call(&self, ctx: &Context) -> Result<SignIn> {
         self.validate()?;
         let db = ctx.db.deref();
@@ -196,14 +172,14 @@ impl SignInUserByEmail {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct ResetUserPassword {
+pub struct ResetPassword {
     #[validate(length(min = "1"))]
     pub token: String,
     #[validate(length(min = "6", max = "32"))]
     pub password: String,
 }
 
-impl ResetUserPassword {
+impl ResetPassword {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let uid = parse_token(&ctx.app.jwt, &self.token, ACT_RESET_PASSWORD)?;
@@ -229,12 +205,12 @@ impl ResetUserPassword {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct UnlockUser {
+pub struct Unlock {
     #[validate(length(min = "1"))]
     pub token: String,
 }
 
-impl UnlockUser {
+impl Unlock {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let uid = parse_token(&ctx.app.jwt, &self.token, ACT_UNLOCK)?;
@@ -259,12 +235,12 @@ impl UnlockUser {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct ConfirmUser {
+pub struct Confirm {
     #[validate(length(min = "1"))]
     pub token: String,
 }
 
-impl ConfirmUser {
+impl Confirm {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let uid = parse_token(&ctx.app.jwt, &self.token, ACT_CONFIRM)?;
@@ -296,7 +272,7 @@ fn parse_token(jwt: &Jwt, token: &String, action: &'static str) -> Result<String
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct Install {
+pub struct SignUp {
     #[validate(length(min = "1", max = "32"))]
     pub name: String,
     #[validate(email, length(min = "2", max = "64"))]
@@ -305,63 +281,7 @@ pub struct Install {
     pub password: String,
 }
 
-impl Install {
-    pub fn call(&self, ctx: &Context) -> Result<H> {
-        self.validate()?;
-        let db = ctx.db.deref();
-        db.transaction::<_, Error, _>(|| {
-            if dao::user::count(db)? > 0 {
-                return Err(t!(db, &ctx.locale, "nut.errors.database-not-empty").into());
-            }
-            let (user, _) = dao::user::add_by_email(db, &self.name, &self.email, &self.password)?;
-            l!(
-                db,
-                &user,
-                &ctx.client_ip,
-                &ctx.locale,
-                "nut.logs.user.sign-up"
-            )?;
-            dao::user::confirm(db, &user)?;
-            l!(
-                db,
-                &user,
-                &ctx.client_ip,
-                &ctx.locale,
-                "nut.logs.user.confirm"
-            )?;
-            for it in vec![dao::role::Type::Admin, dao::role::Type::Root] {
-                let ttl = Duration::weeks(1 << 12);
-                dao::policy::apply(db, &user, &it, &None, &None, ttl)?;
-                l!(
-                    db,
-                    &user,
-                    &ctx.client_ip,
-                    &ctx.locale,
-                    "nut.logs.role.apply",
-                    &Some(json!({
-                            "name":format!("{}", it),
-                            "type": None::<String>,
-                            "id": None::<i64>,
-                            "ttl": format!("{}", ttl)
-                        }))
-                )?;
-            }
-            Ok(H::new())
-        })
-    }
-}
-
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct SignUpUser {
-    #[validate(length(min = "1", max = "32"))]
-    pub name: String,
-    #[validate(email, length(min = "2", max = "64"))]
-    pub email: String,
-    #[validate(length(min = "6", max = "32"))]
-    pub password: String,
-}
-
-impl SignUpUser {
+impl SignUp {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
         let db = ctx.db.deref();
@@ -434,7 +354,7 @@ pub fn send_email(
 
 // https://developers.line.me/en/docs/line-login/web/integrate-line-login/
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct SignInUserByLine {
+pub struct SignInByLine {
     #[validate(length(min = "2", max = "8"))]
     pub lang: String,
     #[validate(length(min = "1", max = "255"))]
@@ -443,46 +363,10 @@ pub struct SignInUserByLine {
     pub message: String,
 }
 
-impl SignInUserByLine {
+impl SignInByLine {
     pub fn call(&self, _ctx: &Context) -> Result<String> {
         self.validate()?;
         // TODO
         Ok("".to_string())
-    }
-}
-
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct RemoveLocale {
-    #[validate(length(min = "1"))]
-    pub id: String,
-}
-
-impl RemoveLocale {
-    pub fn call(&self, ctx: &Context) -> Result<H> {
-        self.validate()?;
-        let id: i64 = self.id.parse()?;
-        ctx.admin()?;
-        let db = ctx.db.deref();
-        let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
-        delete(it).execute(db)?;
-        Ok(H::new())
-    }
-}
-
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct UpdateLocale {
-    #[validate(length(min = "1", max = "255"))]
-    pub code: String,
-    #[validate(length(min = "1"))]
-    pub message: String,
-}
-
-impl UpdateLocale {
-    pub fn call(&self, ctx: &Context) -> Result<H> {
-        self.validate()?;
-        ctx.admin()?;
-        let db = ctx.db.deref();
-        i18n::set(db, &ctx.locale, &self.code, &self.message)?;
-        Ok(H::new())
     }
 }

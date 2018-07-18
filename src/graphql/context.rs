@@ -12,7 +12,7 @@ use super::super::{
     orm::{schema::users, PooledConnection as Db},
     plugins::nut::{
         dao::{policy as policy_dao, role::Type as RoleType},
-        graphql::mutation::ACT_SIGN_IN,
+        graphql::users::mutation::ACT_SIGN_IN,
     },
 };
 

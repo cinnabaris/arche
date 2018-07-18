@@ -12,34 +12,34 @@ graphql_object!(Query: Context |&self| {
     }
 
     //--------------------nut-----------------------
-    field getLocale(&executor, code: String) -> FieldResult<nut::graphql::models::Locale> {
-        gq!(executor, nut::graphql::query::GetLocale{code: code})
+
+    field getLocale(&executor, code: String) -> FieldResult<nut::graphql::locales::Locale> {
+        gq!(executor, nut::graphql::locales::Get{code: code})
     }
-    field listLocaleByLang(&executor, lang: String) -> FieldResult<Vec<nut::graphql::models::Locale>> {
-        gq!(executor, nut::graphql::query::ListLocaleByLang{lang: lang})
+    field listLocaleByLang(&executor, lang: String) -> FieldResult<Vec<nut::graphql::locales::Locale>> {
+        gq!(executor, nut::graphql::locales::ListByLang{lang: lang})
     }
-    field getUserProfile(&executor) -> FieldResult<nut::graphql::models::Profile> {
-        ge!(nut::graphql::query::get_user_profile(executor.context()))
+
+    field getUserProfile(&executor) -> FieldResult<nut::graphql::users::models::Profile> {
+        ge!(nut::graphql::users::query::get_profile(executor.context()))
     }
-    field listUserLog(&executor) -> FieldResult<Vec<nut::graphql::models::Log>> {
-        ge!(nut::graphql::query::list_log(executor.context()))
+    field listUserLog(&executor) -> FieldResult<Vec<nut::graphql::users::models::Log>> {
+        ge!(nut::graphql::users::query::list_log(executor.context()))
     }
     field forgotUserPassword(&executor, email:String) -> FieldResult<H> {
-        gq!(executor, nut::graphql::query::ForgotUserPassword{
+        gq!(executor, nut::graphql::users::query::ForgotPassword{
             email: email.to_lowercase(),
         })
     }
     field unlockUser(&executor, email:String) -> FieldResult<H> {
-        gq!(executor, nut::graphql::query::UnlockUser{
+        gq!(executor, nut::graphql::users::query::Unlock{
             email: email.to_lowercase(),
         })
     }
     field confirmUser(&executor, email:String) -> FieldResult<H> {
-        gq!(executor, nut::graphql::query::ConfirmUser{
+        gq!(executor, nut::graphql::users::query::Confirm{
             email: email.to_lowercase(),
         })
     }
-
-    //--------------------forum--------------------
 
 });
