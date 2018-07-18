@@ -20,7 +20,11 @@ export default {
     password: '密码',
     'password-confirmation': '密码确认',
     body: '正文',
-    content: '内容'
+    content: '内容',
+    id: 'ID',
+    ip: 'IP地址',
+    createdAt: '创建时间',
+    updatedAt: '修改时间'
   },
   validations: {
     email: '不是正确的邮件地址',

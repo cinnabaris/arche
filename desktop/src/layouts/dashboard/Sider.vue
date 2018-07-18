@@ -1,11 +1,11 @@
 <template>
-<el-menu :collapse="$store.state.siderBar" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+<el-menu @select="handleSelect" :default-active="$store.state.siderBar.active" :collapse="!$store.state.siderBar.show" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
   <el-submenu :key="it.label" v-for="it in menus" :index="it.label">
     <template slot="title">
         <icon-font :name="it.icon"/>&nbsp;
         <span>{{$t(it.label)}}</span>
       </template>
-    <el-menu-item :key="jt.to" v-for="jt in it.children" :index="it.label+'-'+jt.label">
+    <el-menu-item :key="it.label+'-'+jt.label" v-for="jt in it.children" :index="jt.to">
       {{$t(jt.label)}}
     </el-menu-item>
   </el-submenu>
@@ -25,6 +25,14 @@ import {
 
 export default {
   name: 'Sider',
+  methods: {
+    handleSelect(key) {
+      this.$store.commit('selectSiderBar', key)
+      this.$router.push({
+        name: key
+      })
+    }
+  },
   computed: {
     menus() {
       var user = this.$store.state.currentUser

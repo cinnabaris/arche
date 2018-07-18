@@ -8,13 +8,17 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     currentUser: null,
-    siderBar: false
+    siderBar: {
+      show: true,
+      active: null
+    }
   },
   mutations: {
+    selectSiderBar(state, key) {
+      state.siderBar.active = key
+    },
     toggleSiderBar(state) {
-      state.siderBar = state.siderBar
-        ? false
-        : true
+      state.siderBar.show = !state.siderBar.show
     },
     signIn(state, token) {
       try {

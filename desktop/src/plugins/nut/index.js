@@ -1,4 +1,6 @@
 import UsersLogs from './users/Logs'
+import UsersProfile from './users/Profile'
+import UsersChangePassword from './users/ChangePassword'
 import UsersSignIn from './users/SignIn'
 import UsersSignUp from './users/SignUp'
 import UsersConfirm from './users/Confirm'
@@ -22,6 +24,14 @@ export default[
     name: 'install',
     path: '/install',
     component: Install
+  }, {
+    name: 'users.profile',
+    path: '/users/profile',
+    component: UsersProfile
+  }, {
+    name: 'users.change-password',
+    path: '/users/change-password',
+    component: UsersChangePassword
   }, {
     name: 'users.logs',
     path: '/users/logs',

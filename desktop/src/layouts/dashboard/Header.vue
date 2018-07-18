@@ -1,7 +1,7 @@
 <template>
 <el-menu mode="horizontal" @select="handleSelect">
   <el-menu-item index="sider-bar">
-    <icon-font :name="$store.state.siderBar ? 'menu-fold' : 'menu-unfold'" />
+    <icon-font :name="$store.state.siderBar.show ? 'menu-unfold' : 'menu-fold'" />
   </el-menu-item>
   <el-menu-item index="go-home">
     <icon-font name='home' />

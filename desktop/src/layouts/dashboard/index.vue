@@ -8,11 +8,9 @@
       <header-bar />
     </el-header>
     <el-main>
+      <document-title :title="title" />
       <el-row>
-        <el-col :md="{offset:8, span:8}" :sm="{span: 24}">
-          <document-title :title="title" />
-          <slot/>
-        </el-col>
+        <slot/>
       </el-row>
     </el-main>
     <layout-footer/>
@@ -40,12 +38,18 @@ export default {
   props: {
     role: String,
     title: String,
+    init: Function
   },
   created() {
     if (!this.$store.state.currentUser) {
       var token = getToken()
       if (token) {
         this.$store.commit('signIn', token)
+      }
+    }
+    if (check(this.$store.state.currentUser, this.role)) {
+      if (this.init) {
+        this.init()
       }
     }
   },
