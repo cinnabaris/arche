@@ -8,6 +8,9 @@ export default {
     success: '操作成功',
     info: '提示信息'
   },
+  'are-you-sure': {
+    delete: '您确定要删除{id}么？'
+  },
   buttons: {
     submit: "提交",
     reset: '重置',
@@ -91,20 +94,24 @@ export default {
           title: '友情链接'
         }
       },
-      'links': {
+      'leave-words': {
+        index: {
+          title: '留言板'
+        }
+      },
+      links: {
         index: {
           title: '导航链接'
         }
       },
-      'cards': {
+      cards: {
         index: {
           title: '卡片内容'
         }
       },
       locales: {
         index: {
-          title: '国际化',
-          'are-you-sure': "你确定要删除{code}么?"
+          title: '国际化'
         }
       }
     },

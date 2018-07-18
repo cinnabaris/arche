@@ -81,6 +81,9 @@ export default {
           }, {
             label: 'nut.admin.cards.index.title',
             to: 'admin.cards.index'
+          }, {
+            label: 'nut.admin.leave-words.index.title',
+            to: 'admin.leave-words.index'
           }]
         })
       }

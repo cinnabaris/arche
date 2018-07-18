@@ -12,6 +12,10 @@ graphql_object!(Query: Context |&self| {
     }
 
     //--------------------nut-----------------------
+    field listLeaveWord(&executor) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
+        ge!(nut::graphql::leave_words::list(executor.context()))
+    }
+
     field getSiteSmtp(&executor) -> FieldResult<nut::graphql::site::models::Smtp> {
         ge!(nut::graphql::site::query::smtp(executor.context()))
     }

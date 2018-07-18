@@ -49,6 +49,11 @@ graphql_object!(
             })
         }
 
+        field removeLeaveWord(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::leave_words::Remove{
+                id: id,
+            })
+        }
         field createLeaveWord(&executor, media_type: String, body: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::leave_words::Create{
                 media_type: media_type,

@@ -15,6 +15,7 @@ import NewLeaveWord from './leave-words/New'
 import Install from './Install'
 import Home from './Home'
 
+import AdminLeaveWordsIndex from './admin/leave-words/Index'
 import AdminLocalesIndex from './admin/locales/Index'
 import AdminLocalesForm from './admin/locales/Form'
 import AdminSiteStatus from './admin/site/Status'
@@ -52,6 +53,10 @@ export default[
     name: 'admin.site.smtp',
     path: '/admin/site/smtp',
     component: AdminSiteSmtp
+  }, {
+    name: 'admin.leave-words.index',
+    path: '/admin/leave-words',
+    component: AdminLeaveWordsIndex
   }, {
     name: 'admin.locales.index',
     path: '/admin/locales',
