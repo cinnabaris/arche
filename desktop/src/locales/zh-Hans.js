@@ -19,6 +19,8 @@ export default {
     username: '用户名',
     password: '密码',
     'password-confirmation': '密码确认',
+    'current-password': '当前密码',
+    'new-password': '新密码',
     body: '正文',
     content: '内容',
     id: 'ID',
@@ -101,6 +103,11 @@ export default {
     'leave-words': {
       new: {
         title: '给我们留言'
+      }
+    },
+    attributes: {
+      user: {
+        logo: '头像'
       }
     }
   },
