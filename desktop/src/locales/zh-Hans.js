@@ -5,11 +5,14 @@ export default {
     "zh-Hant": "繁體中文"
   },
   flashes: {
-    success: '操作成功'
+    success: '操作成功',
+    info: '提示信息'
   },
   buttons: {
     submit: "提交",
-    reset: '重置'
+    reset: '重置',
+    ok: '确定',
+    cancel: '取消'
   },
   attributes: {
     email: '电子邮箱',
@@ -35,11 +38,30 @@ export default {
       button: '返回主页'
     }
   },
+  header: {
+    'sign-out': {
+      confirm: '你确定要注销登录么？'
+    }
+  },
   nut: {
     install: {
       title: '初始化安装'
     },
+    admin: {
+      dashboard: {
+        title: '站点参数'
+      }
+    },
     users: {
+      dashboard: {
+        title: '账户信息'
+      },
+      profile: {
+        title: '个人信息'
+      },
+      'change-password': {
+        title: '修改密码'
+      },
       'logs': {
         title: '日志'
       },
@@ -75,6 +97,63 @@ export default {
     'leave-words': {
       new: {
         title: '给我们留言'
+      }
+    }
+  },
+  forum: {
+    dashboard: {
+      title: '交流论坛'
+    }
+  },
+  cbeta: {
+    dashboard: {
+      title: '电子书'
+    }
+  },
+  pos: {
+    dashboard: {
+      title: 'POS系统'
+    }
+  },
+  shop: {
+    dashboard: {
+      title: '电子商城'
+    }
+  },
+  caring: {
+    dashboard: {
+      title: '会员关怀'
+    }
+  },
+  library: {
+    dashboard: {
+      title: '图书馆'
+    }
+  },
+  hotel: {
+    dashboard: {
+      title: '住宿管理'
+    }
+  },
+  todo: {
+    dashboard: {
+      title: '任务管理'
+    }
+  },
+  donate: {
+    dashboard: {
+      title: '捐赠项目'
+    }
+  },
+  ops: {
+    vpn: {
+      dashboard: {
+        title: 'VPN系统'
+      }
+    },
+    email: {
+      dashboard: {
+        title: 'EMAIL系统'
       }
     }
   }

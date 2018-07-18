@@ -7,9 +7,15 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    currentUser: null
+    currentUser: null,
+    siderBar: false
   },
   mutations: {
+    toggleSiderBar(state) {
+      state.siderBar = state.siderBar
+        ? false
+        : true
+    },
     signIn(state, token) {
       try {
         var it = jwtDecode(token);

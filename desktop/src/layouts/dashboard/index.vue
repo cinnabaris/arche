@@ -1,10 +1,12 @@
 <template>
-<el-container class="min-height:100%;" v-if="allow">
+<el-container style="min-height: 100%;" v-if="allow">
   <el-aside>
     <sider-bar/>
   </el-aside>
   <el-container>
-    <el-header>header</el-header>
+    <el-header>
+      <header-bar />
+    </el-header>
     <el-main>
       <el-row>
         <el-col :md="{offset:8, span:8}" :sm="{span: 24}">
@@ -23,6 +25,7 @@
 <script>
 import Footer from '../Footer'
 import Sider from './Sider'
+import Header from './Header'
 
 import {
   getToken
@@ -49,6 +52,7 @@ export default {
   components: {
     'layout-footer': Footer,
     'sider-bar': Sider,
+    'header-bar': Header,
   },
   computed: {
     allow() {

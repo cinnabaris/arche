@@ -21,7 +21,7 @@ export default {
         to: 'users.sign-up',
         label: 'nut.users.sign-up.title'
       }, {
-        icon: 'retweet',
+        icon: 'key',
         to: 'users.forgot-password',
         label: 'nut.users.forgot-password.title'
       }, {
