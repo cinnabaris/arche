@@ -12,14 +12,20 @@ graphql_object!(Query: Context |&self| {
     }
 
     //--------------------nut-----------------------
+    field getSiteSmtp(&executor) -> FieldResult<nut::graphql::site::models::Smtp> {
+        ge!(nut::graphql::site::query::smtp(executor.context()))
+    }
+    field getSiteSeo(&executor) -> FieldResult<nut::graphql::site::models::Seo> {
+        ge!(nut::graphql::site::query::seo(executor.context()))
+    }
     field getSiteAuthor(&executor) -> FieldResult<nut::graphql::site::models::Author> {
-        ge!(nut::graphql::site::query::get_author(executor.context()))
+        ge!(nut::graphql::site::query::author(executor.context()))
     }
     field getSiteInfo(&executor) -> FieldResult<nut::graphql::site::models::Info> {
-        ge!(nut::graphql::site::query::get_info(executor.context()))
+        ge!(nut::graphql::site::query::info(executor.context()))
     }
     field getSiteStatus(&executor) -> FieldResult<Vec<nut::graphql::site::models::Status>> {
-        ge!(nut::graphql::site::query::get_status(executor.context()))
+        ge!(nut::graphql::site::query::status(executor.context()))
     }
 
     field getLocale(&executor, code: String) -> FieldResult<nut::graphql::locales::Locale> {

@@ -7,6 +7,20 @@ pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        field updateSiteSmtp(&executor, host: String, port: i32, user: String, password:String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::site::mutation::UpdateSmtp{
+                host: host,
+                port: port,
+                user: user,
+                password: password,
+            })
+        }
+        field updateSiteSeo(&executor, google: String, baidu: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::site::mutation::UpdateSeo{
+                google: google,
+                baidu: baidu,
+            })
+        }
         field updateSiteAuthor(&executor, name: String, email: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::site::mutation::UpdateAuthor{
                 name: name,

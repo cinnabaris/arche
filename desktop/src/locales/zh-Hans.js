@@ -26,6 +26,8 @@ export default {
     body: '正文',
     content: '内容',
     id: 'ID',
+    host: '主机',
+    port: '端口',
     ip: 'IP地址',
     name: '名称',
     title: '标题',
@@ -159,6 +161,13 @@ export default {
       },
       locale: {
         code: '代码'
+      },
+      seo: {
+        google: '谷歌网站ID',
+        baidu: '百度网站ID'
+      },
+      smtp: {
+        user: '发送者'
       }
     }
   },

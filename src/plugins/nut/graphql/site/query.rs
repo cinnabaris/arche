@@ -3,14 +3,36 @@ use std::ops::Deref;
 use super::super::super::super::super::{
     env, errors::Result, graphql::context::Context, i18n, settings, sys,
 };
-use super::models::{Author, Info, Status};
+use super::super::super::consumers::send_mail::Config as SmtpConfig;
+use super::models::{Author, Info, Seo, Smtp, Status};
 
-pub fn get_author(ctx: &Context) -> Result<Author> {
+pub fn smtp(ctx: &Context) -> Result<Smtp> {
+    ctx.admin()?;
+    let db = ctx.db.deref();
+    let it: SmtpConfig = settings::get(db, &ctx.app.encryptor, &"site.smtp".to_string())?;
+    Ok(Smtp {
+        host: it.host,
+        port: it.port as i32,
+        user: it.user,
+        password: "".to_string(),
+    })
+}
+
+pub fn seo(ctx: &Context) -> Result<Seo> {
+    ctx.admin()?;
+    let db = ctx.db.deref();
+    Ok(Seo {
+        google: settings::get(db, &ctx.app.encryptor, &"site.seo.google".to_string())?,
+        baidu: settings::get(db, &ctx.app.encryptor, &"site.seo.baidu".to_string())?,
+    })
+}
+
+pub fn author(ctx: &Context) -> Result<Author> {
     let db = ctx.db.deref();
     settings::get(db, &ctx.app.encryptor, &"site.author".to_string())
 }
 
-pub fn get_info(ctx: &Context) -> Result<Info> {
+pub fn info(ctx: &Context) -> Result<Info> {
     let db = ctx.db.deref();
     Ok(Info {
         title: t!(db, &ctx.locale, "site.title"),
@@ -21,7 +43,7 @@ pub fn get_info(ctx: &Context) -> Result<Info> {
     })
 }
 
-pub fn get_status(ctx: &Context) -> Result<Vec<Status>> {
+pub fn status(ctx: &Context) -> Result<Vec<Status>> {
     ctx.admin()?;
     let db = ctx.db.deref();
 

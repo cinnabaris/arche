@@ -20,6 +20,8 @@ import AdminLocalesForm from './admin/locales/Form'
 import AdminSiteStatus from './admin/site/Status'
 import AdminSiteInfo from './admin/site/Info'
 import AdminSiteAuthor from './admin/site/Author'
+import AdminSiteSeo from './admin/site/Seo'
+import AdminSiteSmtp from './admin/site/Smtp'
 
 export default[
   {
@@ -42,6 +44,14 @@ export default[
     name: 'admin.site.author',
     path: '/admin/site/author',
     component: AdminSiteAuthor
+  }, {
+    name: 'admin.site.seo',
+    path: '/admin/site/seo',
+    component: AdminSiteSeo
+  }, {
+    name: 'admin.site.smtp',
+    path: '/admin/site/smtp',
+    component: AdminSiteSmtp
   }, {
     name: 'admin.locales.index',
     path: '/admin/locales',

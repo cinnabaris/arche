@@ -8,7 +8,72 @@ use super::super::super::super::super::{
     graphql::{context::Context, H},
     i18n, settings,
 };
+use super::super::super::consumers::send_mail::Config as SmtpConfig;
 use super::models::Author;
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateSmtp {
+    pub host: String,
+    pub port: i32,
+    pub user: String,
+    pub password: String,
+}
+
+impl UpdateSmtp {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        ctx.admin()?;
+        let db = ctx.db.deref();
+        settings::set(
+            db,
+            &ctx.app.encryptor,
+            &"site.smtp".to_string(),
+            &SmtpConfig {
+                host: self.host.clone(),
+                port: self.port as u16,
+                user: self.user.clone(),
+                password: self.password.clone(),
+            },
+            true,
+        )?;
+        Ok(H::new())
+    }
+}
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateSeo {
+    pub google: String,
+    pub baidu: String,
+}
+
+impl UpdateSeo {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        ctx.admin()?;
+        let db = ctx.db.deref();
+        db.transaction::<_, Error, _>(|| {
+            settings::set(
+                db,
+                &ctx.app.encryptor,
+                &"site.seo.google".to_string(),
+                &self.google,
+                false,
+            )?;
+            settings::set(
+                db,
+                &ctx.app.encryptor,
+                &"site.seo.baidu".to_string(),
+                &self.baidu,
+                false,
+            )?;
+            Ok(())
+        })?;
+
+        Ok(H::new())
+    }
+}
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
