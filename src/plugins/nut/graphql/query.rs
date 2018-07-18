@@ -15,6 +15,36 @@ use super::{
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
 };
 
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct GetLocale {
+    #[validate(length(min = "1"))]
+    pub code: String,
+}
+
+impl GetLocale {
+    pub fn call(&self, ctx: &Context) -> Result<Locale> {
+        self.validate()?;
+        let db = ctx.db.deref();
+        let (id, message, updated_at) = locales::dsl::locales
+            .select((
+                locales::dsl::id,
+                locales::dsl::message,
+                locales::dsl::updated_at,
+            ))
+            .filter(locales::dsl::lang.eq(&ctx.locale))
+            .filter(locales::dsl::code.eq(&self.code))
+            .first::<(i64, String, NaiveDateTime)>(db)?;
+
+        Ok(Locale {
+            id: id.to_string(),
+            lang: ctx.locale.clone(),
+            code: self.code.clone(),
+            message: message.clone(),
+            updated_at: updated_at.to_utc(),
+        })
+    }
+}
+
 pub fn get_user_profile(ctx: &Context) -> Result<Profile> {
     let user = ctx.current_user()?;
     let db = ctx.db.deref();

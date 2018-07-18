@@ -3,6 +3,7 @@ error_chain!{
         StdIo(::std::io::Error);
         StdSystemTime(::std::time::SystemTimeError);
         StdStrUtf8(::std::str::Utf8Error);
+        StdNumParseInt(::std::num::ParseIntError);
 
         SerdeJson(::serde_json::Error);
         Redis(::redis::RedisError);

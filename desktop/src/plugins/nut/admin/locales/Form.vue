@@ -3,17 +3,15 @@
   <col-form>
     <el-card :header="title">
       <el-form :rules="rules" ref="form" :model="form" label-width="80px">
-        <el-form-item :label="$t('attributes.email')" prop="email">
-          <el-input v-model="form.email" disabled clearable required/>
+        <el-form-item :label="$t('nut.attributes.locale.code')" prop="code">
+          <el-input v-model="form.code" :disabled="this.$route.params.code ? true : false" clearable required/>
         </el-form-item>
-        <el-form-item :label="$t('attributes.username')" prop="name">
-          <el-input v-model="form.name" clearable required/>
-        </el-form-item>
-        <el-form-item :label="$t('nut.attributes.user.logo')" prop="logo">
-          <el-input v-model="form.logo" clearable required/>
+        <el-form-item :label="$t('attributes.content')" prop="message">
+          <el-input type="textarea" v-model="form.message" clearable required/>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('form')">{{$t('buttons.submit')}}</el-button>
+          <el-button @click="go_back">{{$t('buttons.return')}}</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -31,19 +29,18 @@ export default {
   name: 'UsersProfile',
   data() {
     return {
-      title: this.$t("nut.users.profile.title"),
+      title: this.$t("nut.admin.locales.index.title"),
       form: {
-        email: '',
-        name: '',
-        logo: ''
+        code: '',
+        message: '',
       },
       rules: {
-        name: [{
+        code: [{
           required: true,
           message: this.$t('validations.required'),
           trigger: ['blur', 'change']
         }],
-        logo: [{
+        message: [{
           required: true,
           message: this.$t('validations.required'),
           trigger: ['blur', 'change']
@@ -52,21 +49,27 @@ export default {
     }
   },
   methods: {
+    go_back() {
+      this.$router.push({
+        name: 'admin.locales.index'
+      })
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          client().request(`mutation form($name: String!, $logo: String!){
-            updateUserProfile(name: $name, logo: $logo) {
+          client().request(`mutation form($code: String!, $message: String!){
+            updateLocale(code: $code, message: $message) {
               createdAt
             }
           }`, {
-            name: this.form.name,
-            logo: this.form.logo
+            code: this.form.code,
+            message: this.form.message
           }).then(() => {
             this.$message({
               type: 'success',
               message: this.$t("flashes.success")
             })
+            this.go_back()
           }).catch(failed)
         } else {
           return false;
@@ -74,18 +77,20 @@ export default {
       });
     },
     init() {
-      client().request(`query info{
-        getUserProfile {
-          name,
-          logo,
-          email
+      var code = this.$route.params.code
+      if (code) {
+        this.form.code = code
+        client().request(`query info($code: String!){
+        getLocale(code: $code) {
+          message
         }
-      }`, {}).then((rst) => {
-        var ifo = rst.getUserProfile
-        this.form.name = ifo.name
-        this.form.logo = ifo.logo
-        this.form.email = ifo.email
-      }).catch(failed)
+      }`, {
+          code
+        }).then((rst) => {
+          var ifo = rst.getLocale
+          this.form.message = ifo.message
+        }).catch(failed)
+      }
     }
   }
 }

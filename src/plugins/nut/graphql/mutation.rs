@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use chrono::{Duration, NaiveDateTime, Utc};
-use diesel::{insert_into, prelude::*, update, Connection};
+use diesel::{delete, insert_into, prelude::*, update, Connection};
 use rocket::http::Status;
 use validator::Validate;
 
@@ -448,6 +448,24 @@ impl SignInUserByLine {
         self.validate()?;
         // TODO
         Ok("".to_string())
+    }
+}
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct RemoveLocale {
+    #[validate(length(min = "1"))]
+    pub id: String,
+}
+
+impl RemoveLocale {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        let id: i64 = self.id.parse()?;
+        ctx.admin()?;
+        let db = ctx.db.deref();
+        let it = locales::dsl::locales.filter(locales::dsl::id.eq(&id));
+        delete(it).execute(db)?;
+        Ok(H::new())
     }
 }
 

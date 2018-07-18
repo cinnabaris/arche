@@ -7,6 +7,11 @@ pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        field removeLocale(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::mutation::RemoveLocale{
+                id: id,
+            })
+        }
         field updateLocale(&executor, code: String, message: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::mutation::UpdateLocale{
                 code: code,

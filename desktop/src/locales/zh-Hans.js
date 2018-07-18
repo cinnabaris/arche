@@ -12,7 +12,9 @@ export default {
     submit: "提交",
     reset: '重置',
     ok: '确定',
-    cancel: '取消'
+    cancel: '取消',
+    operator: '操作',
+    return: '返回'
   },
   attributes: {
     email: '电子邮箱',
@@ -56,6 +58,12 @@ export default {
     admin: {
       dashboard: {
         title: '站点参数'
+      },
+      locales: {
+        index: {
+          title: '国际化',
+          'are-you-sure': "你确定要删除{code}么?"
+        }
       }
     },
     users: {
@@ -108,6 +116,9 @@ export default {
     attributes: {
       user: {
         logo: '头像'
+      },
+      locale: {
+        code: '代码'
       }
     }
   },

@@ -23,7 +23,8 @@ export default {
   methods: {
     switchLocale(l) {
       setLocale(l)
-      this.$i18n.locale = l
+      // this.$i18n.locale = l
+      location.reload()
     }
   }
 }

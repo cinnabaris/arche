@@ -54,7 +54,10 @@ export default {
         items.push({
           icon: 'setting',
           label: 'nut.admin.dashboard.title',
-          children: []
+          children: [{
+            label: 'nut.admin.locales.index.title',
+            to: 'admin.locales.index'
+          }]
         })
       }
       var forum = {

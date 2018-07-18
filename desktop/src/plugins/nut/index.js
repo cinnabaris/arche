@@ -15,6 +15,9 @@ import NewLeaveWord from './leave-words/New'
 import Install from './Install'
 import Home from './Home'
 
+import AdminLocalesIndex from './admin/locales/Index'
+import AdminLocalesForm from './admin/locales/Form'
+
 export default[
   {
     name: 'home',
@@ -24,6 +27,18 @@ export default[
     name: 'install',
     path: '/install',
     component: Install
+  }, {
+    name: 'admin.locales.index',
+    path: '/admin/locales',
+    component: AdminLocalesIndex
+  }, {
+    name: 'admin.locales.new',
+    path: '/admin/locales/new',
+    component: AdminLocalesForm
+  }, {
+    name: 'admin.locales.edit',
+    path: '/admin/locales/:code/edit',
+    component: AdminLocalesForm
   }, {
     name: 'users.profile',
     path: '/users/profile',
