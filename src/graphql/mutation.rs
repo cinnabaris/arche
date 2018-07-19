@@ -7,6 +7,60 @@ pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        field createFriendLink(&executor, title: String, home: String, logo: String, position: i32) -> FieldResult<H> {
+            gq!(executor, nut::graphql::friend_links::Create{
+                title: title,
+                home: home,
+                logo: logo,
+                position: position,
+            })
+        }
+        field updateFriendLink(&executor, id: String, title: String, home: String, logo: String, position: i32) -> FieldResult<H> {
+            gq!(executor, nut::graphql::friend_links::Update{
+                id: id,
+                title: title,
+                home: home,
+                logo: logo,
+                position: position,
+            })
+        }
+        field removeFriendLink(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::friend_links::Remove{
+                id: id,
+            })
+        }
+
+        field createCard(&executor, title: String, body: String, media_type: String, action: String, href: String, logo: String, loc: String, position: i32) -> FieldResult<H> {
+            gq!(executor, nut::graphql::cards::Create{
+                title: title,
+                body: body,
+                media_type: media_type,
+                action: action,
+                href: href,
+                logo: logo,
+                loc: loc,
+                position: position,
+            })
+        }
+        field updateCard(&executor, id: String, title: String, body: String, media_type: String, action: String, href: String, logo: String, loc: String, position: i32) -> FieldResult<H> {
+            gq!(executor, nut::graphql::cards::Update{
+                id: id,
+                title: title,
+                body: body,
+                media_type: media_type,
+                action: action,
+                href: href,
+                logo: logo,
+                loc: loc,
+                position: position,
+            })
+        }
+        field removeCard(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::cards::Remove{
+                id: id,
+            })
+        }
+
         field createLink(&executor, label: String, href: String, loc: String, x: i32, y: i32) -> FieldResult<H> {
             gq!(executor, nut::graphql::links::Create{
                 label: label,

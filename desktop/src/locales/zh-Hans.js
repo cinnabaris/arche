@@ -42,6 +42,8 @@ export default {
     loc: '位置',
     x: '横轴',
     y: '纵轴',
+    logo: '图标',
+    position: '排序',
     createdAt: '创建时间',
     updatedAt: '修改时间'
   },
@@ -110,7 +112,7 @@ export default {
       },
       cards: {
         index: {
-          title: '卡片内容'
+          title: '卡片区块'
         }
       },
       locales: {
@@ -179,6 +181,9 @@ export default {
       },
       smtp: {
         user: '发送者'
+      },
+      card: {
+        action: '动作'
       }
     }
   },

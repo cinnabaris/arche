@@ -12,6 +12,20 @@ graphql_object!(Query: Context |&self| {
     }
 
     //--------------------nut-----------------------
+    field showFriendLink(&executor, id: String) -> FieldResult<nut::graphql::friend_links::FriendLink> {
+        gq!(executor, nut::graphql::friend_links::Show{id: id})
+    }
+    field listFriendLink(&executor) -> FieldResult<Vec<nut::graphql::friend_links::FriendLink>> {
+        ge!(nut::graphql::friend_links::list(executor.context()))
+    }
+
+    field showCard(&executor, id: String) -> FieldResult<nut::graphql::cards::Card> {
+        gq!(executor, nut::graphql::cards::Show{id: id})
+    }
+    field listCard(&executor) -> FieldResult<Vec<nut::graphql::cards::Card>> {
+        ge!(nut::graphql::cards::list(executor.context()))
+    }
+
     field showLink(&executor, id: String) -> FieldResult<nut::graphql::links::Link> {
         gq!(executor, nut::graphql::links::Show{id: id})
     }

@@ -15,6 +15,10 @@ import NewLeaveWord from './leave-words/New'
 import Install from './Install'
 import Home from './Home'
 
+import AdminFriendLinksIndex from './admin/friend-links/Index'
+import AdminFriendLinksForm from './admin/friend-links/Form'
+import AdminCardsIndex from './admin/cards/Index'
+import AdminCardsForm from './admin/cards/Form'
 import AdminLinksIndex from './admin/links/Index'
 import AdminLinksForm from './admin/links/Form'
 import AdminLeaveWordsIndex from './admin/leave-words/Index'
@@ -55,6 +59,30 @@ export default[
     name: 'admin.site.smtp',
     path: '/admin/site/smtp',
     component: AdminSiteSmtp
+  }, {
+    name: 'admin.friend-links.index',
+    path: '/admin/friend-links',
+    component: AdminFriendLinksIndex
+  }, {
+    name: 'admin.friend-links.new',
+    path: '/admin/friend-links/new',
+    component: AdminFriendLinksForm
+  }, {
+    name: 'admin.friend-links.edit',
+    path: '/admin/friend-links/:id/edit',
+    component: AdminFriendLinksForm
+  }, {
+    name: 'admin.cards.index',
+    path: '/admin/cards',
+    component: AdminCardsIndex
+  }, {
+    name: 'admin.cards.new',
+    path: '/admin/cards/new',
+    component: AdminCardsForm
+  }, {
+    name: 'admin.cards.edit',
+    path: '/admin/cards/:id/edit',
+    component: AdminCardsForm
   }, {
     name: 'admin.links.index',
     path: '/admin/links',

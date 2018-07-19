@@ -1,19 +1,19 @@
 <template>
 <dashboard-layout :title="title" :role="null" :init="init">
   <div style="float: right;">
-    <el-button size="mini" type="primary" @click="()=>this.$router.push({name:'admin.links.new'})" class="el-icon-plus" />
+    <el-button size="mini" type="primary" @click="()=>this.$router.push({name:'admin.cards.new'})" class="el-icon-plus" />
   </div>
   <el-pagination @current-change="setPage" :page-size="size" layout="total, prev, pager, next" :total="items.length" />
   <el-table :data="table" border>
     <el-table-column prop="id" :label="$t('attributes.id')" width="60" />
     <el-table-column :label="$t('attributes.loc')" width="120">
       <template slot-scope="scope">
-        {{scope.row.loc}}({{scope.row.x}},{{scope.row.y}})
+        {{scope.row.loc}}[{{scope.row.position}}]
       </template>
     </el-table-column>
-    <el-table-column :label="$t('attributes.name')">
+    <el-table-column :label="$t('attributes.title')">
       <template slot-scope="scope">
-        <a :href="scope.row.href" target="_blank">{{scope.row.label}}</a>
+        <a :href="scope.row.href" target="_blank">{{scope.row.title}}</a>
       </template>
     </el-table-column>
     <el-table-column fixed="right" :label="$t('buttons.operator')" width="120">
@@ -36,10 +36,10 @@ import {
 import lodash from 'lodash'
 
 export default {
-  name: 'AdminLinksIndex',
+  name: 'AdminCardsIndex',
   data() {
     return {
-      title: this.$t("nut.admin.links.index.title"),
+      title: this.$t("nut.admin.cards.index.title"),
       size: 12,
       page: 1,
       items: []
@@ -54,7 +54,7 @@ export default {
   methods: {
     handleEdit(id) {
       this.$router.push({
-        name: 'admin.links.edit',
+        name: 'admin.cards.edit',
         params: {
           id
         }
@@ -70,7 +70,7 @@ export default {
         center: true
       }).then(() => {
         client().request(`mutation form($id: String!){
-          removeLink(id: $id) {
+          removeCard(id: $id) {
             createdAt
           }
         }`, {
@@ -85,11 +85,11 @@ export default {
     },
     init() {
       client().request(`query list{
-        listLink{
-          id, label, href, loc, x, y
+        listCard{
+          id, title, href, loc, position
         }
       }`, {}).then((rst) => {
-        this.items = rst.listLink
+        this.items = rst.listCard
       }).catch(failed)
     },
     setPage(p) {

@@ -47,9 +47,9 @@ impl Show {
 
         Ok(Link {
             id: self.id.clone(),
-            label: label.clone(),
-            href: href.clone(),
-            loc: loc.clone(),
+            label: label,
+            href: href,
+            loc: loc,
             x: x as i32,
             y: y as i32,
             updated_at: updated_at.to_utc(),
