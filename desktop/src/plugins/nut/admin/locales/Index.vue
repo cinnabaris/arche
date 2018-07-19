@@ -52,7 +52,7 @@ export default {
       })
     },
     handleDelete(id, code) {
-      this.$confirm(this.$t('index.are-you-sure.delete', {
+      this.$confirm(this.$t('are-you-sure.delete', {
         id: code
       }), this.$t('flashes.info'), {
         confirmButtonText: this.$t('buttons.ok'),

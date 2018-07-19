@@ -8,7 +8,11 @@
         <timestamp :value="scope.row.createdAt"/>
       </template>
     </el-table-column>
-    <el-table-column prop="body" :label="$t('attributes.content')" />
+    <el-table-column :label="$t('attributes.content')">
+      <template slot-scope="scope">
+        <pre>{{scope.row.body}}</pre>        
+      </template>
+    </el-table-column>
     <el-table-column fixed="right" :label="$t('buttons.operator')" width="120">
       <template slot-scope="scope">
         <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)" class="el-icon-delete"/>
