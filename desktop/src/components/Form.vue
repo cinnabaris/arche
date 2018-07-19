@@ -1,5 +1,5 @@
 <template>
-<el-col :md="{span:12}" :sm="{span: 24}">
+<el-col :md="{span:16}" :sm="{span: 24}">
   <slot/>
 </el-col>
 </template>

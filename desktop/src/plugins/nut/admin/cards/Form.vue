@@ -7,7 +7,7 @@
           <el-input v-model="form.title" clearable required/>
         </el-form-item>
         <el-form-item :label="$t('attributes.body')" prop="body">
-          <el-input type="textarea" v-model="form.body" clearable required/>
+          <quill-editor v-model="form.body" />
         </el-form-item>
         <el-form-item :label="$t('nut.attributes.card.action')" prop="action">
           <el-input v-model="form.action" clearable required/>
