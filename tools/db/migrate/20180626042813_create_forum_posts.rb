@@ -6,7 +6,6 @@ class CreateForumPosts < ActiveRecord::Migration[5.2]
       t.references :post
       t.text :body, null: false
       t.string :media_type, null: false, limit: 8
-      t.datetime :deleted_at
       t.timestamps
     end
   end
