@@ -18,7 +18,7 @@ nut:
       is-locked:           账户被锁定
       not-locked:          账户没有被锁定
       bad-password:        密码错误
-    database-not-empty:    数据库非空
+    database-not-empty:    数据库非空    
   logs:
     user:
       sign-in:             用户登录

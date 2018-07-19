@@ -11,6 +11,8 @@ graphql_object!(Query: Context |&self| {
         env::version()
     }
 
+    //--------------------forum---------------------
+
     //--------------------nut-----------------------
     field showFriendLink(&executor, id: String) -> FieldResult<nut::graphql::friend_links::FriendLink> {
         gq!(executor, nut::graphql::friend_links::Show{id: id})

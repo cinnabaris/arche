@@ -1,12 +1,72 @@
 use juniper::{self, FieldResult};
 
-use super::super::plugins::nut;
+use super::super::plugins::{forum, nut};
 use super::{context::Context, H};
 
 pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        //-----------------------forum----------------
+        field createTag(&executor, name: String) -> FieldResult<H> {
+            gq!(executor, forum::graphql::tags::Create{
+                name: name,
+            })
+        }
+        field updateTag(&executor, id: String, name: String) -> FieldResult<H> {
+            gq!(executor, forum::graphql::tags::Update{
+                id: id,
+                name: name,
+            })
+        }
+        field removeTag(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, forum::graphql::tags::Remove{
+                id: id,
+            })
+        }
+        field createPost(&executor, topic_id: String, post_id: Option<String>, body: String, media_type: String) -> FieldResult<H> {
+            gq!(executor, forum::graphql::posts::Create{
+                topic_id: topic_id,
+                post_id: post_id,
+                body: body,
+                media_type: media_type,
+            })
+        }
+        field updatePost(&executor, id: String, body: String, media_type: String) -> FieldResult<H> {
+            gq!(executor, forum::graphql::posts::Update{
+                id: id,
+                body: body,
+                media_type: media_type,
+            })
+        }
+        field removePost(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, forum::graphql::posts::Remove{
+                id: id,
+            })
+        }
+        field createTopic(&executor, title: String, body: String, media_type: String, tags: Vec<String>) -> FieldResult<H> {
+            gq!(executor, forum::graphql::topics::Create{
+                title: title,
+                body: body,
+                media_type: media_type,
+                tags: tags,
+            })
+        }
+        field updateTopic(&executor, id: String, title: String, body: String, media_type: String, tags: Vec<String>) -> FieldResult<H> {
+            gq!(executor, forum::graphql::topics::Update{
+                id: id,
+                title: title,
+                body: body,
+                media_type: media_type,
+                tags: tags,
+            })
+        }
+        field removeTopic(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, forum::graphql::topics::Remove{
+                id: id,
+            })
+        }
+        //-----------------------nut----------------
         field createFriendLink(&executor, title: String, home: String, logo: String, position: i32) -> FieldResult<H> {
             gq!(executor, nut::graphql::friend_links::Create{
                 title: title,
