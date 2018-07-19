@@ -9,11 +9,5 @@ class CreateForumPosts < ActiveRecord::Migration[5.2]
       t.datetime :deleted_at
       t.timestamps
     end
-
-    create_table :forum_posts_badges do |t|
-      t.references :badage, null: false
-      t.references :post, null: false
-    end
-    add_index :forum_posts_badges, %i[badage_id post_id], unique: true
   end
 end

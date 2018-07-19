@@ -124,32 +124,6 @@ table! {
 }
 
 table! {
-    forum_badges (id) {
-        id -> Bigint,
-        body -> Text,
-        title -> Varchar,
-        media_type -> Varchar,
-        icon -> Varchar,
-        created_at -> Datetime,
-        updated_at -> Datetime,
-    }
-}
-
-table! {
-    forum_categories (id) {
-        id -> Bigint,
-        title -> Varchar,
-        body -> Text,
-        media_type -> Varchar,
-        background -> Varchar,
-        foreground -> Varchar,
-        position -> Tinyint,
-        created_at -> Datetime,
-        updated_at -> Datetime,
-    }
-}
-
-table! {
     forum_posts (id) {
         id -> Bigint,
         user_id -> Bigint,
@@ -164,10 +138,11 @@ table! {
 }
 
 table! {
-    forum_posts_badges (id) {
+    forum_tags (id) {
         id -> Bigint,
-        badage_id -> Bigint,
-        post_id -> Bigint,
+        name -> Varchar,
+        created_at -> Datetime,
+        updated_at -> Datetime,
     }
 }
 
@@ -186,10 +161,10 @@ table! {
 }
 
 table! {
-    forum_topics_badges (id) {
+    forum_topics_tags (id) {
         id -> Bigint,
-        badage_id -> Bigint,
         topic_id -> Bigint,
+        tag_id -> Bigint,
     }
 }
 
@@ -401,12 +376,10 @@ allow_tables_to_appear_in_same_query!(
     caring_tags,
     caring_topics,
     caring_topics_tags,
-    forum_badges,
-    forum_categories,
     forum_posts,
-    forum_posts_badges,
+    forum_tags,
     forum_topics,
-    forum_topics_badges,
+    forum_topics_tags,
     friend_links,
     leave_words,
     links,
