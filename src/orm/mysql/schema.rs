@@ -24,7 +24,7 @@ table! {
     cards (id) {
         id -> Bigint,
         title -> Varchar,
-        body -> Varchar,
+        body -> Text,
         media_type -> Varchar,
         action -> Varchar,
         href -> Varchar,
