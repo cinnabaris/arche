@@ -7,6 +7,31 @@ pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        field createLink(&executor, label: String, href: String, loc: String, x: i32, y: i32) -> FieldResult<H> {
+            gq!(executor, nut::graphql::links::Create{
+                label: label,
+                href: href,
+                loc: loc,
+                x: x,
+                y: y,
+            })
+        }
+        field updateLink(&executor, id: String, label: String, href: String, loc: String, x: i32, y: i32) -> FieldResult<H> {
+            gq!(executor, nut::graphql::links::Update{
+                id: id,
+                label: label,
+                href: href,
+                loc: loc,
+                x: x,
+                y: y,
+            })
+        }
+        field removeLink(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::links::Remove{
+                id: id,
+            })
+        }
+
         field updateSiteSmtp(&executor, host: String, port: i32, user: String, password:String) -> FieldResult<H> {
             gq!(executor, nut::graphql::site::mutation::UpdateSmtp{
                 host: host,

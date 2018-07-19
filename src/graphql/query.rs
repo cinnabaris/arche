@@ -12,6 +12,13 @@ graphql_object!(Query: Context |&self| {
     }
 
     //--------------------nut-----------------------
+    field showLink(&executor, id: String) -> FieldResult<nut::graphql::links::Link> {
+        gq!(executor, nut::graphql::links::Show{id: id})
+    }
+    field listLink(&executor) -> FieldResult<Vec<nut::graphql::links::Link>> {
+        ge!(nut::graphql::links::list(executor.context()))
+    }
+
     field listLeaveWord(&executor) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
         ge!(nut::graphql::leave_words::list(executor.context()))
     }

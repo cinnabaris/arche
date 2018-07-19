@@ -15,6 +15,8 @@ import NewLeaveWord from './leave-words/New'
 import Install from './Install'
 import Home from './Home'
 
+import AdminLinksIndex from './admin/links/Index'
+import AdminLinksForm from './admin/links/Form'
 import AdminLeaveWordsIndex from './admin/leave-words/Index'
 import AdminLocalesIndex from './admin/locales/Index'
 import AdminLocalesForm from './admin/locales/Form'
@@ -53,6 +55,18 @@ export default[
     name: 'admin.site.smtp',
     path: '/admin/site/smtp',
     component: AdminSiteSmtp
+  }, {
+    name: 'admin.links.index',
+    path: '/admin/links',
+    component: AdminLinksIndex
+  }, {
+    name: 'admin.links.new',
+    path: '/admin/links/new',
+    component: AdminLinksForm
+  }, {
+    name: 'admin.links.edit',
+    path: '/admin/links/:id/edit',
+    component: AdminLinksForm
   }, {
     name: 'admin.leave-words.index',
     path: '/admin/leave-words',
