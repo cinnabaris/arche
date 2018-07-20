@@ -1,5 +1,5 @@
 <template>
-<dashboard-layout :title="title" :role="null" :init="init">
+<dashboard-layout :title="title" :role="role" :init="init">
   <el-pagination @current-change="setPage" :page-size="size" layout="total, prev, pager, next" :total="items.length" />
   <el-table :data="table" border>
     <el-table-column prop="name" :label="$t('attributes.name')" width="180" />
@@ -14,11 +14,15 @@ import {
   failed
 } from '@/request'
 import lodash from 'lodash'
+import {
+  ADMIN
+} from '@/authorized'
 
 export default {
   name: 'AdminSiteStatus',
   data() {
     return {
+      role: ADMIN,
       title: this.$t("nut.admin.site.status.title"),
       size: 12,
       page: 1,

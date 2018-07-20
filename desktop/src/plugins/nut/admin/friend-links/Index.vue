@@ -1,5 +1,5 @@
 <template>
-<dashboard-layout :title="title" :role="null" :init="init">
+<dashboard-layout :title="title" :role="role" :init="init">
   <div style="float: right;">
     <el-button size="mini" type="primary" @click="()=>this.$router.push({name:'admin.friend-links.new'})" class="el-icon-plus" />
   </div>
@@ -30,11 +30,15 @@ import {
   failed
 } from '@/request'
 import lodash from 'lodash'
+import {
+  ADMIN
+} from '@/authorized'
 
 export default {
   name: 'AdminFriendLinksIndex',
   data() {
     return {
+      role: ADMIN,
       title: this.$t("nut.admin.friend-links.index.title"),
       size: 12,
       page: 1,

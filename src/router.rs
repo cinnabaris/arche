@@ -1,3 +1,4 @@
+use std::io::Cursor;
 use std::ops::Deref;
 use std::path::{Path, PathBuf};
 use std::result::Result as StdResult;
@@ -6,21 +7,31 @@ use std::sync::Arc;
 use chrono::{DateTime, FixedOffset, Utc};
 use robots_txt::Robots;
 use rocket::{
-    http::Status,
-    response::{content::Xml, NamedFile},
-    Catcher, Route, State,
+    http::{ContentType, Status},
+    response::{content::Xml, NamedFile, Responder},
+    Catcher, Request, Response, Route, State,
 };
 use rss::{ChannelBuilder, ItemBuilder};
 use sitemap::{structs::UrlEntry, writer::SiteMapWriter, Error as SitemapError};
 
 use super::{
     context::Context,
-    errors::Result,
+    errors::{Error, Result},
     graphql,
     orm::PooledConnection as Db,
     plugins::{forum, nut},
     request::Home,
 };
+
+impl<'r> Responder<'r> for Error {
+    fn respond_to(self, _: &Request) -> StdResult<Response<'r>, Status> {
+        Ok(Response::build()
+            .header(ContentType::Plain)
+            .status(Status::InternalServerError)
+            .sized_body(Cursor::new(self.description().to_string()))
+            .finalize())
+    }
+}
 
 pub fn routes() -> Vec<(&'static str, Vec<Route>)> {
     let mut items = Vec::new();

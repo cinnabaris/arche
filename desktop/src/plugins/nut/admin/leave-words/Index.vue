@@ -1,5 +1,5 @@
 <template>
-<dashboard-layout :title="title" :role="null" :init="init">
+<dashboard-layout :title="title" :role="role" :init="init">
   <el-pagination @current-change="setPage" :page-size="size" layout="total, prev, pager, next" :total="items.length" />
   <el-table :data="table" border>
     <el-table-column prop="id" :label="$t('attributes.id')" width="60" />
@@ -10,7 +10,7 @@
     </el-table-column>
     <el-table-column :label="$t('attributes.content')">
       <template slot-scope="scope">
-        <pre>{{scope.row.body}}</pre>        
+        <pre>{{scope.row.body}}</pre>
       </template>
     </el-table-column>
     <el-table-column fixed="right" :label="$t('buttons.operator')" width="120">
@@ -28,11 +28,15 @@ import {
   failed
 } from '@/request'
 import lodash from 'lodash'
+import {
+  ADMIN
+} from '@/authorized'
 
 export default {
   name: 'AdminLeaveWordsIndex',
   data() {
     return {
+      role: ADMIN,
       title: this.$t("nut.admin.leave-words.index.title"),
       size: 12,
       page: 1,

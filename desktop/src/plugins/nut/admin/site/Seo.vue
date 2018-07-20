@@ -1,5 +1,5 @@
 <template>
-<dashboard-layout :title="title" :role="null" :init="init">
+<dashboard-layout :title="title" :role="role" :init="init">
   <col-form>
     <el-card :header="title">
       <el-form :rules="rules" ref="form" :model="form" label-width="100px">
@@ -23,11 +23,15 @@ import {
   client,
   failed
 } from '@/request'
+import {
+  ADMIN
+} from '@/authorized'
 
 export default {
   name: 'AdminSiteSeo',
   data() {
     return {
+      role: ADMIN,
       title: this.$t("nut.admin.site.seo.title"),
       form: {
         google: '',

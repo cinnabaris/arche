@@ -1,5 +1,5 @@
 <template>
-<dashboard-layout :title="title" :role="null" :init="init">
+<dashboard-layout :title="title" :role="role" :init="init">
   <col-form>
     <el-card :header="title">
       <el-form :rules="rules" ref="form" :model="form" label-width="80px">
@@ -40,11 +40,15 @@ import {
   failed
 } from '@/request'
 import lodash from 'lodash'
+import {
+  ADMIN
+} from '@/authorized'
 
 export default {
   name: 'AdminLinksForm',
   data() {
     return {
+      role: ADMIN,
       title: this.$t("nut.admin.links.index.title"),
       form: {
         id: null,
