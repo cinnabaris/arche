@@ -62,11 +62,19 @@ graphql_object!(Query: Context |&self| {
         gq!(executor, nut::graphql::locales::ListByLang{lang: lang})
     }
 
+    field getUserPolicy(&executor, id: String) -> FieldResult<Vec<nut::graphql::users::models::Policy>> {
+        gq!(executor, nut::graphql::users::query::GetPolicy{
+            id: id,
+        })
+    }
+    field listUser(&executor) -> FieldResult<Vec<nut::graphql::users::models::User>> {
+        ge!(nut::graphql::users::query::list(executor.context()))
+    }
     field getUserProfile(&executor) -> FieldResult<nut::graphql::users::models::Profile> {
-        ge!(nut::graphql::users::query::get_profile(executor.context()))
+        ge!(nut::graphql::users::query::profile(executor.context()))
     }
     field listUserLog(&executor) -> FieldResult<Vec<nut::graphql::users::models::Log>> {
-        ge!(nut::graphql::users::query::list_log(executor.context()))
+        ge!(nut::graphql::users::query::logs(executor.context()))
     }
     field forgotUserPassword(&executor, email:String) -> FieldResult<H> {
         gq!(executor, nut::graphql::users::query::ForgotPassword{

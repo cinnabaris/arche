@@ -6,7 +6,8 @@ export default {
   },
   flashes: {
     success: '操作成功',
-    info: '提示信息'
+    info: '提示信息',
+    error: '出错了'
   },
   'are-you-sure': {
     delete: '您确定要删除{id}么？'
@@ -17,7 +18,9 @@ export default {
     ok: '确定',
     cancel: '取消',
     operator: '操作',
-    return: '返回'
+    return: '返回',
+    enable: '启用',
+    disable: '禁用'
   },
   attributes: {
     email: '电子邮箱',
@@ -44,14 +47,19 @@ export default {
     y: '纵轴',
     logo: '图标',
     position: '排序',
-    createdAt: '创建时间',
-    updatedAt: '修改时间'
+    'created-at': '创建时间',
+    'updated-at': '修改时间',
+    'date-range': '日期区间',
+    'to': '至',
+    'nbf': '起始',
+    'exp': '截止'
   },
   validations: {
     email: '不是正确的邮件地址',
     required: '不能为空',
     password: '密码长度应该在6位和32位之间',
-    'password-confirmation': '两次密码输入不一致'
+    'password-confirmation': '两次密码输入不一致',
+    'date-range': '请选择日期区间'
   },
   errors: {
     forbidden: {
@@ -119,6 +127,20 @@ export default {
         index: {
           title: '国际化'
         }
+      },
+      users: {
+        index: {
+          title: '用户',
+          lock: '你确定要锁定用户{name}么？',
+          prolicy: '权限'
+        },
+        policy: {
+          title: '权限设置',
+          admin: '超级管理员',
+          caring: '会员关怀模块',
+          forum: '论坛模块',
+          donate: '捐赠模块'
+        }
       }
     },
     users: {
@@ -170,7 +192,10 @@ export default {
     },
     attributes: {
       user: {
-        logo: '头像'
+        logo: '头像',
+        'last-sign-in': '上次登录',
+        'current-sign-in': '本次登录',
+        'info': '信息'
       },
       locale: {
         code: '代码'

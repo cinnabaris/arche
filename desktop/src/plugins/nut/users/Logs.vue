@@ -2,7 +2,7 @@
 <dashboard-layout :title="title" :role="null" :init="init">
   <el-pagination @current-change="setPage" :page-size="size" layout="total, prev, pager, next" :total="items.length" />
   <el-table :data="table" border>
-    <el-table-column prop="createdAt" :label="$t('attributes.createdAt')" width="240">
+    <el-table-column prop="createdAt" :label="$t('attributes.created-at')" width="240">
       <template slot-scope="scope">
         <timestamp :value="scope.row.createdAt"/>
       </template>

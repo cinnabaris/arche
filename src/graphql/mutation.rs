@@ -200,6 +200,19 @@ graphql_object!(
             })
         }
 
+        field lockUser(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::users::mutation::Lock{
+                id: id,
+            })
+        }
+        field updateUserPolicy(&executor, user: String, policies: String, nbf:String, exp:String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::users::mutation::UpdatePolicy{
+                user: user,
+                policies: policies,
+                nbf: nbf,
+                exp: exp,
+            })
+        }
         field updateUserProfile(&executor, name: String, logo: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::users::mutation::UpdateProfile{
                 name: name,

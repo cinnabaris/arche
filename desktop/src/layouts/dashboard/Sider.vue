@@ -70,6 +70,9 @@ export default {
             label: 'nut.admin.site.smtp.title',
             to: 'admin.site.smtp'
           }, {
+            label: 'nut.admin.users.index.title',
+            to: 'admin.users.index'
+          }, {
             label: 'nut.admin.locales.index.title',
             to: 'admin.locales.index'
           }, {

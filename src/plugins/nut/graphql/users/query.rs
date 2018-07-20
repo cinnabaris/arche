@@ -10,12 +10,89 @@ use super::super::super::super::super::{
     orm::schema::*,
     rfc::Utc as ToUtc,
 };
+use super::super::super::dao;
 use super::{
-    models::{Log, Profile},
+    models::{Log, Policy, Profile, User},
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
 };
 
-pub fn get_profile(ctx: &Context) -> Result<Profile> {
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GetPolicy {
+    #[validate(length(min = "1"))]
+    pub id: String,
+}
+
+impl GetPolicy {
+    pub fn call(&self, ctx: &Context) -> Result<Vec<Policy>> {
+        self.validate()?;
+        ctx.admin()?;
+        let db = ctx.db.deref();
+        let user: i64 = self.id.parse()?;
+        let items = dao::policy::groups(db, &user)?;
+        Ok(items.iter().map(|n| Policy { name: n.clone() }).collect())
+    }
+}
+
+pub fn list(ctx: &Context) -> Result<Vec<User>> {
+    ctx.admin()?;
+    let db = ctx.db.deref();
+    let items = users::dsl::users
+        .select((
+            users::dsl::id,
+            users::dsl::name,
+            users::dsl::email,
+            users::dsl::sign_in_count,
+            users::dsl::last_sign_in_at,
+            users::dsl::last_sign_in_ip,
+            users::dsl::current_sign_in_at,
+            users::dsl::current_sign_in_ip,
+        ))
+        .order(users::dsl::updated_at.desc())
+        .load::<(
+            i64,
+            String,
+            String,
+            i64,
+            Option<NaiveDateTime>,
+            Option<String>,
+            Option<NaiveDateTime>,
+            Option<String>,
+        )>(db)?;
+
+    Ok(items
+        .iter()
+        .map(
+            |(
+                id,
+                name,
+                email,
+                sign_in_count,
+                last_sign_in_at,
+                last_sign_in_ip,
+                current_sign_in_at,
+                current_sign_in_ip,
+            )| User {
+                id: id.to_string(),
+                name: name.clone(),
+                email: email.clone(),
+                sign_in_count: sign_in_count.to_string(),
+                last_sign_in_at: match last_sign_in_at {
+                    Some(d) => Some(d.to_utc()),
+                    None => None,
+                },
+                last_sign_in_ip: last_sign_in_ip.clone(),
+                current_sign_in_at: match current_sign_in_at {
+                    Some(d) => Some(d.to_utc()),
+                    None => None,
+                },
+                current_sign_in_ip: current_sign_in_ip.clone(),
+            },
+        )
+        .collect())
+}
+
+pub fn profile(ctx: &Context) -> Result<Profile> {
     let user = ctx.current_user()?;
     let db = ctx.db.deref();
     let (name, email, logo) = users::dsl::users
@@ -29,7 +106,7 @@ pub fn get_profile(ctx: &Context) -> Result<Profile> {
     })
 }
 
-pub fn list_log(ctx: &Context) -> Result<Vec<Log>> {
+pub fn logs(ctx: &Context) -> Result<Vec<Log>> {
     let user = ctx.current_user()?;
     let db = ctx.db.deref();
     let items = logs::dsl::logs

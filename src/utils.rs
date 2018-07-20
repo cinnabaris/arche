@@ -2,6 +2,8 @@ use sodiumoxide::crypto::secretbox;
 
 use super::errors::Result;
 
+pub const DATE_FORMAT: &'static str = "%Y-%m-%d";
+
 pub struct Encryptor {
     key: secretbox::Key,
 }

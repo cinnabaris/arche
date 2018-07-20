@@ -15,6 +15,8 @@ import NewLeaveWord from './leave-words/New'
 import Install from './Install'
 import Home from './Home'
 
+import AdminUsersIndex from './admin/users/Index'
+import AdminUsersPolicy from './admin/users/Policy'
 import AdminFriendLinksIndex from './admin/friend-links/Index'
 import AdminFriendLinksForm from './admin/friend-links/Form'
 import AdminCardsIndex from './admin/cards/Index'
@@ -111,6 +113,14 @@ export default[
     name: 'admin.locales.edit',
     path: '/admin/locales/:code/edit',
     component: AdminLocalesForm
+  }, {
+    name: 'admin.users.index',
+    path: '/admin/users',
+    component: AdminUsersIndex
+  }, {
+    name: 'admin.users.policy',
+    path: '/admin/users/:id/policy',
+    component: AdminUsersPolicy
   }, {
     name: 'users.profile',
     path: '/users/profile',

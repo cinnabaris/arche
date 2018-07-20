@@ -2,20 +2,27 @@
 <dashboard-layout :title="title" :role="role" :init="init">
   <el-pagination @current-change="setPage" :page-size="size" layout="total, prev, pager, next" :total="items.length" />
   <el-table :data="table" border>
-    <el-table-column prop="id" :label="$t('attributes.id')" width="60" />
-    <el-table-column prop="createdAt" :label="$t('attributes.created-at')" width="240">
+    <el-table-column :label="$t('nut.attributes.user.info')">
       <template slot-scope="scope">
-        <timestamp :value="scope.row.createdAt"/>
+        {{scope.row.name}}&lt;{{scope.row.email}}&gt;[{{scope.row.signInCount}}]
       </template>
     </el-table-column>
-    <el-table-column :label="$t('attributes.content')">
+    <el-table-column :label="$t('nut.attributes.user.last-sign-in')">
       <template slot-scope="scope">
-        <pre>{{scope.row.body}}</pre>
+        {{scope.row.lastSignInAt}}[{{scope.row.lastSignInIp}}]
+      </template>
+    </el-table-column>
+    <el-table-column :label="$t('nut.attributes.user.current-sign-in')">
+      <template slot-scope="scope">
+        {{scope.row.currentSignInAt}}[{{scope.row.currentSignInIp}}]
       </template>
     </el-table-column>
     <el-table-column fixed="right" :label="$t('buttons.operator')" width="120">
       <template slot-scope="scope">
-        <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)" class="el-icon-delete"/>
+        <el-button-group>
+          <el-button size="mini" type="warning" @click="handlePolicy(scope.row.id)" class="el-icon-menu"/>
+          <el-button size="mini" type="danger" @click="handleLock(scope.row.id, scope.row.name)" class="el-icon-bell"/>
+        </el-button-group>
       </template>
     </el-table-column>
   </el-table>
@@ -33,11 +40,11 @@ import {
 } from '@/authorized'
 
 export default {
-  name: 'AdminLeaveWordsIndex',
+  name: 'AdminUsersIndex',
   data() {
     return {
       role: ADMIN,
-      title: this.$t("nut.admin.leave-words.index.title"),
+      title: this.$t("nut.admin.users.index.title"),
       size: 12,
       page: 1,
       items: []
@@ -50,9 +57,17 @@ export default {
     }
   },
   methods: {
-    handleDelete(id) {
-      this.$confirm(this.$t('are-you-sure.delete', {
-        id
+    handlePolicy(id) {
+      this.$router.push({
+        name: 'admin.users.policy',
+        params: {
+          id
+        }
+      })
+    },
+    handleLock(id, name) {
+      this.$confirm(this.$t('nut.admin.users.index.lock', {
+        name
       }), this.$t('flashes.info'), {
         confirmButtonText: this.$t('buttons.ok'),
         cancelButtonText: this.$t('buttons.cancel'),
@@ -60,14 +75,15 @@ export default {
         center: true
       }).then(() => {
         client().request(`mutation form($id: String!){
-          removeLeaveWord(id: $id) {
+          lockUser(id: $id) {
             createdAt
           }
         }`, {
           id
         }).then(() => {
-          this.items = this.items.filter((it) => {
-            return it.id !== id
+          this.$message({
+            type: 'success',
+            message: this.$t("flashes.success")
           })
         }).catch(failed)
       }).catch(() => {})
@@ -75,11 +91,11 @@ export default {
     },
     init() {
       client().request(`query list{
-        listLeaveWord{
-          id, body, createdAt
+        listUser{
+          id, name, email, lastSignInAt, lastSignInIp, currentSignInAt, currentSignInIp, signInCount
         }
       }`, {}).then((rst) => {
-        this.items = rst.listLeaveWord
+        this.items = rst.listUser
       }).catch(failed)
     },
     setPage(p) {

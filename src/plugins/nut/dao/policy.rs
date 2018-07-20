@@ -82,7 +82,6 @@ pub fn deny(
     }
     Ok(())
 }
-
 pub fn apply(
     db: &Db,
     user: &i64,
@@ -91,10 +90,23 @@ pub fn apply(
     resource_id: &Option<i64>,
     ttl: Duration,
 ) -> Result<i64> {
-    let role = format!("{}", role);
     let now = Utc::now().naive_utc();
     let nbf = now.date();
     let exp = now.add(ttl).date();
+    apply_by_range(db, user, role, resource_type, resource_id, &nbf, &exp)
+}
+
+pub fn apply_by_range(
+    db: &Db,
+    user: &i64,
+    role: &RoleType,
+    resource_type: &Option<String>,
+    resource_id: &Option<i64>,
+    nbf: &NaiveDate,
+    exp: &NaiveDate,
+) -> Result<i64> {
+    let role = format!("{}", role);
+    let now = Utc::now().naive_utc();
 
     let role = match get_role(db, &role, resource_type, resource_id) {
         Ok(id) => id,
@@ -122,8 +134,8 @@ pub fn apply(
             let it = policies::dsl::policies.filter(policies::dsl::id.eq(&id));
             update(it)
                 .set((
-                    policies::dsl::exp.eq(&exp),
-                    policies::dsl::nbf.eq(&nbf),
+                    policies::dsl::exp.eq(exp),
+                    policies::dsl::nbf.eq(nbf),
                     policies::dsl::updated_at.eq(&now),
                 ))
                 .execute(db)?;
@@ -134,8 +146,8 @@ pub fn apply(
                 .values((
                     policies::dsl::user_id.eq(user),
                     policies::dsl::role_id.eq(&role),
-                    policies::dsl::exp.eq(&exp),
-                    policies::dsl::nbf.eq(&nbf),
+                    policies::dsl::exp.eq(exp),
+                    policies::dsl::nbf.eq(nbf),
                     policies::dsl::updated_at.eq(&now),
                     policies::dsl::created_at.eq(&now),
                 ))

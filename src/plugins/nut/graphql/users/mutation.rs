@@ -1,8 +1,9 @@
 use std::ops::Deref;
 
-use chrono::{Duration, NaiveDateTime, Utc};
+use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
 use diesel::{prelude::*, update, Connection};
 use rocket::http::Status;
+use serde_json;
 use validator::Validate;
 
 use super::super::super::super::super::{
@@ -13,8 +14,90 @@ use super::super::super::super::super::{
     orm::{schema::*, Connection as Db},
     queue, utils,
 };
-use super::super::super::{consumers, dao};
+use super::super::super::{
+    consumers,
+    dao::{self, role::Type as RoleType},
+};
 use super::models::SignIn;
+
+#[derive(Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Policy {
+    #[validate(length(min = "1"))]
+    pub name: String,
+    pub enable: bool,
+}
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdatePolicy {
+    #[validate(length(min = "1"))]
+    pub user: String,
+    #[validate(length(min = "1"))]
+    pub nbf: String,
+    #[validate(length(min = "1"))]
+    pub exp: String,
+    pub policies: String,
+}
+
+impl UpdatePolicy {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        ctx.admin()?;
+        let db = ctx.db.deref();
+        let user: i64 = self.user.parse()?;
+        if dao::policy::is(db, &user, &RoleType::Root) {
+            return Err(Status::Forbidden.reason.into());
+        }
+
+        let policies: Vec<Policy> = serde_json::from_str(&self.policies)?;
+        for it in policies.iter() {
+            it.validate()?;
+        }
+
+        db.transaction::<_, Error, _>(|| {
+            for it in policies.iter() {
+                let role = RoleType::By(it.name.clone());
+
+                if it.enable {
+                    let nbf = NaiveDate::parse_from_str(&self.nbf, utils::DATE_FORMAT)?;
+                    let exp = NaiveDate::parse_from_str(&self.exp, utils::DATE_FORMAT)?;
+                    dao::policy::apply_by_range(db, &user, &role, &None, &None, &nbf, &exp)?;
+                    l!(
+                        db,
+                        &user,
+                        &ctx.client_ip,
+                        &ctx.locale,
+                        "nut.logs.role.apply",
+                        &Some(json!({
+                            "name":format!("{}", role),
+                            "type": None::<String>,
+                            "id": None::<i64>,
+                            "ttl": format!("{}-{}", nbf, exp)
+                        }))
+                    )?;
+                } else {
+                    dao::policy::deny(db, &user, &role, &None, &None)?;
+                    l!(
+                        db,
+                        &user,
+                        &ctx.client_ip,
+                        &ctx.locale,
+                        "nut.logs.role.deny",
+                        &Some(json!({
+                            "name":format!("{}", role),
+                            "type": None::<String>,
+                            "id": None::<i64>
+                        }))
+                    )?;
+                }
+            }
+            Ok(())
+        })?;
+
+        Ok(H::new())
+    }
+}
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -53,6 +136,7 @@ impl ChangePassword {
         Err(e!(db, &ctx.locale, "nut.errors.user.bad-password"))
     }
 }
+
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct UpdateProfile {
     #[validate(length(min = "1"))]
@@ -205,6 +289,34 @@ impl ResetPassword {
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+pub struct Lock {
+    #[validate(length(min = "1"))]
+    pub id: String,
+}
+
+impl Lock {
+    pub fn call(&self, ctx: &Context) -> Result<H> {
+        self.validate()?;
+        ctx.admin()?;
+        let db = ctx.db.deref();
+        let now = Utc::now().naive_utc();
+        let id = self.id.parse::<i64>()?;
+        db.transaction::<_, Error, _>(|| {
+            let it = users::dsl::users.filter(users::dsl::id.eq(&id));
+            update(it)
+                .set((
+                    users::dsl::locked_at.eq(&now),
+                    users::dsl::updated_at.eq(&now),
+                ))
+                .execute(db)?;
+            l!(db, &id, &ctx.client_ip, &ctx.locale, "nut.logs.user.lock")?;
+            Ok(())
+        })?;
+        Ok(H::new())
+    }
+}
+
+#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct Unlock {
     #[validate(length(min = "1"))]
     pub token: String,
@@ -223,13 +335,17 @@ impl Unlock {
             return Err(t!(db, &ctx.locale, "nut.errors.user.not-locked").into());
         }
         let now = Utc::now().naive_utc();
-        let it = users::dsl::users.filter(users::dsl::id.eq(id));
-        update(it)
-            .set((
-                users::dsl::locked_at.eq(&None::<NaiveDateTime>),
-                users::dsl::updated_at.eq(&now),
-            ))
-            .execute(db)?;
+        db.transaction::<_, Error, _>(|| {
+            let it = users::dsl::users.filter(users::dsl::id.eq(id));
+            update(it)
+                .set((
+                    users::dsl::locked_at.eq(&None::<NaiveDateTime>),
+                    users::dsl::updated_at.eq(&now),
+                ))
+                .execute(db)?;
+            l!(db, &id, &ctx.client_ip, &ctx.locale, "nut.logs.user.unlock")?;
+            Ok(())
+        })?;
         Ok(H::new())
     }
 }
@@ -252,7 +368,17 @@ impl Confirm {
         if let Some(_) = confirmed_at {
             return Err(t!(db, &ctx.locale, "nut.errors.user.is-confirmed").into());
         }
-        dao::user::confirm(db, &id)?;
+        db.transaction::<_, Error, _>(|| {
+            dao::user::confirm(db, &id)?;
+            l!(
+                db,
+                &id,
+                &ctx.client_ip,
+                &ctx.locale,
+                "nut.logs.user.confirm"
+            )?;
+            Ok(())
+        })?;
         Ok(H::new())
     }
 }
