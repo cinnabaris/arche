@@ -131,7 +131,6 @@ table! {
         post_id -> Nullable<Bigint>,
         body -> Text,
         media_type -> Varchar,
-        deleted_at -> Nullable<Datetime>,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -149,12 +148,11 @@ table! {
 table! {
     forum_topics (id) {
         id -> Bigint,
-        category_id -> Bigint,
         user_id -> Bigint,
+        lang -> Varchar,
         title -> Varchar,
         body -> Text,
         media_type -> Varchar,
-        deleted_at -> Nullable<Datetime>,
         created_at -> Datetime,
         updated_at -> Datetime,
     }

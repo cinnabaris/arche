@@ -131,7 +131,6 @@ table! {
         post_id -> Nullable<Int8>,
         body -> Text,
         media_type -> Varchar,
-        deleted_at -> Nullable<Timestamp>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -149,12 +148,11 @@ table! {
 table! {
     forum_topics (id) {
         id -> Int8,
-        category_id -> Int8,
         user_id -> Int8,
+        lang -> Varchar,
         title -> Varchar,
         body -> Text,
         media_type -> Varchar,
-        deleted_at -> Nullable<Timestamp>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
