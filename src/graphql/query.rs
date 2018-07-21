@@ -91,8 +91,8 @@ graphql_object!(Query: Context |&self| {
         gq!(executor, nut::graphql::locales::ListByLang{lang: lang})
     }
 
-    field getUserPolicy(&executor, id: String) -> FieldResult<Vec<nut::graphql::users::models::Policy>> {
-        gq!(executor, nut::graphql::users::query::GetPolicy{
+    field listManagerByUser(&executor, id: String) -> FieldResult<Vec<nut::graphql::users::models::Policy>> {
+        gq!(executor, nut::graphql::users::query::ListManagerByUser{
             id: id,
         })
     }

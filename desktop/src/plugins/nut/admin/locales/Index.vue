@@ -33,7 +33,9 @@ export default {
   name: 'AdminLocalesIndex',
   data() {
     return {
-      role: ADMIN,
+      role: {
+        name: ADMIN
+      },
       title: this.$t("nut.admin.locales.index.title"),
       size: 12,
       page: 1,

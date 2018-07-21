@@ -17,9 +17,6 @@ import {
   client,
   failed
 } from '@/request'
-import {
-  removeToken
-} from '@/utils'
 
 export default {
   name: 'Header',
@@ -41,7 +38,6 @@ export default {
                 createdAt
               }
             }`, {}).then(() => {
-              removeToken()
               this.$message({
                 type: 'success',
                 message: this.$t('flashes.success')

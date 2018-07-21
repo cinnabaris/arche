@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use chrono::{Duration, NaiveDate, NaiveDateTime, Utc};
-use diesel::{prelude::*, update, Connection};
+use diesel::{delete, prelude::*, update, Connection};
 use rocket::http::Status;
 use serde_json;
 use validator::Validate;
@@ -18,15 +18,7 @@ use super::super::super::{
     consumers,
     dao::{self, role::Type as RoleType},
 };
-use super::models::SignIn;
-
-#[derive(Debug, Validate, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Policy {
-    #[validate(length(min = "1"))]
-    pub name: String,
-    pub enable: bool,
-}
+use super::models::{Policy, SignIn};
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -51,47 +43,41 @@ impl UpdatePolicy {
         }
 
         let policies: Vec<Policy> = serde_json::from_str(&self.policies)?;
-        for it in policies.iter() {
-            it.validate()?;
-        }
 
         db.transaction::<_, Error, _>(|| {
+            let it = policies::dsl::policies.filter(policies::dsl::user_id.eq(user));
+            delete(it).execute(db)?;
+            l!(
+                db,
+                &user,
+                &ctx.client_ip,
+                &ctx.locale,
+                "nut.logs.role.clear"
+            )?;
             for it in policies.iter() {
-                let role = RoleType::Manager;
-                let rty = Some(it.name.clone());
-                if it.enable {
-                    let nbf = NaiveDate::parse_from_str(&self.nbf, utils::DATE_FORMAT)?;
-                    let exp = NaiveDate::parse_from_str(&self.exp, utils::DATE_FORMAT)?;
-                    dao::policy::apply_by_range(db, &user, &role, &rty, &None, &nbf, &exp)?;
-                    l!(
-                        db,
-                        &user,
-                        &ctx.client_ip,
-                        &ctx.locale,
-                        "nut.logs.role.apply.range",
-                        &Some(json!({
+                let role = it.role_name.parse::<RoleType>()?;
+                let rid = match it.resource_id {
+                    Some(ref v) => Some(v.parse()?),
+                    None => None,
+                };
+
+                let nbf = NaiveDate::parse_from_str(&self.nbf, utils::DATE_FORMAT)?;
+                let exp = NaiveDate::parse_from_str(&self.exp, utils::DATE_FORMAT)?;
+                dao::policy::apply_by_range(db, &user, &role, &it.resource_type, &rid, &nbf, &exp)?;
+                l!(
+                    db,
+                    &user,
+                    &ctx.client_ip,
+                    &ctx.locale,
+                    "nut.logs.role.apply.range",
+                    &Some(json!({
                             "name":format!("{}", role),
-                            "type": rty,
-                            "id": None::<i64>,
+                            "type": it.resource_type,
+                            "id": rid,
                             "exp": exp.format(utils::DATE_FORMAT).to_string(),
                             "nbf": nbf.format(utils::DATE_FORMAT).to_string(),
                         }))
-                    )?;
-                } else {
-                    dao::policy::deny(db, &user, &role, &rty, &None)?;
-                    l!(
-                        db,
-                        &user,
-                        &ctx.client_ip,
-                        &ctx.locale,
-                        "nut.logs.role.deny",
-                        &Some(json!({
-                            "name":format!("{}", role),
-                            "type": rty,
-                            "id": None::<i64>
-                        }))
-                    )?;
-                }
+                )?;
             }
             Ok(())
         })?;

@@ -35,3 +35,4 @@ nut:
         ttl:               应用权限{{name}}@{{type}}/{{id}}?ttl={{ttl}}
         range:             应用权限{{name}}@{{type}}/{{id}}?nbf={{nbf}}&exp={{exp}}
       deny:                禁止权限{{name}}@{{type}}/{{id}}
+      clear:               清理权限

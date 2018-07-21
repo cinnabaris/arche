@@ -10,12 +10,12 @@ use super::super::super::super::super::{
     orm::schema::*,
     rfc::Utc as ToUtc,
 };
-use super::super::super::dao;
 use super::{
     models::{Log, Policy, Profile, User},
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
 };
 
+// resource_id is null
 pub fn policies(ctx: &Context) -> Result<Vec<Policy>> {
     let user = ctx.current_user()?;
     let mut items = Vec::new();
@@ -31,22 +31,19 @@ pub fn policies(ctx: &Context) -> Result<Vec<Policy>> {
         .load::<(i64, NaiveDate, NaiveDate)>(db)?
     {
         if today.ge(&nbf) && today.le(&exp) {
-            let (name, rty, rid) = roles::dsl::roles
-                .select((
-                    roles::dsl::name,
-                    roles::dsl::resource_type,
-                    roles::dsl::resource_id,
-                ))
+            // don't throw error
+            if let Ok((name, rty)) = roles::dsl::roles
+                .select((roles::dsl::name, roles::dsl::resource_type))
                 .filter(roles::dsl::id.eq(&rid))
-                .first::<(String, Option<String>, Option<i64>)>(db)?;
-            items.push(Policy {
-                role_name: name,
-                resource_type: rty,
-                resource_id: match rid {
-                    Some(v) => Some(v.to_string()),
-                    None => None,
-                },
-            });
+                .filter(roles::dsl::resource_id.is_null())
+                .first::<(String, Option<String>)>(db)
+            {
+                items.push(Policy {
+                    role_name: name,
+                    resource_type: rty,
+                    resource_id: None,
+                });
+            }
         }
     }
     Ok(items)
@@ -54,26 +51,46 @@ pub fn policies(ctx: &Context) -> Result<Vec<Policy>> {
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPolicy {
+pub struct ListManagerByUser {
     #[validate(length(min = "1"))]
     pub id: String,
 }
 
-impl GetPolicy {
+impl ListManagerByUser {
     pub fn call(&self, ctx: &Context) -> Result<Vec<Policy>> {
         self.validate()?;
         ctx.admin()?;
         let db = ctx.db.deref();
         let user: i64 = self.id.parse()?;
-        let items = dao::policy::groups(db, &user)?;
-        Ok(items
-            .iter()
-            .map(|n| Policy {
-                role_name: n.clone(),
-                resource_id: None,
-                resource_type: None,
-            })
-            .collect())
+
+        let today = Utc::now().naive_utc().date();
+        let mut items = Vec::new();
+        for (rid, nbf, exp) in policies::dsl::policies
+            .select((
+                policies::dsl::role_id,
+                policies::dsl::nbf,
+                policies::dsl::exp,
+            ))
+            .filter(policies::dsl::user_id.eq(&user))
+            .load::<(i64, NaiveDate, NaiveDate)>(db)?
+        {
+            // don't throw error
+            if today.ge(&nbf) && today.le(&exp) {
+                if let Ok((rn, rty)) = roles::dsl::roles
+                    .select((roles::dsl::name, roles::dsl::resource_type))
+                    .filter(roles::dsl::id.eq(&rid))
+                    .filter(roles::dsl::resource_id.is_null())
+                    .first::<(String, Option<String>)>(db)
+                {
+                    items.push(Policy {
+                        role_name: rn,
+                        resource_type: rty,
+                        resource_id: None,
+                    });
+                }
+            }
+        }
+        Ok(items)
     }
 }
 

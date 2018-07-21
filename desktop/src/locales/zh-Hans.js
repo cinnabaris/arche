@@ -137,10 +137,10 @@ export default {
         },
         policy: {
           title: '权限设置',
-          admin: '超级管理员',
-          caring: '会员关怀模块',
-          forum: '论坛模块',
-          donate: '捐赠模块'
+          'r-admin': '系统管理员',
+          't-caring': '会员关怀模块',
+          't-forum': '论坛模块',
+          't-donate': '捐赠模块'
         }
       }
     },

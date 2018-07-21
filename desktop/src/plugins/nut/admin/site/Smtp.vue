@@ -50,7 +50,9 @@ export default {
     };
 
     return {
-      role: ADMIN,
+      role: {
+        name: ADMIN
+      },
       title: this.$t("nut.admin.site.smtp.title"),
       form: {
         host: '',

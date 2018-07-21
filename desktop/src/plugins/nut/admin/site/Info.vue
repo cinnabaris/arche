@@ -37,10 +37,12 @@ import {
 } from '@/authorized'
 
 export default {
-  role: ADMIN,
   name: 'AdminSiteInfo',
   data() {
     return {
+      role: {
+        name: ADMIN
+      },
       title: this.$t("nut.admin.site.info.title"),
       form: {
         title: '',

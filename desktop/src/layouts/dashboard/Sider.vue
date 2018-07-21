@@ -16,7 +16,7 @@
 import {
   check,
   ADMIN,
-  CARING,
+  MANAGER,
   FORUM,
   POS,
   LIBRARY,
@@ -50,7 +50,9 @@ export default {
           to: 'users.change-password'
         }]
       }]
-      if (check(user, ADMIN)) {
+      if (check(user, {
+          name: ADMIN
+        })) {
         items.push({
           icon: 'setting',
           label: 'nut.admin.dashboard.title',
@@ -101,7 +103,11 @@ export default {
           to: 'forum.posts.index'
         }]
       }
-      if (check(user, FORUM)) {
+      if (check(user, {
+          name: MANAGER,
+          type: FORUM,
+          id: null
+        })) {
         forum.children.push({
           label: 'forum.tags.index.title',
           to: 'forum.tags.index'
@@ -113,14 +119,22 @@ export default {
         label: 'cbeta.dashboard.title',
         children: []
       })
-      if (check(user, LIBRARY)) {
+      if (check(user, {
+          name: MANAGER,
+          type: LIBRARY,
+          id: null
+        })) {
         items.push({
           icon: 'idcard',
           label: 'library.dashboard.title',
           children: []
         })
       }
-      if (check(user, HOTEL)) {
+      if (check(user, {
+          name: MANAGER,
+          type: HOTEL,
+          id: null
+        })) {
         items.push({
           icon: 'fork',
           label: 'hotel.dashboard.title',
@@ -134,7 +148,11 @@ export default {
         children: []
       })
 
-      if (check(user, POS)) {
+      if (check(user, {
+          name: MANAGER,
+          type: POS,
+          id: null
+        })) {
         items.push({
           icon: 'qrcode',
           label: 'pos.dashboard.title',
@@ -148,15 +166,15 @@ export default {
         children: []
       })
 
+      items.push({
+        icon: 'team',
+        label: 'caring.dashboard.title',
+        children: []
+      })
 
-      if (check(user, CARING)) {
-        items.push({
-          icon: 'team',
-          label: 'caring.dashboard.title',
-          children: []
-        })
-      }
-      if (check(user, ADMIN)) {
+      if (check(user, {
+          name: ADMIN,
+        })) {
         items.push({
           icon: 'bank',
           label: 'donate.dashboard.title',

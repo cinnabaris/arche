@@ -29,7 +29,6 @@ import {
   client,
   failed
 } from '@/request'
-import lodash from 'lodash'
 
 export default {
   name: 'ForumTopicForm',

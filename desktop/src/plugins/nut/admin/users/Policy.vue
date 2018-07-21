@@ -24,26 +24,28 @@ import {
   client,
   failed
 } from '@/request'
-import lodash from 'lodash'
 import {
-  ADMIN
+  ADMIN,
+  MANAGER,
 } from '@/authorized'
 
 export default {
   name: 'AdminUsersPolicy',
   data() {
     return {
-      role: ADMIN,
+      role: {
+        name: ADMIN
+      },
       title: this.$t("nut.admin.users.policy.title"),
       form: {
-        admin: false,
-        forum: false,
-        caring: false,
-        donate: false,
+        'r-admin': false,
+        't-forum': false,
+        't-caring': false,
+        't-donate': false,
         dates: []
       },
       roles: [
-        'admin', 'forum', 'caring', 'donate'
+        'r-admin', 't-forum', 't-caring', 't-donate'
       ],
       rules: {}
     }
@@ -54,52 +56,70 @@ export default {
         name: 'admin.users.index'
       })
     },
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        var id = this.$route.params.id
-        if (this.form.dates.length < 2) {
-          this.$notify.error({
-            title: this.$t('flashes.error'),
-            message: this.$t('validations.date-range')
-          })
-          return
+    submitForm() {
+      var policies = JSON.stringify(this.roles.reduce((ar, it) => {
+        if (this.form[it]) {
+          if (it.startsWith('r-')) {
+            ar.push({
+              roleName: it.substring(2),
+            })
+          } else if (it.startsWith('t-')) {
+            ar.push({
+              roleName: MANAGER,
+              resourceType: it.substring(2),
+            })
+          }
         }
-        client().request(
-          `mutation form($user: String!, $policies: String!, $nbf: String!, $exp: String!){
+        return ar
+      }, []))
+
+      var id = this.$route.params.id
+      if (this.form.dates.length < 2) {
+        this.$notify.error({
+          title: this.$t('flashes.error'),
+          message: this.$t('validations.date-range')
+        })
+        return
+      }
+      client().request(
+        `mutation form($user: String!, $policies: String!, $nbf: String!, $exp: String!){
             updateUserPolicy(user: $user, policies: $policies, nbf: $nbf, exp: $exp) {
               createdAt
             }
           }`, {
-            user: id,
-            nbf: this.form.dates[0],
-            exp: this.form.dates[1],
-            policies: JSON.stringify(this.roles.map((it) => {
-              return {
-                name: it,
-                enable: this.form[it]
-              }
-            })),
-          }).then(() => {
-          this.$message({
-            type: 'success',
-            message: this.$t("flashes.success")
-          })
-          this.go_back()
-        }).catch(failed)
-
-      });
+          user: id,
+          nbf: this.form.dates[0],
+          exp: this.form.dates[1],
+          policies,
+        }).then(() => {
+        this.$message({
+          type: 'success',
+          message: this.$t("flashes.success")
+        })
+        this.go_back()
+      }).catch(failed)
     },
     init() {
       var id = this.$route.params.id
       client().request(`query info($id: String!){
-          getUserPolicy(id: $id) {
-            name
+          listManagerByUser(id: $id) {
+            roleName, resourceType, resourceId
           }
         }`, {
         id
       }).then((rst) => {
-        rst.getUserPolicy.forEach((it) => {
-          this.form[it.name] = true
+        rst.listManagerByUser.forEach((it) => {
+          if (!it.resourceId) {
+            if (it.resourceType) {
+              if (it.roleName == MANAGER) {
+                // module manager
+                this.form[`t-${it.resourceType}`] = true
+              }
+            } else {
+              // all module
+              this.form[`r-${it.roleName}`] = true
+            }
+          }
         })
       }).catch(failed)
     }

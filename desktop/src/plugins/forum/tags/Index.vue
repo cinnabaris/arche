@@ -31,14 +31,19 @@ import {
 } from '@/request'
 import lodash from 'lodash'
 import {
-  FORUM
+  FORUM,
+  MANAGER
 } from '@/authorized'
 
 export default {
   name: 'ForumTagsIndex',
   data() {
     return {
-      role: FORUM,
+      role: {
+        name: MANAGER,
+        type: FORUM,
+        id: null
+      },
       title: this.$t("forum.tags.index.title"),
       size: 12,
       page: 1,

@@ -38,7 +38,9 @@ export default {
   name: 'AdminFriendLinksIndex',
   data() {
     return {
-      role: ADMIN,
+      role: {
+        name: ADMIN
+      },
       title: this.$t("nut.admin.friend-links.index.title"),
       size: 12,
       page: 1,

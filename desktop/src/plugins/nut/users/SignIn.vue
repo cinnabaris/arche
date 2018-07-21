@@ -24,9 +24,6 @@ import {
   client,
   failed
 } from '@/request'
-import {
-  setToken
-} from '@/utils'
 
 export default {
   name: 'UsersSignIn',
@@ -75,7 +72,6 @@ export default {
               message: this.$t("flashes.success")
             })
             var token = rst.signInUserByEmail.token
-            setToken(token)
             this.$store.commit('signIn', token)
             this.$router.push({
               name: 'users.logs'

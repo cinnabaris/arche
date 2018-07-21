@@ -21,9 +21,9 @@ import {
   client,
   failed
 } from '@/request'
-import lodash from 'lodash'
 import {
-  FORUM
+  FORUM,
+  MANAGER
 } from '@/authorized'
 
 export default {
@@ -31,7 +31,11 @@ export default {
   data() {
     return {
       title: this.$t("forum.tags.index.title"),
-      role: FORUM,
+      role: {
+        name: MANAGER,
+        type: FORUM,
+        id: null
+      },
       form: {
         id: null,
         name: ''

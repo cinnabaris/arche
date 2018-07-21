@@ -53,7 +53,9 @@ export default {
   data() {
     return {
       title: this.$t("nut.admin.cards.index.title"),
-      role: ADMIN,
+      role: {
+        name: ADMIN
+      },
       form: {
         id: null,
         title: '',

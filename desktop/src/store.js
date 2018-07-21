@@ -3,11 +3,13 @@ import Vuex from 'vuex'
 import jwtDecode from 'jwt-decode'
 import moment from 'moment'
 
+import {removeToken, setToken} from './utils'
+
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    currentUser: null,
+    currentUser: {},
     siderBar: {
       show: true,
       active: null
@@ -22,6 +24,9 @@ const store = new Vuex.Store({
     refresh(state, info) {
       state.siteInfo = info
     },
+    updatePolicies(state, policies) {
+      state.currentUser.policies = policies
+    },
     selectSiderBar(state, key) {
       state.siderBar.active = key
     },
@@ -32,18 +37,19 @@ const store = new Vuex.Store({
       try {
         var it = jwtDecode(token);
         if (moment().isBetween(moment.unix(it.nbf), moment.unix(it.exp))) {
-          state.currentUser = {
-            uid: it.uid,
-            groups: it.groups
-          }
+          state.currentUser.uid = it.uid
         }
+        setToken(token)
+        return
       } catch (e) {
         // eslint-disable-next-line
         console.error(e)
       }
+      removeToken()
     },
     signOut(state) {
-      state.currentUser = null
+      state.currentUser = {}
+      removeToken()
     }
   }
 })

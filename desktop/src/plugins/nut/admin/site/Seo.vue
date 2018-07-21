@@ -13,8 +13,15 @@
           <el-button type="primary" @click="submitForm('form')">{{$t('buttons.submit')}}</el-button>
         </el-form-item>
       </el-form>
+
+      <el-menu @select="handleSelect">
+        <el-menu-item :key="it" v-for="it in items" :index="it">
+          <span slot="title">{{it}}</span>
+        </el-menu-item>
+      </el-menu>
     </el-card>
   </col-form>
+
 </dashboard-layout>
 </template>
 
@@ -26,12 +33,15 @@ import {
 import {
   ADMIN
 } from '@/authorized'
+import locales from '@/locales'
 
 export default {
   name: 'AdminSiteSeo',
   data() {
     return {
-      role: ADMIN,
+      role: {
+        name: ADMIN
+      },
       title: this.$t("nut.admin.site.seo.title"),
       form: {
         google: '',
@@ -40,7 +50,21 @@ export default {
       rules: {}
     }
   },
+  computed: {
+    items() {
+      return Object.keys(locales).map((it) => `/rss/${it}`).concat([
+        `/google${this.form.google}.html`,
+        `/baidu_verify_${this.form.baidu}.html`,
+        '/robots.txt',
+        '/sitemap.xml'
+      ])
+    }
+  },
   methods: {
+    handleSelect(key) {
+      var win = window.open(key, '_blank')
+      win.focus()
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {

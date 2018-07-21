@@ -12,7 +12,8 @@ pub struct User {
     pub current_sign_in_ip: Option<String>,
 }
 
-#[derive(GraphQLObject, Debug, Serialize)]
+#[derive(GraphQLObject, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Policy {
     pub role_name: String,
     pub resource_type: Option<String>,

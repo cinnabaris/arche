@@ -40,15 +40,12 @@ import {
   failed
 } from '@/request'
 import lodash from 'lodash'
-import {
-  FORUM
-} from '@/authorized'
 
 export default {
   name: 'ForumTopicsIndex',
   data() {
     return {
-      role: FORUM,
+      role: null,
       title: this.$t("forum.topics.index.title"),
       size: 12,
       page: 1,

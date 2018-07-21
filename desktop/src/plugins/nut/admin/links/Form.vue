@@ -48,7 +48,9 @@ export default {
   name: 'AdminLinksForm',
   data() {
     return {
-      role: ADMIN,
+      role: {
+        name: ADMIN
+      },
       title: this.$t("nut.admin.links.index.title"),
       form: {
         id: null,

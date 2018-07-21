@@ -21,7 +21,6 @@ import {
   client,
   failed
 } from '@/request'
-import lodash from 'lodash'
 
 export default {
   name: 'ForumPostForm',
@@ -35,11 +34,11 @@ export default {
         mediaType: 'html',
       },
       rules: {
-        // body: [{
-        //   required: true,
-        //   message: this.$t('validations.required'),
-        //   trigger: ['blur', 'change']
-        // }]
+        body: [{
+          required: true,
+          message: this.$t('validations.required'),
+          trigger: ['blur', 'change']
+        }]
       }
     }
   },
@@ -53,7 +52,6 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           var id = this.$route.params.id
-          var topic = this.$route.params.topic
           client().request(id ?
             `mutation form($id: String!, $body: String!, $mediaType: String!){
             updateForumPost(id: $id, body: $body, mediaType: $mediaType) {

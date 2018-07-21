@@ -1,20 +1,26 @@
-export const ADMIN = 'admin'
 export const CARING = 'caring'
 export const FORUM = 'forum'
 export const POS = 'pos'
 export const HOTEL = 'hotel'
 export const LIBRARY = 'library'
 
+export const MANAGER = 'manager'
+export const ADMIN = 'admin'
+
 export const check = (user, role) => {
-  if (!user || !user.uid || !user.groups) {
+  // non-sign-in
+  if (!user.uid || !user.policies) {
     return false
   }
+  // only need sign-in
+  if (!role) {
+    return true
+  }
 
-  if (role) {
-    if (user.groups.includes(ADMIN)) {
+  return user.policies.filter((it) => {
+    if (it.roleName == ADMIN) {
       return true
     }
-    return user.groups.includes(role)
-  }
-  return true
+    return it.roleName === role.name && it.resourceType === role.type && it.resourceId === role.id
+  }).length > 0
 }
