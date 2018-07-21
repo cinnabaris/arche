@@ -1,4 +1,5 @@
 use juniper::{self, FieldResult};
+use log;
 
 use super::super::{
     env,
@@ -105,7 +106,13 @@ graphql_object!(Query: Context |&self| {
         ge!(nut::graphql::users::query::logs(executor.context()))
     }
     field listUserPolicy(&executor) -> FieldResult<Vec<nut::graphql::users::models::Policy>> {
-        ge!(nut::graphql::users::query::policies(executor.context()))
+        match nut::graphql::users::query::policies(executor.context()){
+            Ok(v) => Ok(v),
+            Err(e) => {
+                log::error!("{:?}", e);
+                Ok(Vec::new())
+            },
+        }
     }
     field forgotUserPassword(&executor, email:String) -> FieldResult<H> {
         gq!(executor, nut::graphql::users::query::ForgotPassword{
