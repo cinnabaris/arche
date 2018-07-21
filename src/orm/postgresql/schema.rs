@@ -38,15 +38,6 @@ table! {
 }
 
 table! {
-    caring_managers (id) {
-        id -> Int8,
-        topic_id -> Int8,
-        user_id -> Int8,
-        created_at -> Timestamp,
-    }
-}
-
-table! {
     caring_posts (id) {
         id -> Int8,
         topic_id -> Int8,
@@ -368,7 +359,6 @@ allow_tables_to_appear_in_same_query!(
     ar_internal_metadata,
     attachments,
     cards,
-    caring_managers,
     caring_posts,
     caring_posts_members,
     caring_tags,

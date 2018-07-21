@@ -13,12 +13,5 @@ class CreateCaringTopics < ActiveRecord::Migration[5.2]
       t.datetime :created_at, null: false
     end
     add_index :caring_topics_tags, %i[topic_id tag_id], unique: true
-
-    create_table :caring_managers do |t|
-      t.references :topic, null: false
-      t.references :user, null: false
-      t.datetime :created_at, null: false
-    end
-    add_index :caring_managers, %i[topic_id user_id], unique: true
   end
 end

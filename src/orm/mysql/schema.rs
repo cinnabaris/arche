@@ -38,15 +38,6 @@ table! {
 }
 
 table! {
-    caring_managers (id) {
-        id -> Bigint,
-        topic_id -> Bigint,
-        user_id -> Bigint,
-        created_at -> Datetime,
-    }
-}
-
-table! {
     caring_posts (id) {
         id -> Bigint,
         topic_id -> Bigint,
@@ -368,7 +359,6 @@ allow_tables_to_appear_in_same_query!(
     ar_internal_metadata,
     attachments,
     cards,
-    caring_managers,
     caring_posts,
     caring_posts_members,
     caring_tags,
