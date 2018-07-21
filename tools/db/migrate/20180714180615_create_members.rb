@@ -8,6 +8,7 @@ class CreateMembers < ActiveRecord::Migration[5.2]
       t.string :address, limit: 255
       t.string :line, limit: 255
       t.string :wechat, limit: 255
+      t.string :skype, limit: 255
       t.string :weibo, limit: 255
       t.string :facebook, limit: 255
       t.timestamps
