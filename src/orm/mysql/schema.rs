@@ -47,23 +47,6 @@ table! {
 }
 
 table! {
-    caring_members (id) {
-        id -> Bigint,
-        nick_name -> Varchar,
-        real_name -> Varchar,
-        phone -> Nullable<Varchar>,
-        email -> Nullable<Varchar>,
-        address -> Nullable<Varchar>,
-        line -> Nullable<Varchar>,
-        wechat -> Nullable<Varchar>,
-        weibo -> Nullable<Varchar>,
-        facebook -> Nullable<Varchar>,
-        created_at -> Datetime,
-        updated_at -> Datetime,
-    }
-}
-
-table! {
     caring_posts (id) {
         id -> Bigint,
         topic_id -> Bigint,
@@ -223,6 +206,23 @@ table! {
 }
 
 table! {
+    members (id) {
+        id -> Bigint,
+        nick_name -> Varchar,
+        real_name -> Varchar,
+        phone -> Nullable<Varchar>,
+        email -> Nullable<Varchar>,
+        address -> Nullable<Varchar>,
+        line -> Nullable<Varchar>,
+        wechat -> Nullable<Varchar>,
+        weibo -> Nullable<Varchar>,
+        facebook -> Nullable<Varchar>,
+        created_at -> Datetime,
+        updated_at -> Datetime,
+    }
+}
+
+table! {
     notifications (id) {
         id -> Bigint,
         user_id -> Bigint,
@@ -368,7 +368,6 @@ allow_tables_to_appear_in_same_query!(
     attachments,
     cards,
     caring_managers,
-    caring_members,
     caring_posts,
     caring_posts_members,
     caring_tags,
@@ -383,6 +382,7 @@ allow_tables_to_appear_in_same_query!(
     links,
     locales,
     logs,
+    members,
     notifications,
     policies,
     roles,

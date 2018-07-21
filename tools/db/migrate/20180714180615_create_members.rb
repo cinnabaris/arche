@@ -1,6 +1,6 @@
-class CreateCaringMembers < ActiveRecord::Migration[5.2]
+class CreateMembers < ActiveRecord::Migration[5.2]
   def change
-    create_table :caring_members do |t|
+    create_table :members do |t|
       t.string :nick_name, null: false, limit: 255
       t.string :real_name, null: false, limit: 255
       t.string :phone, limit: 255
@@ -12,7 +12,7 @@ class CreateCaringMembers < ActiveRecord::Migration[5.2]
       t.string :facebook, limit: 255
       t.timestamps
     end
-    add_index :caring_members, :nick_name, unique: true
-    add_index :caring_members, :real_name
+    add_index :members, :nick_name, unique: true
+    add_index :members, :real_name
   end
 end
