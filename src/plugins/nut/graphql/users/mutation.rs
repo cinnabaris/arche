@@ -57,12 +57,12 @@ impl UpdatePolicy {
 
         db.transaction::<_, Error, _>(|| {
             for it in policies.iter() {
-                let role = RoleType::By(it.name.clone());
-
+                let role = RoleType::Manager;
+                let rty = Some(it.name.clone());
                 if it.enable {
                     let nbf = NaiveDate::parse_from_str(&self.nbf, utils::DATE_FORMAT)?;
                     let exp = NaiveDate::parse_from_str(&self.exp, utils::DATE_FORMAT)?;
-                    dao::policy::apply_by_range(db, &user, &role, &None, &None, &nbf, &exp)?;
+                    dao::policy::apply_by_range(db, &user, &role, &rty, &None, &nbf, &exp)?;
                     l!(
                         db,
                         &user,
@@ -71,14 +71,14 @@ impl UpdatePolicy {
                         "nut.logs.role.apply.range",
                         &Some(json!({
                             "name":format!("{}", role),
-                            "type": None::<String>,
+                            "type": rty,
                             "id": None::<i64>,
                             "exp": exp.format(utils::DATE_FORMAT).to_string(),
                             "nbf": nbf.format(utils::DATE_FORMAT).to_string(),
                         }))
                     )?;
                 } else {
-                    dao::policy::deny(db, &user, &role, &None, &None)?;
+                    dao::policy::deny(db, &user, &role, &rty, &None)?;
                     l!(
                         db,
                         &user,
@@ -87,7 +87,7 @@ impl UpdatePolicy {
                         "nut.logs.role.deny",
                         &Some(json!({
                             "name":format!("{}", role),
-                            "type": None::<String>,
+                            "type": rty,
                             "id": None::<i64>
                         }))
                     )?;
@@ -244,7 +244,6 @@ impl SignInByEmail {
                             &mut json!({
                                 UID: uid,
                                 ACT: ACT_SIGN_IN,
-                                "groups": dao::policy::groups(db, &id)?,
                             }),
                             Duration::days(7),
                         )?,

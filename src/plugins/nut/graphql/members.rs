@@ -17,8 +17,11 @@ use super::super::super::{
 };
 
 fn can_view(db: &Db, user: &i64) -> Result<()> {
-    for it in vec![RoleType::Admin, RoleType::By(caring::NAME.to_string())] {
-        if nut::dao::policy::is(db, user, &it) {
+    for (n, rty, rid) in vec![
+        (RoleType::Admin, None, None),
+        (RoleType::Manager, Some(caring::NAME.to_string()), None),
+    ] {
+        if nut::dao::policy::can(db, user, &n, &rty, &rid) {
             return Ok(());
         }
     }
@@ -261,6 +264,8 @@ pub struct Update {
     #[validate(length(min = "1"))]
     pub id: String,
     #[validate(length(min = "1"))]
+    pub nick_name: String,
+    #[validate(length(min = "1"))]
     pub real_name: String,
     pub phone: Option<String>,
     pub email: Option<String>,
@@ -281,6 +286,7 @@ impl Update {
         let it = members::dsl::members.filter(members::dsl::id.eq(&id));
         update(it)
             .set((
+                members::dsl::real_name.eq(&self.nick_name),
                 members::dsl::real_name.eq(&self.real_name),
                 members::dsl::phone.eq(&self.phone),
                 members::dsl::email.eq(&self.email),

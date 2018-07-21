@@ -14,7 +14,9 @@ pub struct User {
 
 #[derive(GraphQLObject, Debug, Serialize)]
 pub struct Policy {
-    pub name: String,
+    pub role_name: String,
+    pub resource_type: Option<String>,
+    pub resource_id: Option<String>,
 }
 
 #[derive(GraphQLObject, Debug, Serialize)]

@@ -5,6 +5,7 @@ pub enum Type {
     Admin,
     Root,
     Member,
+    Manager,
     By(String),
 }
 
@@ -14,6 +15,7 @@ impl fmt::Display for Type {
             Type::Admin => write!(fmt, "admin"),
             Type::Root => write!(fmt, "root"),
             Type::Member => write!(fmt, "member"),
+            Type::Manager => write!(fmt, "manager"),
             Type::By(n) => write!(fmt, "{}", &n),
         }
     }

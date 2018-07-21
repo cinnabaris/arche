@@ -56,6 +56,13 @@ graphql_object!(Query: Context |&self| {
         ge!(nut::graphql::links::list(executor.context()))
     }
 
+    field showMember(&executor, id: String) -> FieldResult<nut::graphql::members::Member> {
+        gq!(executor, nut::graphql::members::Show{id: id})
+    }
+    field listMember(&executor) -> FieldResult<Vec<nut::graphql::members::Member>> {
+        ge!(nut::graphql::members::list(executor.context()))
+    }
+
     field listLeaveWord(&executor) -> FieldResult<Vec<nut::graphql::leave_words::LeaveWord>> {
         ge!(nut::graphql::leave_words::list(executor.context()))
     }
@@ -96,6 +103,9 @@ graphql_object!(Query: Context |&self| {
     }
     field listUserLog(&executor) -> FieldResult<Vec<nut::graphql::users::models::Log>> {
         ge!(nut::graphql::users::query::logs(executor.context()))
+    }
+    field listUserPolicy(&executor) -> FieldResult<Vec<nut::graphql::users::models::Policy>> {
+        ge!(nut::graphql::users::query::policies(executor.context()))
     }
     field forgotUserPassword(&executor, email:String) -> FieldResult<H> {
         gq!(executor, nut::graphql::users::query::ForgotPassword{

@@ -67,6 +67,41 @@ graphql_object!(
             })
         }
         //-----------------------nut----------------
+        field createMember(&executor, nick_name: String, real_name: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
+            gq!(executor, nut::graphql::members::Create{
+                nick_name: nick_name,
+                real_name: real_name,
+                phone: phone,
+                email: email,
+                address: address,
+                line: line,
+                wechat: wechat,
+                skype: skype,
+                weibo: weibo,
+                facebook: facebook,
+            })
+        }
+        field updateMember(&executor, id: String, nick_name: String, real_name: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
+            gq!(executor, nut::graphql::members::Update{
+                id: id,
+                nick_name: nick_name,
+                real_name: real_name,
+                phone: phone,
+                email: email,
+                address: address,
+                line: line,
+                wechat: wechat,
+                skype: skype,
+                weibo: weibo,
+                facebook: facebook,
+            })
+        }
+        field removeMember(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, nut::graphql::members::Remove{
+                id: id,
+            })
+        }
+
         field createFriendLink(&executor, title: String, home: String, logo: String, position: i32) -> FieldResult<H> {
             gq!(executor, nut::graphql::friend_links::Create{
                 title: title,

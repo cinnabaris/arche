@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use chrono::NaiveDateTime;
+use chrono::{NaiveDate, NaiveDateTime, Utc};
 use diesel::prelude::*;
 use validator::Validate;
 
@@ -16,6 +16,42 @@ use super::{
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
 };
 
+pub fn policies(ctx: &Context) -> Result<Vec<Policy>> {
+    let user = ctx.current_user()?;
+    let mut items = Vec::new();
+    let db = ctx.db.deref();
+    let today = Utc::now().naive_utc().date();
+    for (rid, nbf, exp) in policies::dsl::policies
+        .select((
+            policies::dsl::role_id,
+            policies::dsl::nbf,
+            policies::dsl::exp,
+        ))
+        .filter(policies::dsl::user_id.eq(&user.id))
+        .load::<(i64, NaiveDate, NaiveDate)>(db)?
+    {
+        if today.ge(&nbf) && today.le(&exp) {
+            let (name, rty, rid) = roles::dsl::roles
+                .select((
+                    roles::dsl::name,
+                    roles::dsl::resource_type,
+                    roles::dsl::resource_id,
+                ))
+                .filter(roles::dsl::id.eq(&rid))
+                .first::<(String, Option<String>, Option<i64>)>(db)?;
+            items.push(Policy {
+                role_name: name,
+                resource_type: rty,
+                resource_id: match rid {
+                    Some(v) => Some(v.to_string()),
+                    None => None,
+                },
+            });
+        }
+    }
+    Ok(items)
+}
+
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPolicy {
@@ -30,7 +66,14 @@ impl GetPolicy {
         let db = ctx.db.deref();
         let user: i64 = self.id.parse()?;
         let items = dao::policy::groups(db, &user)?;
-        Ok(items.iter().map(|n| Policy { name: n.clone() }).collect())
+        Ok(items
+            .iter()
+            .map(|n| Policy {
+                role_name: n.clone(),
+                resource_id: None,
+                resource_type: None,
+            })
+            .collect())
     }
 }
 
