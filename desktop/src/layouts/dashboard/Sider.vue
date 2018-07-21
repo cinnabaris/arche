@@ -75,6 +75,9 @@ export default {
             label: 'nut.admin.users.index.title',
             to: 'admin.users.index'
           }, {
+            label: 'nut.admin.members.index.title',
+            to: 'admin.members.index'
+          }, {
             label: 'nut.admin.locales.index.title',
             to: 'admin.locales.index'
           }, {

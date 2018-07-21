@@ -69,7 +69,7 @@ graphql_object!(
         //-----------------------nut----------------
         field createMember(&executor, nick_name: String, real_name: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
             gq!(executor, nut::graphql::members::Create{
-                nick_name: nick_name,
+                nick_name: nick_name.to_lowercase().trim().to_string(),
                 real_name: real_name,
                 phone: phone,
                 email: email,
@@ -81,10 +81,9 @@ graphql_object!(
                 facebook: facebook,
             })
         }
-        field updateMember(&executor, id: String, nick_name: String, real_name: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
+        field updateMember(&executor, id: String, real_name: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
             gq!(executor, nut::graphql::members::Update{
                 id: id,
-                nick_name: nick_name,
                 real_name: real_name,
                 phone: phone,
                 email: email,
@@ -266,7 +265,7 @@ graphql_object!(
 
         field signInUserByEmail(&executor, email: String, password: String) -> FieldResult<nut::graphql::users::models::SignIn> {
             gq!(executor, nut::graphql::users::mutation::SignInByEmail{
-                email: email,
+                email: email.to_lowercase().trim().to_string(),
                 password: password,
             })
         }
@@ -289,7 +288,7 @@ graphql_object!(
         field signUpUser(&executor, name: String, email:String, password:String) -> FieldResult<H> {
             gq!(executor, nut::graphql::users::mutation::SignUp{
                 name: name,
-                email: email.to_lowercase(),
+                email: email.to_lowercase().trim().to_string(),
                 password: password,
             })
         }
@@ -297,7 +296,7 @@ graphql_object!(
         field install(&executor, name: String, email:String, password:String) -> FieldResult<H> {
             gq!(executor, nut::graphql::home::Install{
                 name: name,
-                email: email.to_lowercase(),
+                email: email.to_lowercase().trim().to_string(),
                 password: password,
             })
         }

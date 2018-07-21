@@ -53,7 +53,8 @@ export default {
     to: '至',
     nbf: '起始',
     exp: '截止',
-    lang: '语言'
+    lang: '语言',
+    contact: '联系信息'
   },
   validations: {
     email: '不是正确的邮件地址',
@@ -117,6 +118,11 @@ export default {
       links: {
         index: {
           title: '导航链接'
+        }
+      },
+      members: {
+        index: {
+          title: '会员'
         }
       },
       cards: {
@@ -210,6 +216,18 @@ export default {
       },
       card: {
         action: '动作'
+      },
+      member: {
+        'nick-name': '唯一ID',
+        'real-name': '姓名',
+        phone: '电话号码',
+        email: '邮箱',
+        address: '住址',
+        line: 'Line',
+        wechat: '微信',
+        skype: 'Skype',
+        weibo: '微博',
+        facebook: 'Facebook'
       }
     }
   },

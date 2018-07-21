@@ -15,6 +15,8 @@ import NewLeaveWord from './leave-words/New'
 import Install from './Install'
 import Home from './Home'
 
+import AdminMembersIndex from './admin/members/Index'
+import AdminMembersForm from './admin/members/Form'
 import AdminUsersIndex from './admin/users/Index'
 import AdminUsersPolicy from './admin/users/Policy'
 import AdminFriendLinksIndex from './admin/friend-links/Index'
@@ -85,6 +87,18 @@ export default[
     name: 'admin.cards.edit',
     path: '/admin/cards/:id/edit',
     component: AdminCardsForm
+  }, {
+    name: 'admin.members.index',
+    path: '/admin/members',
+    component: AdminMembersIndex
+  }, {
+    name: 'admin.members.new',
+    path: '/admin/members/new',
+    component: AdminMembersForm
+  }, {
+    name: 'admin.members.edit',
+    path: '/admin/members/:id/edit',
+    component: AdminMembersForm
   }, {
     name: 'admin.links.index',
     path: '/admin/links',
