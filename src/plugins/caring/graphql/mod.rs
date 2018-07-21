@@ -1,3 +1,3 @@
-pub mod models;
-pub mod mutation;
-pub mod query;
+pub mod posts;
+pub mod tags;
+pub mod topics;

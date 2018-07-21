@@ -215,6 +215,7 @@ table! {
         address -> Nullable<Varchar>,
         line -> Nullable<Varchar>,
         wechat -> Nullable<Varchar>,
+        skype -> Nullable<Varchar>,
         weibo -> Nullable<Varchar>,
         facebook -> Nullable<Varchar>,
         created_at -> Timestamp,

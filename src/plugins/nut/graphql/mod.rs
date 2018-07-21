@@ -4,5 +4,6 @@ pub mod home;
 pub mod leave_words;
 pub mod links;
 pub mod locales;
+pub mod members;
 pub mod site;
 pub mod users;
