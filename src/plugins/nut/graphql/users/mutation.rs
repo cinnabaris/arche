@@ -68,12 +68,13 @@ impl UpdatePolicy {
                         &user,
                         &ctx.client_ip,
                         &ctx.locale,
-                        "nut.logs.role.apply",
+                        "nut.logs.role.apply.range",
                         &Some(json!({
                             "name":format!("{}", role),
                             "type": None::<String>,
                             "id": None::<i64>,
-                            "ttl": format!("{}-{}", nbf, exp)
+                            "exp": exp.format(utils::DATE_FORMAT).to_string(),
+                            "nbf": nbf.format(utils::DATE_FORMAT).to_string(),
                         }))
                     )?;
                 } else {

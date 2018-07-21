@@ -1,6 +1,9 @@
 use juniper::{self, FieldResult};
 
-use super::super::{env, plugins::nut};
+use super::super::{
+    env,
+    plugins::{forum, nut},
+};
 use super::{context::Context, H};
 
 pub struct Query;
@@ -12,6 +15,24 @@ graphql_object!(Query: Context |&self| {
     }
 
     //--------------------forum---------------------
+    field showForumPost(&executor, id: String) -> FieldResult<forum::graphql::posts::Post> {
+        gq!(executor, forum::graphql::posts::Show{id: id})
+    }
+    field listForumPost(&executor) -> FieldResult<Vec<forum::graphql::posts::Post>> {
+        ge!(forum::graphql::posts::list(executor.context()))
+    }
+    field showForumTopic(&executor, id: String) -> FieldResult<forum::graphql::topics::Topic> {
+        gq!(executor, forum::graphql::topics::Show{id: id})
+    }
+    field listForumTopic(&executor) -> FieldResult<Vec<forum::graphql::topics::Topic>> {
+        ge!(forum::graphql::topics::list(executor.context()))
+    }
+    field showForumTag(&executor, id: String) -> FieldResult<forum::graphql::tags::Tag> {
+        gq!(executor, forum::graphql::tags::Show{id: id})
+    }
+    field listForumTag(&executor) -> FieldResult<Vec<forum::graphql::tags::Tag>> {
+        ge!(forum::graphql::tags::list(executor.context()))
+    }
 
     //--------------------nut-----------------------
     field showFriendLink(&executor, id: String) -> FieldResult<nut::graphql::friend_links::FriendLink> {

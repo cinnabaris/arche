@@ -8,23 +8,23 @@ pub struct Mutation;
 graphql_object!(
     Mutation: Context | &self | {
         //-----------------------forum----------------
-        field createTag(&executor, name: String) -> FieldResult<H> {
+        field createForumTag(&executor, name: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::tags::Create{
                 name: name,
             })
         }
-        field updateTag(&executor, id: String, name: String) -> FieldResult<H> {
+        field updateForumTag(&executor, id: String, name: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::tags::Update{
                 id: id,
                 name: name,
             })
         }
-        field removeTag(&executor, id: String) -> FieldResult<H> {
+        field removeForumTag(&executor, id: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::tags::Remove{
                 id: id,
             })
         }
-        field createPost(&executor, topic_id: String, post_id: Option<String>, body: String, media_type: String) -> FieldResult<H> {
+        field createForumPost(&executor, topic_id: String, post_id: Option<String>, body: String, media_type: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::posts::Create{
                 topic_id: topic_id,
                 post_id: post_id,
@@ -32,19 +32,19 @@ graphql_object!(
                 media_type: media_type,
             })
         }
-        field updatePost(&executor, id: String, body: String, media_type: String) -> FieldResult<H> {
+        field updateForumPost(&executor, id: String, body: String, media_type: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::posts::Update{
                 id: id,
                 body: body,
                 media_type: media_type,
             })
         }
-        field removePost(&executor, id: String) -> FieldResult<H> {
+        field removeForumPost(&executor, id: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::posts::Remove{
                 id: id,
             })
         }
-        field createTopic(&executor, title: String, body: String, media_type: String, tags: Vec<String>) -> FieldResult<H> {
+        field createForumTopic(&executor, title: String, body: String, media_type: String, tags: Vec<String>) -> FieldResult<H> {
             gq!(executor, forum::graphql::topics::Create{
                 title: title,
                 body: body,
@@ -52,7 +52,7 @@ graphql_object!(
                 tags: tags,
             })
         }
-        field updateTopic(&executor, id: String, title: String, body: String, media_type: String, tags: Vec<String>) -> FieldResult<H> {
+        field updateForumTopic(&executor, id: String, title: String, body: String, media_type: String, tags: Vec<String>) -> FieldResult<H> {
             gq!(executor, forum::graphql::topics::Update{
                 id: id,
                 title: title,
@@ -61,7 +61,7 @@ graphql_object!(
                 tags: tags,
             })
         }
-        field removeTopic(&executor, id: String) -> FieldResult<H> {
+        field removeForumTopic(&executor, id: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::topics::Remove{
                 id: id,
             })

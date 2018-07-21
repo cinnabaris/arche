@@ -31,5 +31,7 @@ nut:
       change-password:     修改密码
       reset-password:      重置密码
     role:
-      apply:               应用权限{{name}}@{{type}}/{{id}}?ttl={{ttl}}
+      apply:
+        ttl:               应用权限{{name}}@{{type}}/{{id}}?ttl={{ttl}}
+        range:             应用权限{{name}}@{{type}}/{{id}}?nbf={{nbf}}&exp={{exp}}
       deny:                禁止权限{{name}}@{{type}}/{{id}}

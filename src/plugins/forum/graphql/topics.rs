@@ -8,20 +8,23 @@ use validator::Validate;
 use super::super::super::super::{
     errors::{Error, Result},
     graphql::{context::Context, H},
-    orm::schema::{forum_posts, forum_topics, forum_topics_tags},
+    orm::schema::{forum_posts, forum_tags, forum_topics, forum_topics_tags},
     rfc::Utc as ToUtc,
 };
 use super::super::dao;
+use super::tags::Tag;
 
 #[derive(GraphQLObject, Debug, Serialize)]
 pub struct Topic {
     pub id: String,
+    pub lang: String,
     pub title: String,
     pub body: String,
     pub media_type: String,
     pub user_id: String,
     pub editable: bool,
     pub updated_at: DateTime<Utc>,
+    pub tags: Vec<Tag>,
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
@@ -37,24 +40,45 @@ impl Show {
         let user = ctx.current_user()?;
         let db = ctx.db.deref();
         let is_manager = dao::is_manager(db, user.id);
-        let (user_id, title, body, media_type, updated_at) = forum_topics::dsl::forum_topics
+
+        let tag_ids = forum_topics_tags::dsl::forum_topics_tags
+            .select(forum_topics_tags::dsl::tag_id)
+            .filter(forum_topics_tags::dsl::topic_id.eq(id))
+            .load::<(i64)>(db)?;
+        let mut tags = Vec::new();
+        for id in tag_ids {
+            let (name, updated_at) = forum_tags::dsl::forum_tags
+                .select((forum_tags::dsl::name, forum_tags::dsl::updated_at))
+                .filter(forum_tags::dsl::id.eq(&id))
+                .first::<(String, NaiveDateTime)>(db)?;
+            tags.push(Tag {
+                id: id.to_string(),
+                name: name,
+                updated_at: updated_at.to_utc(),
+            });
+        }
+
+        let (user_id, lang, title, body, media_type, updated_at) = forum_topics::dsl::forum_topics
             .select((
                 forum_topics::dsl::user_id,
+                forum_topics::dsl::lang,
                 forum_topics::dsl::title,
                 forum_topics::dsl::body,
                 forum_topics::dsl::media_type,
                 forum_topics::dsl::updated_at,
             ))
             .filter(forum_topics::dsl::id.eq(&id))
-            .first::<(i64, String, String, String, NaiveDateTime)>(db)?;
+            .first::<(i64, String, String, String, String, NaiveDateTime)>(db)?;
 
         Ok(Topic {
             id: self.id.clone(),
             user_id: user_id.to_string(),
+            lang: lang,
             title: title,
             body: body,
             media_type: media_type,
             editable: is_manager || user_id == user.id,
+            tags: tags,
             updated_at: updated_at.to_utc(),
         })
     }
@@ -98,25 +122,30 @@ pub fn list(ctx: &Context) -> Result<Vec<Topic>> {
         .select((
             forum_topics::dsl::id,
             forum_topics::dsl::user_id,
+            forum_topics::dsl::lang,
             forum_topics::dsl::title,
             forum_topics::dsl::body,
             forum_topics::dsl::media_type,
             forum_topics::dsl::updated_at,
         ))
         .order(forum_topics::dsl::updated_at.desc())
-        .load::<(i64, i64, String, String, String, NaiveDateTime)>(db)?;
+        .load::<(i64, i64, String, String, String, String, NaiveDateTime)>(db)?;
 
     Ok(items
         .iter()
-        .map(|(id, user_id, title, body, media_type, updated_at)| Topic {
-            id: id.to_string(),
-            user_id: user_id.to_string(),
-            title: title.clone(),
-            body: body.clone(),
-            media_type: media_type.clone(),
-            editable: is_manager || *user_id == user.id,
-            updated_at: updated_at.to_utc(),
-        })
+        .map(
+            |(id, user_id, lang, title, body, media_type, updated_at)| Topic {
+                id: id.to_string(),
+                user_id: user_id.to_string(),
+                lang: lang.clone(),
+                title: title.clone(),
+                body: body.clone(),
+                media_type: media_type.clone(),
+                editable: is_manager || *user_id == user.id,
+                updated_at: updated_at.to_utc(),
+                tags: Vec::new(),
+            },
+        )
         .collect())
 }
 
@@ -141,6 +170,7 @@ impl Create {
             let id = insert_into(forum_topics::dsl::forum_topics)
                 .values((
                     forum_topics::dsl::user_id.eq(&user.id),
+                    forum_topics::dsl::lang.eq(&ctx.locale),
                     forum_topics::dsl::title.eq(&self.title),
                     forum_topics::dsl::body.eq(&self.body),
                     forum_topics::dsl::media_type.eq(&self.media_type),

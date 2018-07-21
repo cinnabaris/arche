@@ -52,7 +52,7 @@ impl Install {
                     &user,
                     &ctx.client_ip,
                     &ctx.locale,
-                    "nut.logs.role.apply",
+                    "nut.logs.role.apply.ttl",
                     &Some(json!({
                             "name":format!("{}", it),
                             "type": None::<String>,

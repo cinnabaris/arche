@@ -93,10 +93,19 @@ export default {
       var forum = {
         icon: 'sharealt',
         label: 'forum.dashboard.title',
-        children: []
+        children: [{
+          label: 'forum.topics.index.title',
+          to: 'forum.topics.index'
+        }, {
+          label: 'forum.posts.index.title',
+          to: 'forum.posts.index'
+        }]
       }
       if (check(user, FORUM)) {
-        // TODO
+        forum.children.push({
+          label: 'forum.tags.index.title',
+          to: 'forum.tags.index'
+        })
       }
       items.push(forum)
       items.push({

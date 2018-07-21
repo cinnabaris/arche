@@ -50,9 +50,10 @@ export default {
     'created-at': '创建时间',
     'updated-at': '修改时间',
     'date-range': '日期区间',
-    'to': '至',
-    'nbf': '起始',
-    'exp': '截止'
+    to: '至',
+    nbf: '起始',
+    exp: '截止',
+    lang: '语言'
   },
   validations: {
     email: '不是正确的邮件地址',
@@ -215,6 +216,26 @@ export default {
   forum: {
     dashboard: {
       title: '交流论坛'
+    },
+    attributes: {
+      topic: {
+        tags: '标签'
+      }
+    },
+    topics: {
+      index: {
+        title: '话题'
+      }
+    },
+    posts: {
+      index: {
+        title: '讨论'
+      }
+    },
+    tags: {
+      index: {
+        title: '标签'
+      }
     }
   },
   cbeta: {

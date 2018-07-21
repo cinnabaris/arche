@@ -200,7 +200,6 @@ impl Update {
                 forum_posts::dsl::body.eq(&self.body),
                 forum_posts::dsl::media_type.eq(&self.media_type),
                 forum_posts::dsl::updated_at.eq(&now),
-                forum_posts::dsl::updated_at.eq(&now),
             ))
             .execute(db)?;
         Ok(H::new())
