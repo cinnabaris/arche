@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 use rocket::http::Status;
 use validator::Validate;
@@ -9,7 +9,8 @@ use super::super::super::super::{
     errors::Result,
     graphql::{context::Context, H},
     orm::{schema::members, Connection as Db},
-    rfc::Utc as ToUtc,
+    rfc::UtcDateTime,
+    utils,
 };
 use super::super::super::{
     caring,
@@ -39,6 +40,8 @@ pub struct Member {
     pub id: String,
     pub nick_name: String,
     pub real_name: String,
+    pub gender: String,
+    pub birthday: String, //FIXME NaiveDate,
     pub phone: Option<String>,
     pub email: Option<String>,
     pub address: Option<String>,
@@ -66,6 +69,8 @@ impl Show {
         let (
             nick_name,
             real_name,
+            gender,
+            birthday,
             phone,
             email,
             address,
@@ -79,6 +84,8 @@ impl Show {
             .select((
                 members::dsl::nick_name,
                 members::dsl::real_name,
+                members::dsl::gender,
+                members::dsl::birthday,
                 members::dsl::phone,
                 members::dsl::email,
                 members::dsl::address,
@@ -93,6 +100,8 @@ impl Show {
             .first::<(
                 String,
                 String,
+                String,
+                NaiveDate,
                 Option<String>,
                 Option<String>,
                 Option<String>,
@@ -108,6 +117,8 @@ impl Show {
             id: self.id.clone(),
             nick_name: nick_name,
             real_name: real_name,
+            gender: gender,
+            birthday: birthday.format(utils::DATE_FORMAT).to_string(),
             phone: phone,
             email: email,
             address: address,
@@ -148,6 +159,8 @@ pub fn list(ctx: &Context) -> Result<Vec<Member>> {
             members::dsl::id,
             members::dsl::nick_name,
             members::dsl::real_name,
+            members::dsl::gender,
+            members::dsl::birthday,
             members::dsl::phone,
             members::dsl::email,
             members::dsl::address,
@@ -163,6 +176,8 @@ pub fn list(ctx: &Context) -> Result<Vec<Member>> {
             i64,
             String,
             String,
+            String,
+            NaiveDate,
             Option<String>,
             Option<String>,
             Option<String>,
@@ -181,6 +196,8 @@ pub fn list(ctx: &Context) -> Result<Vec<Member>> {
                 id,
                 nick_name,
                 real_name,
+                gender,
+                birthday,
                 phone,
                 email,
                 address,
@@ -194,6 +211,8 @@ pub fn list(ctx: &Context) -> Result<Vec<Member>> {
                 id: id.to_string(),
                 nick_name: nick_name.clone(),
                 real_name: real_name.clone(),
+                gender: gender.clone(),
+                birthday: birthday.format(utils::DATE_FORMAT).to_string(),
                 phone: phone.clone(),
                 email: email.clone(),
                 address: address.clone(),
@@ -214,6 +233,8 @@ pub struct Create {
     pub nick_name: String,
     #[validate(length(min = "1"))]
     pub real_name: String,
+    pub gender: String,
+    pub birthday: String,
     pub phone: Option<String>,
     pub email: Option<String>,
     pub address: Option<String>,
@@ -227,6 +248,7 @@ pub struct Create {
 impl Create {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
+        let birthday = NaiveDate::parse_from_str(&self.birthday, utils::DATE_FORMAT)?;
         let user = ctx.current_user()?;
         let db = ctx.db.deref();
         can_edit(db, &user.id)?;
@@ -243,6 +265,8 @@ impl Create {
             .values((
                 members::dsl::nick_name.eq(&self.nick_name),
                 members::dsl::real_name.eq(&self.real_name),
+                members::dsl::gender.eq(&self.gender),
+                members::dsl::birthday.eq(&birthday),
                 members::dsl::phone.eq(&self.phone),
                 members::dsl::email.eq(&self.email),
                 members::dsl::address.eq(&self.address),
@@ -265,6 +289,8 @@ pub struct Update {
     pub id: String,
     #[validate(length(min = "1"))]
     pub real_name: String,
+    pub gender: String,
+    pub birthday: String,
     pub phone: Option<String>,
     pub email: Option<String>,
     pub address: Option<String>,
@@ -278,6 +304,7 @@ pub struct Update {
 impl Update {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
+        let birthday = NaiveDate::parse_from_str(&self.birthday, utils::DATE_FORMAT)?;
         let id = self.id.parse::<i64>()?;
         let db = ctx.db.deref();
         let now = Utc::now().naive_utc();
@@ -285,6 +312,8 @@ impl Update {
         update(it)
             .set((
                 members::dsl::real_name.eq(&self.real_name),
+                members::dsl::gender.eq(&self.gender),
+                members::dsl::birthday.eq(&birthday),
                 members::dsl::phone.eq(&self.phone),
                 members::dsl::email.eq(&self.email),
                 members::dsl::address.eq(&self.address),

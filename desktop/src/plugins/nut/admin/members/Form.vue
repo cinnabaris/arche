@@ -9,6 +9,14 @@
         <el-form-item :label="$t('nut.attributes.member.real-name')" prop="realName">
           <el-input v-model="form.realName" clearable required/>
         </el-form-item>
+        <el-form-item :label="$t('attributes.gender')" prop="gender">
+          <el-select v-model="form.gender" placeholder="请选择">
+            <el-option v-for="it in ['m', 'f']" :key="it" :label="$t(`attributes.gender-${it}`)" :value="it" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('attributes.birthday')" prop="birthday">
+          <el-date-picker value-format="yyyy-MM-dd" v-model="form.birthday" type="date" />
+        </el-form-item>
         <el-form-item :label="$t('nut.attributes.member.phone')" prop="phone">
           <el-input v-model="form.phone" clearable/>
         </el-form-item>
@@ -67,6 +75,8 @@ export default {
         id: null,
         nickName: '',
         realName: '',
+        gender: 'm',
+        birthday: '',
         phone: '',
         email: '',
         address: '',
@@ -83,6 +93,16 @@ export default {
           trigger: ['blur', 'change']
         }],
         realName: [{
+          required: true,
+          message: this.$t('validations.required'),
+          trigger: ['blur', 'change']
+        }],
+        gender: [{
+          required: true,
+          message: this.$t('validations.required'),
+          trigger: ['blur', 'change']
+        }],
+        birthday: [{
           required: true,
           message: this.$t('validations.required'),
           trigger: ['blur', 'change']
@@ -106,13 +126,13 @@ export default {
         if (valid) {
           var id = this.$route.params.id
           client().request(id ?
-            `mutation form($id: String!, $realName: String!, $phone: String, $email: String, $address: String, $line: String, $wechat: String, $skype: String, $weibo: String, $facebook: String){
-            updateMember(id: $id, realName: $realName, phone: $phone, email: $email, address: $address, line: $line, wechat: $wechat, skype: $skype, weibo: $weibo, facebook: $facebook) {
+            `mutation form($id: String!, $realName: String!, $gender: String!, $birthday: String!, $phone: String, $email: String, $address: String, $line: String, $wechat: String, $skype: String, $weibo: String, $facebook: String){
+            updateMember(id: $id, realName: $realName, gender: $gender, birthday: $birthday, phone: $phone, email: $email, address: $address, line: $line, wechat: $wechat, skype: $skype, weibo: $weibo, facebook: $facebook) {
               createdAt
             }
           }` :
-            `mutation form($nickName: String!, $realName: String!, $phone: String, $email: String, $address: String, $line: String, $wechat: String, $skype: String, $weibo: String, $facebook: String){
-            createMember(nickName: $nickName, realName: $realName, phone: $phone, email: $email, address: $address, line: $line, wechat: $wechat, skype: $skype, weibo: $weibo, facebook: $facebook) {
+            `mutation form($nickName: String!, $realName: String!, $gender: String!, $birthday: String!, $phone: String, $email: String, $address: String, $line: String, $wechat: String, $skype: String, $weibo: String, $facebook: String){
+            createMember(nickName: $nickName, realName: $realName, gender: $gender, birthday: $birthday, phone: $phone, email: $email, address: $address, line: $line, wechat: $wechat, skype: $skype, weibo: $weibo, facebook: $facebook) {
               createdAt
             }
           }`,
@@ -133,7 +153,7 @@ export default {
       if (id) {
         client().request(`query info($id: String!){
         showMember(id: $id) {
-          id, nickName, realName, phone, email, address, line, wechat, skype, weibo, facebook
+          id, nickName, realName, gender, birthday, phone, email, address, line, wechat, skype, weibo, facebook
         }
       }`, {
           id

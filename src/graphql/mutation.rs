@@ -67,10 +67,12 @@ graphql_object!(
             })
         }
         //-----------------------nut----------------
-        field createMember(&executor, nick_name: String, real_name: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
+        field createMember(&executor, nick_name: String, real_name: String, gender: String, birthday: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
             gq!(executor, nut::graphql::members::Create{
                 nick_name: nick_name.to_lowercase().trim().to_string(),
                 real_name: real_name,
+                gender: gender,
+                birthday: birthday,
                 phone: phone,
                 email: email,
                 address: address,
@@ -81,10 +83,12 @@ graphql_object!(
                 facebook: facebook,
             })
         }
-        field updateMember(&executor, id: String, real_name: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
+        field updateMember(&executor, id: String, real_name: String, gender: String, birthday: String, phone: Option<String>, email: Option<String>, address: Option<String>, line: Option<String>, wechat: Option<String>, skype: Option<String>, weibo: Option<String>, facebook: Option<String>) -> FieldResult<H> {
             gq!(executor, nut::graphql::members::Update{
                 id: id,
                 real_name: real_name,
+                gender: gender,
+                birthday: birthday,
                 phone: phone,
                 email: email,
                 address: address,

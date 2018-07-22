@@ -9,7 +9,7 @@ use super::super::super::super::{
     errors::{Error, Result},
     graphql::{context::Context, H},
     orm::schema::{forum_posts, forum_tags, forum_topics, forum_topics_tags},
-    rfc::Utc as ToUtc,
+    rfc::UtcDateTime,
 };
 use super::super::dao;
 use super::tags::Tag;

@@ -41,36 +41,12 @@ table! {
     caring_posts (id) {
         id -> Int8,
         topic_id -> Int8,
-        member_id -> Int8,
-        who -> Varchar,
+        user_id -> Int8,
         method -> Varchar,
-        address -> Varchar,
-        progress -> Int2,
-        timezone -> Varchar,
-        remind -> Nullable<Varchar>,
-        date -> Date,
-        begin -> Time,
-        end -> Time,
         body -> Text,
         media_type -> Varchar,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-    }
-}
-
-table! {
-    caring_posts_members (id) {
-        id -> Int8,
-        post_id -> Int8,
-        member_id -> Int8,
-        created_at -> Timestamp,
-    }
-}
-
-table! {
-    caring_tags (id) {
-        id -> Int8,
-        name -> Varchar,
+        begin -> Timestamp,
+        end -> Timestamp,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -79,21 +55,28 @@ table! {
 table! {
     caring_topics (id) {
         id -> Int8,
+        user_id -> Int8,
         member_id -> Int8,
-        title -> Varchar,
-        body -> Text,
+        tag -> Varchar,
+        gender -> Varchar,
+        age -> Int2,
+        name -> Varchar,
+        phone -> Nullable<Varchar>,
+        email -> Nullable<Varchar>,
+        address -> Nullable<Varchar>,
+        reason -> Text,
         media_type -> Varchar,
+        status -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
 }
 
 table! {
-    caring_topics_tags (id) {
+    caring_topics_users (id) {
         id -> Int8,
         topic_id -> Int8,
-        tag_id -> Int8,
-        created_at -> Timestamp,
+        user_id -> Int8,
     }
 }
 
@@ -201,6 +184,8 @@ table! {
         id -> Int8,
         nick_name -> Varchar,
         real_name -> Varchar,
+        gender -> Varchar,
+        birthday -> Date,
         phone -> Nullable<Varchar>,
         email -> Nullable<Varchar>,
         address -> Nullable<Varchar>,
@@ -360,10 +345,8 @@ allow_tables_to_appear_in_same_query!(
     attachments,
     cards,
     caring_posts,
-    caring_posts_members,
-    caring_tags,
     caring_topics,
-    caring_topics_tags,
+    caring_topics_users,
     forum_posts,
     forum_tags,
     forum_topics,

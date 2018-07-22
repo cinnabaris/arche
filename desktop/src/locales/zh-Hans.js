@@ -54,7 +54,11 @@ export default {
     nbf: '起始',
     exp: '截止',
     lang: '语言',
-    contact: '联系信息'
+    contact: '联系信息',
+    gender: '性别',
+    'gender-m': '男',
+    'gender-f': '女',
+    birthday: '生日'
   },
   validations: {
     email: '不是正确的邮件地址',

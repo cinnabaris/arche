@@ -7,7 +7,7 @@
   <el-table :data="table" border>
     <el-table-column :label="$t('attributes.username')" width="320">
       <template slot-scope="scope">
-        {{scope.row.nickName}}[{{scope.row.realName}}]
+        {{scope.row.nickName}}[{{scope.row.realName}}]({{$t(`attributes.gender-${scope.row.gender}`)}})
       </template>
     </el-table-column>
     <el-table-column :label="$t('attributes.contact')">
@@ -97,7 +97,7 @@ export default {
     init() {
       client().request(`query list{
         listMember{
-          id, nickName, realName, phone, email, address, line, wechat, skype, weibo, facebook
+          id, nickName, realName, gender, birthday, phone, email, address, line, wechat, skype, weibo, facebook
         }
       }`, {}).then((rst) => {
         this.items = rst.listMember

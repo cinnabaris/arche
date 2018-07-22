@@ -9,7 +9,7 @@ use super::super::super::super::{
     graphql::{context::Context, H},
     i18n,
     orm::schema::*,
-    rfc::Utc as ToUtc,
+    rfc::UtcDateTime,
 };
 
 #[derive(GraphQLObject, Debug, Serialize)]

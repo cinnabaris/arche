@@ -3,6 +3,8 @@ class CreateMembers < ActiveRecord::Migration[5.2]
     create_table :members do |t|
       t.string :nick_name, null: false, limit: 255
       t.string :real_name, null: false, limit: 255
+      t.string :gender, null: false, limit: 1
+      t.date :birthday, null: false
       t.string :phone, limit: 255
       t.string :email, limit: 255
       t.string :address, limit: 255

@@ -12,7 +12,7 @@ use super::super::super::super::{
         schema::{forum_tags, forum_topics_tags},
         Connection as Db,
     },
-    rfc::Utc as ToUtc,
+    rfc::UtcDateTime,
 };
 use super::super::dao;
 

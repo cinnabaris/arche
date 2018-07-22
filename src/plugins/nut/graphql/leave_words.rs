@@ -8,7 +8,7 @@ use super::super::super::super::{
     errors::Result,
     graphql::{context::Context, H},
     orm::schema::*,
-    rfc::Utc as ToUtc,
+    rfc::UtcDateTime,
 };
 
 #[derive(GraphQLObject, Debug, Serialize)]

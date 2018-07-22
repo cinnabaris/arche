@@ -9,7 +9,7 @@ use super::super::super::super::{
     errors::{Error, Result},
     graphql::{context::Context, H},
     orm::schema::forum_posts,
-    rfc::Utc as ToUtc,
+    rfc::UtcDateTime,
 };
 use super::super::dao;
 

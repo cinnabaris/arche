@@ -41,36 +41,12 @@ table! {
     caring_posts (id) {
         id -> Bigint,
         topic_id -> Bigint,
-        member_id -> Bigint,
-        who -> Varchar,
+        user_id -> Bigint,
         method -> Varchar,
-        address -> Varchar,
-        progress -> Tinyint,
-        timezone -> Varchar,
-        remind -> Nullable<Varchar>,
-        date -> Date,
-        begin -> Time,
-        end -> Time,
         body -> Text,
         media_type -> Varchar,
-        created_at -> Datetime,
-        updated_at -> Datetime,
-    }
-}
-
-table! {
-    caring_posts_members (id) {
-        id -> Bigint,
-        post_id -> Bigint,
-        member_id -> Bigint,
-        created_at -> Datetime,
-    }
-}
-
-table! {
-    caring_tags (id) {
-        id -> Bigint,
-        name -> Varchar,
+        begin -> Datetime,
+        end -> Datetime,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
@@ -79,21 +55,28 @@ table! {
 table! {
     caring_topics (id) {
         id -> Bigint,
+        user_id -> Bigint,
         member_id -> Bigint,
-        title -> Varchar,
-        body -> Text,
+        tag -> Varchar,
+        gender -> Varchar,
+        age -> Tinyint,
+        name -> Varchar,
+        phone -> Nullable<Varchar>,
+        email -> Nullable<Varchar>,
+        address -> Nullable<Varchar>,
+        reason -> Text,
         media_type -> Varchar,
+        status -> Varchar,
         created_at -> Datetime,
         updated_at -> Datetime,
     }
 }
 
 table! {
-    caring_topics_tags (id) {
+    caring_topics_users (id) {
         id -> Bigint,
         topic_id -> Bigint,
-        tag_id -> Bigint,
-        created_at -> Datetime,
+        user_id -> Bigint,
     }
 }
 
@@ -360,10 +343,8 @@ allow_tables_to_appear_in_same_query!(
     attachments,
     cards,
     caring_posts,
-    caring_posts_members,
-    caring_tags,
     caring_topics,
-    caring_topics_tags,
+    caring_topics_users,
     forum_posts,
     forum_tags,
     forum_topics,
