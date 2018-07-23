@@ -1,3 +1,4 @@
+use std::convert::From;
 use std::ops::Deref;
 
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -9,15 +10,25 @@ use super::super::super::super::{
     errors::{Error, Result},
     graphql::{context::Context, H},
     orm::{
-        schema::{caring_topics, caring_topics_users},
+        schema::{caring_posts, caring_topics, members},
         Connection as Db,
     },
-    rfc::Utc as ToUtc,
+    rfc::UtcDateTime,
 };
-use super::super::dao;
+use super::super::super::nut::{self, dao::role::Type as RoleType};
+use super::super::{dao, models};
 
-fn can(db: &Db, user: i64) -> Result<()> {
+pub fn can_view(db: &Db, user: i64, topic: i64) -> Result<()> {
     if dao::is_manager(db, user) {
+        return Ok(());
+    }
+    if nut::dao::policy::can(
+        db,
+        &user,
+        &RoleType::Member,
+        &Some(super::super::NAME.to_string()),
+        &Some(topic),
+    ) {
         return Ok(());
     }
     Err(Status::Forbidden.reason.into())
@@ -28,7 +39,7 @@ pub struct Topic {
     pub id: String,
     pub user_id: String,
     pub tag: String,
-    pub username: String,
+    pub name: String,
     pub gender: String,
     pub age: i32,
     pub phone: Option<String>,
@@ -37,7 +48,29 @@ pub struct Topic {
     pub reason: String,
     pub media_type: String,
     pub status: String,
+    pub editable: bool,
     pub updated_at: DateTime<Utc>,
+}
+
+impl From<models::Topic> for Topic {
+    fn from(it: models::Topic) -> Self {
+        Self {
+            id: it.id.to_string(),
+            user_id: it.user_id.to_string(),
+            editable: false,
+            tag: it.tag,
+            age: it.age.into(),
+            name: it.name,
+            phone: it.phone,
+            email: it.email,
+            gender: it.gender,
+            address: it.address,
+            reason: it.reason,
+            media_type: it.media_type,
+            status: it.status,
+            updated_at: it.updated_at.to_utc(),
+        }
+    }
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
@@ -47,22 +80,23 @@ pub struct Show {
 }
 
 impl Show {
-    pub fn call(&self, ctx: &Context) -> Result<Tag> {
+    pub fn call(&self, ctx: &Context) -> Result<Topic> {
         self.validate()?;
         let id: i64 = self.id.parse()?;
+        let user = ctx.current_user()?;
         let db = ctx.db.deref();
-        let (name, updated_at) = caring_tags::dsl::caring_tags
-            .select((caring_tags::dsl::name, caring_tags::dsl::updated_at))
-            .filter(caring_tags::dsl::id.eq(&id))
-            .first::<(String, NaiveDateTime)>(db)?;
+        can_view(db, user.id, id)?;
 
-        Ok(Tag {
-            id: self.id.clone(),
-            name: name,
-            updated_at: updated_at.to_utc(),
-        })
+        let it = caring_topics::dsl::caring_topics
+            .filter(caring_topics::dsl::id.eq(&id))
+            .first::<models::Topic>(db)?;
+        let editable = dao::is_manager(db, user.id) || user.id == it.user_id;
+        let mut ret: Topic = it.into();
+        ret.editable = editable;
+        Ok(ret)
     }
 }
+
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct Remove {
     #[validate(length(min = "1"))]
@@ -72,15 +106,21 @@ pub struct Remove {
 impl Remove {
     pub fn call(&self, ctx: &Context) -> Result<H> {
         self.validate()?;
-        let db = ctx.db.deref();
-        let user = ctx.current_user()?;
-        can(db, user.id)?;
         let id: i64 = self.id.parse()?;
+        let user = ctx.current_user()?;
+        let db = ctx.db.deref();
+
+        let it = caring_topics::dsl::caring_topics
+            .filter(caring_topics::dsl::id.eq(&id))
+            .first::<models::Topic>(db)?;
+        if !dao::is_manager(db, user.id) && user.id != it.user_id {
+            return Err(Status::Forbidden.reason.into());
+        }
+
         db.transaction::<_, Error, _>(|| {
-            let it = caring_topics_tags::dsl::caring_topics_tags
-                .filter(caring_topics_tags::dsl::tag_id.eq(&id));
+            let it = caring_posts::dsl::caring_posts.filter(caring_posts::dsl::topic_id.eq(&id));
             delete(it).execute(db)?;
-            let it = caring_tags::dsl::caring_tags.filter(caring_tags::dsl::id.eq(&id));
+            let it = caring_topics::dsl::caring_topics.filter(caring_topics::dsl::id.eq(&id));
             delete(it).execute(db)?;
             Ok(())
         })?;
@@ -88,88 +128,137 @@ impl Remove {
     }
 }
 
-pub fn list(ctx: &Context) -> Result<Vec<Tag>> {
-    let db = ctx.db.deref();
-    let items = caring_tags::dsl::caring_tags
-        .select((
-            caring_tags::dsl::id,
-            caring_tags::dsl::name,
-            caring_tags::dsl::updated_at,
-        ))
-        .order(caring_tags::dsl::name.asc())
-        .load::<(i64, String, NaiveDateTime)>(db)?;
+const NAME: &'static str = "caring.topic";
 
-    Ok(items
-        .iter()
-        .map(|(id, name, updated_at)| Tag {
-            id: id.to_string(),
-            name: name.clone(),
-            updated_at: updated_at.to_utc(),
-        })
-        .collect())
-}
+// pub fn list(ctx: &Context) -> Result<Vec<Topic>> {
+//     let user = ctx.current_user()?;
+//     let db = ctx.db.deref();
+//     let items = if dao::is_manager(db, user.id) {
+//         caring_topics::dsl::caring_topics
+//             .order(caring_topics::dsl::updated_at.desc())
+//             .load::<models::Topic>(db)?
+//     } else {
+//         let ids = nut::dao::policy::fetch(db, &user.id, &RoleType::Member, &Name::to_string())?;
+//         let mut items = Vec::new();
+//         for id in ids {
+//             let it = caring_topics::dsl::caring_topics
+//                 .filter(caring_topics::dsl::id.eq(&id))
+//                 .first::<models::Topic>(db)?;
+//             items.push(it);
+//         }
+//     };
+//
+//     Ok(items
+//         .iter()
+//         .map(
+//             |(id, user_id, lang, title, body, media_type, updated_at)| Topic {
+//                 id: id.to_string(),
+//                 user_id: user_id.to_string(),
+//                 lang: lang.clone(),
+//                 title: title.clone(),
+//                 body: body.clone(),
+//                 media_type: media_type.clone(),
+//                 editable: is_manager || *user_id == user.id,
+//                 updated_at: updated_at.to_utc(),
+//                 tags: Vec::new(),
+//             },
+//         )
+//         .collect())
+// }
 
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct Create {
-    #[validate(length(min = "1"))]
-    pub name: String,
-}
-
-impl Create {
-    pub fn call(&self, ctx: &Context) -> Result<H> {
-        self.validate()?;
-        let db = ctx.db.deref();
-        let user = ctx.current_user()?;
-        can(db, user.id)?;
-        let cnt: i64 = caring_tags::dsl::caring_tags
-            .filter(caring_tags::dsl::name.eq(&self.name))
-            .count()
-            .get_result(db)?;
-        if cnt > 0 {
-            return Err(Status::BadRequest.reason.into());
-        }
-        let now = Utc::now().naive_utc();
-        insert_into(caring_tags::dsl::caring_tags)
-            .values((
-                caring_tags::dsl::name.eq(&self.name),
-                caring_tags::dsl::updated_at.eq(&now),
-                caring_tags::dsl::created_at.eq(&now),
-            ))
-            .execute(db)?;
-        Ok(H::new())
-    }
-}
-
-#[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
-pub struct Update {
-    #[validate(length(min = "1"))]
-    pub id: String,
-    #[validate(length(min = "1"))]
-    pub name: String,
-}
-
-impl Update {
-    pub fn call(&self, ctx: &Context) -> Result<H> {
-        self.validate()?;
-        let id = self.id.parse::<i64>()?;
-        let db = ctx.db.deref();
-        let user = ctx.current_user()?;
-        can(db, user.id)?;
-        let now = Utc::now().naive_utc();
-        let cnt: i64 = caring_tags::dsl::caring_tags
-            .filter(caring_tags::dsl::name.eq(&self.name))
-            .count()
-            .get_result(db)?;
-        if cnt > 0 {
-            return Err(Status::BadRequest.reason.into());
-        }
-        let it = caring_tags::dsl::caring_tags.filter(caring_tags::dsl::id.eq(&id));
-        update(it)
-            .set((
-                caring_tags::dsl::name.eq(&self.name),
-                caring_tags::dsl::updated_at.eq(&now),
-            ))
-            .execute(db)?;
-        Ok(H::new())
-    }
-}
+// #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+// pub struct Create {
+//     #[validate(length(min = "1"))]
+//     pub title: String,
+//     #[validate(length(min = "1"))]
+//     pub body: String,
+//     #[validate(length(min = "1"))]
+//     pub media_type: String,
+//     pub tags: Vec<String>,
+// }
+//
+// impl Create {
+//     pub fn call(&self, ctx: &Context) -> Result<H> {
+//         self.validate()?;
+//         let db = ctx.db.deref();
+//         let user = ctx.current_user()?;
+//         db.transaction::<_, Error, _>(|| {
+//             let now = Utc::now().naive_utc();
+//             let id = insert_into(caring_topics::dsl::caring_topics)
+//                 .values((
+//                     caring_topics::dsl::user_id.eq(&user.id),
+//                     caring_topics::dsl::lang.eq(&ctx.locale),
+//                     caring_topics::dsl::title.eq(&self.title),
+//                     caring_topics::dsl::body.eq(&self.body),
+//                     caring_topics::dsl::media_type.eq(&self.media_type),
+//                     caring_topics::dsl::updated_at.eq(&now),
+//                     caring_topics::dsl::created_at.eq(&now),
+//                 ))
+//                 .returning(caring_topics::dsl::id)
+//                 .get_result::<i64>(db)?;
+//             for t in self.tags.iter() {
+//                 insert_into(caring_topics_tags::dsl::caring_topics_tags)
+//                     .values((
+//                         caring_topics_tags::dsl::topic_id.eq(&id),
+//                         caring_topics_tags::dsl::tag_id.eq(&t.parse::<i64>()?),
+//                     ))
+//                     .execute(db)?;
+//             }
+//             Ok(())
+//         })?;
+//
+//         Ok(H::new())
+//     }
+// }
+//
+// #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
+// pub struct Update {
+//     #[validate(length(min = "1"))]
+//     pub id: String,
+//     #[validate(length(min = "1"))]
+//     pub title: String,
+//     #[validate(length(min = "1"))]
+//     pub body: String,
+//     #[validate(length(min = "1"))]
+//     pub media_type: String,
+//     pub tags: Vec<String>,
+// }
+//
+// impl Update {
+//     pub fn call(&self, ctx: &Context) -> Result<H> {
+//         self.validate()?;
+//         let id = self.id.parse::<i64>()?;
+//         let user = ctx.current_user()?;
+//         let db = ctx.db.deref();
+//
+//         if !dao::is_manager(db, user.id) && user.id != id {
+//             return Err(Status::Forbidden.reason.into());
+//         }
+//
+//         db.transaction::<_, Error, _>(|| {
+//             let now = Utc::now().naive_utc();
+//             let it = caring_topics::dsl::caring_topics.filter(caring_topics::dsl::id.eq(&id));
+//             update(it)
+//                 .set((
+//                     caring_topics::dsl::title.eq(&self.title),
+//                     caring_topics::dsl::body.eq(&self.body),
+//                     caring_topics::dsl::media_type.eq(&self.media_type),
+//                     caring_topics::dsl::updated_at.eq(&now),
+//                 ))
+//                 .execute(db)?;
+//             let it = caring_topics_tags::dsl::caring_topics_tags
+//                 .filter(caring_topics_tags::dsl::topic_id.eq(&id));
+//             delete(it).execute(db)?;
+//             for t in self.tags.iter() {
+//                 insert_into(caring_topics_tags::dsl::caring_topics_tags)
+//                     .values((
+//                         caring_topics_tags::dsl::topic_id.eq(&id),
+//                         caring_topics_tags::dsl::tag_id.eq(&t.parse::<i64>()?),
+//                     ))
+//                     .execute(db)?;
+//             }
+//             Ok(())
+//         })?;
+//         Ok(H::new())
+//     }
+// }

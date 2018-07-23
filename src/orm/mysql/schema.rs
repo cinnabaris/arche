@@ -58,9 +58,9 @@ table! {
         user_id -> Bigint,
         member_id -> Bigint,
         tag -> Varchar,
+        name -> Varchar,
         gender -> Varchar,
         age -> Tinyint,
-        name -> Varchar,
         phone -> Nullable<Varchar>,
         email -> Nullable<Varchar>,
         address -> Nullable<Varchar>,
@@ -69,14 +69,6 @@ table! {
         status -> Varchar,
         created_at -> Datetime,
         updated_at -> Datetime,
-    }
-}
-
-table! {
-    caring_topics_users (id) {
-        id -> Bigint,
-        topic_id -> Bigint,
-        user_id -> Bigint,
     }
 }
 
@@ -184,6 +176,8 @@ table! {
         id -> Bigint,
         nick_name -> Varchar,
         real_name -> Varchar,
+        gender -> Varchar,
+        birthday -> Date,
         phone -> Nullable<Varchar>,
         email -> Nullable<Varchar>,
         address -> Nullable<Varchar>,
@@ -344,7 +338,6 @@ allow_tables_to_appear_in_same_query!(
     cards,
     caring_posts,
     caring_topics,
-    caring_topics_users,
     forum_posts,
     forum_tags,
     forum_topics,

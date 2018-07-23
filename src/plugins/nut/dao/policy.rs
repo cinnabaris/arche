@@ -10,7 +10,31 @@ use super::super::super::super::{
         Connection as Db,
     },
 };
+use super::super::models;
 use super::role::Type as RoleType;
+
+pub fn fetch(db: &Db, user: &i64, role: &RoleType, resource_type: &String) -> Result<Vec<i64>> {
+    let role = format!("{}", role);
+    let mut items = Vec::new();
+    for r in roles::dsl::roles
+        .filter(roles::dsl::name.eq(&role))
+        .filter(roles::dsl::resource_type.eq(&Some(resource_type.clone())))
+        .load::<models::Role>(db)?
+    {
+        if let Some(id) = r.resource_id {
+            if let Ok(p) = policies::dsl::policies
+                .filter(policies::dsl::user_id.eq(user))
+                .filter(policies::dsl::role_id.eq(&r.id))
+                .first::<models::Policy>(db)
+            {
+                if p.enable() {
+                    items.push(id);
+                }
+            }
+        }
+    }
+    Ok(items)
+}
 
 pub fn is(db: &Db, user: &i64, role: &RoleType) -> bool {
     can(db, user, role, &None, &None)

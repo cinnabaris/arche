@@ -4,9 +4,9 @@ class CreateCaringTopics < ActiveRecord::Migration[5.2]
       t.references :user, null: false
       t.references :member, null: false
       t.string :tag, null: false, limit: 32
+      t.string :name, null: false, limit: 36
       t.string :gender, null: false, limit: 1
       t.integer :age, null: false, limit: 1
-      t.string :name, null: false, limit: 36
       t.string :phone,  limit: 255
       t.string :email,  limit: 255
       t.string :address, limit: 255

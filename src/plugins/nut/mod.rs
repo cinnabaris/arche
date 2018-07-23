@@ -2,6 +2,7 @@ pub mod consumers;
 pub mod controllers;
 pub mod dao;
 pub mod graphql;
+pub mod models;
 
 use chrono::Utc;
 use rocket::Route;
