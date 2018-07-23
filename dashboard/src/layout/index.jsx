@@ -16,24 +16,36 @@ import {
   Route,
   Switch
 } from "react-router-dom"
+import Exception from 'ant-design-pro/lib/Exception'
+import HeaderSearch from 'ant-design-pro/lib/HeaderSearch'
+import {
+  Icon,
+  Layout,
+  Menu,
+  message,
+  Modal
+} from 'antd'
 
-import Header from './Header'
 import {
   signIn,
   signOut
 } from '../actions'
 import plugins from '../plugins'
-import NotFound from '../plugins/NotFound'
 import createLoading from '../loading'
+
+const {
+  Header,
+  Sider,
+  Content
+} = Layout
 
 class Widget extends Component {
   render() {
     return (<div>
-      <Header/>
       <div>header</div>
       <Switch>
         {plugins.routes.map((it)=><Route exact key={it.path} path={it.path} component={createLoading(it.component)} />)}
-        <Route component={NotFound} />
+        <Route component={()=><Exception type="404" />} />
       </Switch>
       <div>footer</div>
     </div>)

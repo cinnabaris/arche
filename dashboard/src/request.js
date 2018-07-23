@@ -1,6 +1,10 @@
 import {
   GraphQLClient
 } from 'graphql-request'
+import {
+  notification
+} from 'antd'
+import moment from 'moment'
 
 import {
   getToken
@@ -15,3 +19,9 @@ export const client = () => {
     mode: 'cors'
   })
 }
+
+export const failed = (err) => notification.error({
+  message: moment().format('ll LTS'),
+  description: JSON.stringify(err.response),
+  duration: 30
+})

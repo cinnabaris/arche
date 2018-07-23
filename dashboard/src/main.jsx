@@ -1,6 +1,3 @@
-import 'typeface-roboto'
-import 'material-design-icons/iconfont/material-icons.css'
-import 'react-quill/dist/quill.snow.css'
 import './main.css'
 
 import React from 'react'
@@ -29,7 +26,8 @@ import reducers from './reducers'
 import Router from './Router'
 import detectLocale from './intl'
 import {
-  client
+  client,
+  failed
 } from './request'
 
 const history = createBrowserHistory({
@@ -65,7 +63,5 @@ export default (el) => {
         <Router history={history}/>
       </IntlProvider>
     </Provider>), el)
-  }).catch(console.log)
-
-
+  }).catch(failed)
 }

@@ -1,11 +1,14 @@
 import React from 'react'
 import Loadable from 'react-loadable'
-import RefreshIcon from '@material-ui/icons/Refresh'
+import {
+  Spin
+} from 'antd'
+
 
 const createLoading = (loader) => {
   return Loadable({
     loader: loader,
-    loading: () => (<RefreshIcon/>)
+    loading: () => (<Spin size="large"/>)
   })
 }
 
