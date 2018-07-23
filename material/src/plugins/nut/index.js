@@ -1,19 +1,18 @@
-import Home from './Home'
-import UsersSignIn from './users/SignIn'
-import UsersSignUp from './users/SignUp'
-
 export default {
   routes: [{
       path: '/',
-      component: Home
+      component: () =>
+        import ('./Home')
     },
     {
       path: '/users/sign-in',
-      component: UsersSignIn
+      component: () =>
+        import ('./users/SignIn')
     },
     {
       path: '/users/sign-up',
-      component: UsersSignUp
+      component: () =>
+        import ('./users/SignUp')
     }
   ]
 }

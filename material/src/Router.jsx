@@ -5,14 +5,8 @@ import PropTypes from 'prop-types'
 import {
   ConnectedRouter
 } from 'connected-react-router'
-import {
-  Route,
-  Switch
-} from "react-router-dom"
 
-import plugins from './plugins'
-import NotFound from './plugins/NotFound'
-
+import Layout from './layout'
 
 class Widget extends Component {
   render() {
@@ -20,10 +14,7 @@ class Widget extends Component {
       history
     } = this.props
     return (<ConnectedRouter history={history}>
-      <Switch>
-        {plugins.routes.map((it)=><Route exact key={it.path} path={it.path} component={it.component} />)}
-        <Route component={NotFound} />
-      </Switch>
+      <Layout/>
     </ConnectedRouter>)
   }
 }
