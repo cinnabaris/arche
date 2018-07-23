@@ -209,21 +209,12 @@ table! {
     policies (id) {
         id -> Bigint,
         user_id -> Bigint,
-        role_id -> Bigint,
+        role -> Varchar,
+        resource -> Varchar,
         nbf -> Date,
         exp -> Date,
         created_at -> Datetime,
         updated_at -> Datetime,
-    }
-}
-
-table! {
-    roles (id) {
-        id -> Bigint,
-        name -> Varchar,
-        resource_type -> Nullable<Varchar>,
-        resource_id -> Nullable<Bigint>,
-        created_at -> Datetime,
     }
 }
 
@@ -350,7 +341,6 @@ allow_tables_to_appear_in_same_query!(
     members,
     notifications,
     policies,
-    roles,
     schema_migrations,
     settings,
     survey_fields,

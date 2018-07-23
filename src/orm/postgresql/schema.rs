@@ -73,14 +73,6 @@ table! {
 }
 
 table! {
-    caring_topics_users (id) {
-        id -> Int8,
-        topic_id -> Int8,
-        user_id -> Int8,
-    }
-}
-
-table! {
     forum_posts (id) {
         id -> Int8,
         user_id -> Int8,
@@ -217,21 +209,12 @@ table! {
     policies (id) {
         id -> Int8,
         user_id -> Int8,
-        role_id -> Int8,
+        role -> Varchar,
+        resource -> Varchar,
         nbf -> Date,
         exp -> Date,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-    }
-}
-
-table! {
-    roles (id) {
-        id -> Int8,
-        name -> Varchar,
-        resource_type -> Nullable<Varchar>,
-        resource_id -> Nullable<Int8>,
-        created_at -> Timestamp,
     }
 }
 
@@ -346,7 +329,6 @@ allow_tables_to_appear_in_same_query!(
     cards,
     caring_posts,
     caring_topics,
-    caring_topics_users,
     forum_posts,
     forum_tags,
     forum_topics,
@@ -359,7 +341,6 @@ allow_tables_to_appear_in_same_query!(
     members,
     notifications,
     policies,
-    roles,
     schema_migrations,
     settings,
     survey_fields,
