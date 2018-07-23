@@ -1,40 +1,30 @@
-import jwtDecode from 'jwt-decode'
-import moment from 'moment'
+import {combineReducers} from 'redux'
 
-import {USERS_SIGN_IN, PAGE_TITLE, USERS_SIGN_OUT} from './actions'
-import {ADMIN, MEMBER, NULL, reload as reloadAuthorized} from './Authorized'
+import {SIGN_IN, SIGN_OUT, REFRESH} from './actions'
 
 const currentUser = (state = {}, action) => {
   switch (action.type) {
-    case USERS_SIGN_IN:
-      try {
-        var it = jwtDecode(action.token);
-        if (moment().isBetween(moment.unix(it.nbf), moment.unix(it.exp))) {
-          reloadAuthorized(
-            it.admin
-            ? ADMIN
-            : MEMBER)
-          return {uid: it.uid}
+    case SIGN_IN:
+      // TODO parse token
+      return [
+        ...state, {
+          id: 111
         }
-      } catch (e) {
-        console.error(e)
-      }
-      return {}
-    case USERS_SIGN_OUT:
-      reloadAuthorized(NULL)
+      ]
+    case SIGN_OUT:
       return {}
     default:
       return state
   }
 }
 
-const pageTitle = (state = {}, action) => {
+const siteInfo = (state = {}, action) => {
   switch (action.type) {
-    case PAGE_TITLE:
-      return {title: action.title}
+    case REFRESH:
+      return Object.assign({}, action.info)
     default:
       return state
   }
 }
 
-export default {currentUser, pageTitle}
+export default combineReducers({currentUser, siteInfo})

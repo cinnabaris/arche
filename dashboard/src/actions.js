@@ -1,15 +1,7 @@
-export const USERS_SIGN_IN = "users.sign-in"
-export const USERS_SIGN_OUT = "users.sign-out"
-export const PAGE_TITLE = "page.title"
+export const REFRESH = 'refresh'
+export const SIGN_IN = 'users.sign-in'
+export const SIGN_OUT = 'users.sign-out'
 
-export const signOut = () => {
-  return {type: USERS_SIGN_OUT}
-}
-
-export const signIn = (token) => {
-  return {type: USERS_SIGN_IN, token}
-}
-
-export const setPageTitle = (title) => {
-  return {type: PAGE_TITLE, title}
-}
+export const refresh = (info) => ({type: REFRESH, info})
+export const signIn = (token) => ({type: SIGN_IN, token})
+export const signOut = () => ({type: SIGN_OUT})

@@ -1,5 +1,5 @@
-import main from './main';
-import registerServiceWorker from './registerServiceWorker';
+import main from './main'
+import registerServiceWorker from './registerServiceWorker'
 
-main('root')
-registerServiceWorker()
+main(document.getElementById('root'))
+registerServiceWorker();
