@@ -1,14 +1,16 @@
+use std::ops::Add;
 use std::ops::Deref;
 
-use chrono::Duration;
+use chrono::{Duration, Utc};
 use diesel::Connection;
 use validator::Validate;
 
 use super::super::super::super::{
     errors::{Error, Result},
     graphql::{context::Context, H},
+    utils,
 };
-use super::super::dao;
+use super::super::{dao, models::Role};
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct Install {
@@ -44,20 +46,23 @@ impl Install {
                 &ctx.locale,
                 "nut.logs.user.confirm"
             )?;
-            for it in vec![dao::role::Type::Admin, dao::role::Type::Root] {
-                let ttl = Duration::weeks(1 << 12);
-                dao::policy::apply(db, &user, &it, &None, &None, ttl)?;
+            let now = Utc::now().naive_utc();
+            let nbf = now.date();
+            let exp = now.add(Duration::weeks(1 << 12)).date();
+            for it in vec![Role::Admin, Role::Root] {
+                dao::policy::apply(db, &user, &it, &None, &nbf, &exp)?;
                 l!(
                     db,
                     &user,
                     &ctx.client_ip,
                     &ctx.locale,
-                    "nut.logs.role.apply.ttl",
+                    "nut.logs.role.apply",
                     &Some(json!({
                             "name":format!("{}", it),
                             "type": None::<String>,
                             "id": None::<i64>,
-                            "ttl": format!("{}", ttl)
+                            "exp": exp.format(utils::DATE_FORMAT).to_string(),
+                            "nbf": nbf.format(utils::DATE_FORMAT).to_string(),
                         }))
                 )?;
             }

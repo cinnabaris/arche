@@ -12,24 +12,22 @@ use super::super::super::super::{
     rfc::UtcDateTime,
     utils,
 };
-use super::super::super::{
-    caring,
-    nut::{self, dao::role::Type as RoleType},
-};
+use super::super::super::caring;
+use super::super::{dao::policy as policy_dao, models::Role};
 
 fn can_view(db: &Db, user: &i64) -> Result<()> {
-    for (n, rty, rid) in vec![
-        (RoleType::Admin, None, None),
-        (RoleType::Manager, Some(caring::NAME.to_string()), None),
+    for (n, rty) in vec![
+        (Role::Admin, None),
+        (Role::Manager, Some(caring::NAME.to_string())),
     ] {
-        if nut::dao::policy::can(db, user, &n, &rty, &rid) {
+        if policy_dao::can(db, user, &n, &rty) {
             return Ok(());
         }
     }
     Err(Status::Forbidden.reason.into())
 }
 fn can_edit(db: &Db, user: &i64) -> Result<()> {
-    if nut::dao::policy::is(db, user, &RoleType::Admin) {
+    if policy_dao::is(db, user, &Role::Admin) {
         return Ok(());
     }
     Err(Status::Forbidden.reason.into())

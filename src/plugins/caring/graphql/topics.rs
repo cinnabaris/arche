@@ -15,22 +15,23 @@ use super::super::super::super::{
     },
     rfc::UtcDateTime,
 };
-use super::super::super::nut::{self, dao::role::Type as RoleType};
+use super::super::super::nut::{dao::policy as policy_dao, models::Role};
 use super::super::{dao, models};
 
 pub fn can_view(db: &Db, user: i64, topic: i64) -> Result<()> {
     if dao::is_manager(db, user) {
         return Ok(());
     }
-    if nut::dao::policy::can(
-        db,
-        &user,
-        &RoleType::Member,
-        &Some(super::super::NAME.to_string()),
-        &Some(topic),
-    ) {
-        return Ok(());
-    }
+    // TODO
+    // if policy_dao::can(
+    //     db,
+    //     &user,
+    //     &Role::Member,
+    //     &Some(super::super::NAME.to_string()),
+    //     &Some(topic),
+    // ) {
+    //     return Ok(());
+    // }
     Err(Status::Forbidden.reason.into())
 }
 
@@ -138,7 +139,7 @@ const NAME: &'static str = "caring.topic";
 //             .order(caring_topics::dsl::updated_at.desc())
 //             .load::<models::Topic>(db)?
 //     } else {
-//         let ids = nut::dao::policy::fetch(db, &user.id, &RoleType::Member, &Name::to_string())?;
+//         let ids = nut::dao::policy::fetch(db, &user.id, &Role::Member, &Name::to_string())?;
 //         let mut items = Vec::new();
 //         for id in ids {
 //             let it = caring_topics::dsl::caring_topics

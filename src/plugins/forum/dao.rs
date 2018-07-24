@@ -1,17 +1,11 @@
 use super::super::super::{
     orm::Connection as Db,
-    plugins::nut::{self, dao::role::Type as RoleType},
+    plugins::nut::{dao::policy as policy_dao, models::Role},
 };
 
 pub fn is_manager(db: &Db, user: i64) -> bool {
-    if nut::dao::policy::is(db, &user, &RoleType::Admin) {
+    if policy_dao::is(db, &user, &Role::Admin) {
         return true;
     }
-    nut::dao::policy::can(
-        db,
-        &user,
-        &RoleType::Manager,
-        &Some(super::NAME.to_string()),
-        &None,
-    )
+    policy_dao::can(db, &user, &Role::Manager, &Some(super::NAME.to_string()))
 }

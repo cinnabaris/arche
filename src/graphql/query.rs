@@ -92,7 +92,7 @@ graphql_object!(Query: Context |&self| {
     }
 
     field listManagerByUser(&executor, id: String) -> FieldResult<Vec<nut::graphql::users::models::Policy>> {
-        gq!(executor, nut::graphql::users::query::ListManagerByUser{
+        gq!(executor, nut::graphql::users::query::ListPolicyByUser{
             id: id,
         })
     }

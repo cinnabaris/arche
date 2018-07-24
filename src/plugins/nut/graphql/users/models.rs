@@ -1,4 +1,8 @@
+use std::convert::From;
+
 use chrono::{DateTime, Utc};
+
+use super::super::super::models;
 
 #[derive(GraphQLObject, Debug, Serialize)]
 pub struct User {
@@ -15,9 +19,17 @@ pub struct User {
 #[derive(GraphQLObject, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Policy {
-    pub role_name: String,
-    pub resource_type: Option<String>,
-    pub resource_id: Option<String>,
+    pub role: String,
+    pub resource: Option<String>,
+}
+
+impl From<models::Policy> for Policy {
+    fn from(it: models::Policy) -> Self {
+        Self {
+            role: it.role,
+            resource: it.resource,
+        }
+    }
 }
 
 #[derive(GraphQLObject, Debug, Serialize)]

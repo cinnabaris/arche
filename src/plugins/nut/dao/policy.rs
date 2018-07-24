@@ -1,131 +1,82 @@
-use std::ops::Add;
-
-use chrono::{Duration, NaiveDate, Utc};
+use chrono::{NaiveDate, Utc};
 use diesel::{delete, insert_into, prelude::*, update};
 
 use super::super::super::super::{
     errors::Result,
-    orm::{
-        schema::{policies, roles},
-        Connection as Db,
-    },
+    orm::{schema::policies, Connection as Db},
 };
-use super::super::models;
-use super::role::Type as RoleType;
+use super::super::models::{Policy, Role};
 
-pub fn fetch(db: &Db, user: &i64, role: &RoleType, resource_type: &String) -> Result<Vec<i64>> {
-    let role = format!("{}", role);
-    let mut items = Vec::new();
-    for r in roles::dsl::roles
-        .filter(roles::dsl::name.eq(&role))
-        .filter(roles::dsl::resource_type.eq(&Some(resource_type.clone())))
-        .load::<models::Role>(db)?
-    {
-        if let Some(id) = r.resource_id {
-            if let Ok(p) = policies::dsl::policies
-                .filter(policies::dsl::user_id.eq(user))
-                .filter(policies::dsl::role_id.eq(&r.id))
-                .first::<models::Policy>(db)
-            {
-                if p.enable() {
-                    items.push(id);
-                }
-            }
-        }
-    }
-    Ok(items)
+pub fn is(db: &Db, user: &i64, role: &Role) -> bool {
+    can(db, user, role, &None)
 }
 
-pub fn is(db: &Db, user: &i64, role: &RoleType) -> bool {
-    can(db, user, role, &None, &None)
-}
-
-pub fn can(
-    db: &Db,
-    user: &i64,
-    role: &RoleType,
-    resource_type: &Option<String>,
-    resource_id: &Option<i64>,
-) -> bool {
+pub fn can(db: &Db, user: &i64, role: &Role, resource: &Option<String>) -> bool {
     let role = format!("{}", role);
-    if let Ok(role) = get_role(db, &role, resource_type, resource_id) {
-        if let Ok((nbf, exp)) = policies::dsl::policies
-            .select((policies::dsl::nbf, policies::dsl::exp))
+    let it = match resource {
+        Some(_) => policies::dsl::policies
             .filter(policies::dsl::user_id.eq(user))
-            .filter(policies::dsl::role_id.eq(&role))
-            .first::<(NaiveDate, NaiveDate)>(db)
-        {
-            let today = Utc::now().naive_utc().date();
-            return today.ge(&nbf) && today.le(&exp);
-        }
+            .filter(policies::dsl::role.eq(&role))
+            .filter(policies::dsl::resource.eq(resource))
+            .first::<Policy>(db),
+        None => policies::dsl::policies
+            .filter(policies::dsl::user_id.eq(user))
+            .filter(policies::dsl::role.eq(&role))
+            .filter(policies::dsl::resource.is_null())
+            .first::<Policy>(db),
+    };
+    if let Ok(it) = it {
+        return it.enable();
     }
     false
 }
 
-pub fn deny(
-    db: &Db,
-    user: &i64,
-    role: &RoleType,
-    resource_type: &Option<String>,
-    resource_id: &Option<i64>,
-) -> Result<()> {
+pub fn deny(db: &Db, user: &i64, role: &Role, resource: &Option<String>) -> Result<()> {
     let role = format!("{}", role);
-    if let Ok(role) = get_role(db, &role, resource_type, resource_id) {
-        let it = policies::dsl::policies
-            .filter(policies::dsl::user_id.eq(user))
-            .filter(policies::dsl::role_id.eq(&role));
-        delete(it).execute(db)?;
-    }
+    match resource {
+        Some(_) => delete(
+            policies::dsl::policies
+                .filter(policies::dsl::user_id.eq(user))
+                .filter(policies::dsl::role.eq(&role))
+                .filter(policies::dsl::resource.eq(resource)),
+        ).execute(db),
+        None => delete(
+            policies::dsl::policies
+                .filter(policies::dsl::user_id.eq(user))
+                .filter(policies::dsl::role.eq(&role))
+                .filter(policies::dsl::resource.is_null()),
+        ).execute(db),
+    }?;
     Ok(())
 }
+
 pub fn apply(
     db: &Db,
     user: &i64,
-    role: &RoleType,
-    resource_type: &Option<String>,
-    resource_id: &Option<i64>,
-    ttl: Duration,
-) -> Result<i64> {
-    let now = Utc::now().naive_utc();
-    let nbf = now.date();
-    let exp = now.add(ttl).date();
-    apply_by_range(db, user, role, resource_type, resource_id, &nbf, &exp)
-}
-
-pub fn apply_by_range(
-    db: &Db,
-    user: &i64,
-    role: &RoleType,
-    resource_type: &Option<String>,
-    resource_id: &Option<i64>,
+    role: &Role,
+    resource: &Option<String>,
     nbf: &NaiveDate,
     exp: &NaiveDate,
 ) -> Result<i64> {
     let role = format!("{}", role);
     let now = Utc::now().naive_utc();
 
-    let role = match get_role(db, &role, resource_type, resource_id) {
-        Ok(id) => id,
-        Err(_) => {
-            let id = insert_into(roles::dsl::roles)
-                .values((
-                    roles::dsl::name.eq(&role),
-                    roles::dsl::resource_type.eq(resource_type),
-                    roles::dsl::resource_id.eq(resource_id),
-                    roles::dsl::created_at.eq(&now),
-                ))
-                .returning(roles::dsl::id)
-                .get_result::<i64>(db)?;
-            id
-        }
+    let id = match resource {
+        Some(_) => policies::dsl::policies
+            .select(policies::dsl::id)
+            .filter(policies::dsl::user_id.eq(user))
+            .filter(policies::dsl::role.eq(&role))
+            .filter(policies::dsl::resource.eq(resource))
+            .first::<i64>(db),
+        None => policies::dsl::policies
+            .select(policies::dsl::id)
+            .filter(policies::dsl::user_id.eq(user))
+            .filter(policies::dsl::role.eq(&role))
+            .filter(policies::dsl::resource.is_null())
+            .first::<i64>(db),
     };
 
-    match policies::dsl::policies
-        .select(policies::dsl::id)
-        .filter(policies::dsl::user_id.eq(user))
-        .filter(policies::dsl::role_id.eq(&role))
-        .first::<i64>(db)
-    {
+    match id {
         Ok(id) => {
             let it = policies::dsl::policies.filter(policies::dsl::id.eq(&id));
             update(it)
@@ -141,7 +92,8 @@ pub fn apply_by_range(
             let id = insert_into(policies::dsl::policies)
                 .values((
                     policies::dsl::user_id.eq(user),
-                    policies::dsl::role_id.eq(&role),
+                    policies::dsl::role.eq(&role),
+                    policies::dsl::resource.eq(resource),
                     policies::dsl::exp.eq(exp),
                     policies::dsl::nbf.eq(nbf),
                     policies::dsl::updated_at.eq(&now),
@@ -152,34 +104,4 @@ pub fn apply_by_range(
             Ok(id)
         }
     }
-}
-
-fn get_role(
-    db: &Db,
-    name: &String,
-    resource_type: &Option<String>,
-    resource_id: &Option<i64>,
-) -> Result<i64> {
-    if &None == resource_type {
-        return Ok(roles::dsl::roles
-            .select(roles::dsl::id)
-            .filter(roles::dsl::name.eq(name))
-            .filter(roles::dsl::resource_type.is_null())
-            .filter(roles::dsl::resource_id.is_null())
-            .first::<i64>(db)?);
-    }
-    if &None == resource_id {
-        return Ok(roles::dsl::roles
-            .select(roles::dsl::id)
-            .filter(roles::dsl::name.eq(name))
-            .filter(roles::dsl::resource_type.eq(resource_type))
-            .filter(roles::dsl::resource_id.is_null())
-            .first::<i64>(db)?);
-    }
-    Ok(roles::dsl::roles
-        .select(roles::dsl::id)
-        .filter(roles::dsl::name.eq(name))
-        .filter(roles::dsl::resource_type.eq(resource_type))
-        .filter(roles::dsl::resource_id.eq(resource_id))
-        .first::<i64>(db)?)
 }

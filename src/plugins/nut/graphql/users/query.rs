@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use chrono::{NaiveDate, NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use validator::Validate;
 
@@ -10,6 +10,7 @@ use super::super::super::super::super::{
     orm::schema::*,
     rfc::UtcDateTime,
 };
+use super::super::super::models;
 use super::{
     models::{Log, Policy, Profile, User},
     mutation::{send_email, ACT_CONFIRM, ACT_RESET_PASSWORD, ACT_UNLOCK},
@@ -20,30 +21,12 @@ pub fn policies(ctx: &Context) -> Result<Vec<Policy>> {
     let user = ctx.current_user()?;
     let mut items = Vec::new();
     let db = ctx.db.deref();
-    let today = Utc::now().naive_utc().date();
-    for (rid, nbf, exp) in policies::dsl::policies
-        .select((
-            policies::dsl::role_id,
-            policies::dsl::nbf,
-            policies::dsl::exp,
-        ))
+    for it in policies::dsl::policies
         .filter(policies::dsl::user_id.eq(&user.id))
-        .load::<(i64, NaiveDate, NaiveDate)>(db)?
+        .load::<models::Policy>(db)?
     {
-        if today.ge(&nbf) && today.le(&exp) {
-            // don't throw error
-            if let Ok((name, rty)) = roles::dsl::roles
-                .select((roles::dsl::name, roles::dsl::resource_type))
-                .filter(roles::dsl::id.eq(&rid))
-                .filter(roles::dsl::resource_id.is_null())
-                .first::<(String, Option<String>)>(db)
-            {
-                items.push(Policy {
-                    role_name: name,
-                    resource_type: rty,
-                    resource_id: None,
-                });
-            }
+        if it.enable() {
+            items.push(it.into());
         }
     }
     Ok(items)
@@ -51,43 +34,25 @@ pub fn policies(ctx: &Context) -> Result<Vec<Policy>> {
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ListManagerByUser {
+pub struct ListPolicyByUser {
     #[validate(length(min = "1"))]
     pub id: String,
 }
 
-impl ListManagerByUser {
+impl ListPolicyByUser {
     pub fn call(&self, ctx: &Context) -> Result<Vec<Policy>> {
         self.validate()?;
         ctx.admin()?;
         let db = ctx.db.deref();
         let user: i64 = self.id.parse()?;
 
-        let today = Utc::now().naive_utc().date();
         let mut items = Vec::new();
-        for (rid, nbf, exp) in policies::dsl::policies
-            .select((
-                policies::dsl::role_id,
-                policies::dsl::nbf,
-                policies::dsl::exp,
-            ))
+        for it in policies::dsl::policies
             .filter(policies::dsl::user_id.eq(&user))
-            .load::<(i64, NaiveDate, NaiveDate)>(db)?
+            .load::<models::Policy>(db)?
         {
-            // don't throw error
-            if today.ge(&nbf) && today.le(&exp) {
-                if let Ok((rn, rty)) = roles::dsl::roles
-                    .select((roles::dsl::name, roles::dsl::resource_type))
-                    .filter(roles::dsl::id.eq(&rid))
-                    .filter(roles::dsl::resource_id.is_null())
-                    .first::<(String, Option<String>)>(db)
-                {
-                    items.push(Policy {
-                        role_name: rn,
-                        resource_type: rty,
-                        resource_id: None,
-                    });
-                }
+            if it.enable() {
+                items.push(it.into());
             }
         }
         Ok(items)

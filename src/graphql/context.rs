@@ -11,8 +11,7 @@ use super::super::{
     errors::Result,
     orm::{schema::users, PooledConnection as Db},
     plugins::nut::{
-        dao::{policy as policy_dao, role::Type as RoleType},
-        graphql::users::mutation::ACT_SIGN_IN,
+        dao::policy as policy_dao, graphql::users::mutation::ACT_SIGN_IN, models::Role,
     },
 };
 
@@ -77,27 +76,15 @@ impl Context {
         }
         Err(Status::NonAuthoritativeInformation.reason.into())
     }
+
     pub fn admin(&self) -> Result<CurrentUser> {
-        self.must(&RoleType::Admin, &None, &None)
-    }
-    pub fn must(
-        &self,
-        role_type: &RoleType,
-        resource_type: &Option<String>,
-        resource_id: &Option<i64>,
-    ) -> Result<CurrentUser> {
         let user = self.current_user()?;
-        if policy_dao::can(
-            self.db.deref(),
-            &user.id,
-            role_type,
-            resource_type,
-            resource_id,
-        ) {
+        if policy_dao::is(self.db.deref(), &user.id, &Role::Admin) {
             return Ok(user);
         }
         Err(Status::Forbidden.reason.into())
     }
+
     pub fn client_ip(&self) -> Result<String> {
         Ok("ip".to_string())
     }

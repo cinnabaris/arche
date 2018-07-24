@@ -210,7 +210,7 @@ table! {
         id -> Int8,
         user_id -> Int8,
         role -> Varchar,
-        resource -> Varchar,
+        resource -> Nullable<Varchar>,
         nbf -> Date,
         exp -> Date,
         created_at -> Timestamp,

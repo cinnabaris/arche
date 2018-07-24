@@ -210,7 +210,7 @@ table! {
         id -> Bigint,
         user_id -> Bigint,
         role -> Varchar,
-        resource -> Varchar,
+        resource -> Nullable<Varchar>,
         nbf -> Date,
         exp -> Date,
         created_at -> Datetime,

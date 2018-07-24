@@ -14,10 +14,7 @@ use super::super::super::super::super::{
     orm::{schema::*, Connection as Db},
     queue, utils,
 };
-use super::super::super::{
-    consumers,
-    dao::{self, role::Type as RoleType},
-};
+use super::super::super::{consumers, dao, models::Role};
 use super::models::{Policy, SignIn};
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
@@ -38,7 +35,7 @@ impl UpdatePolicy {
         ctx.admin()?;
         let db = ctx.db.deref();
         let user: i64 = self.user.parse()?;
-        if dao::policy::is(db, &user, &RoleType::Root) {
+        if dao::policy::is(db, &user, &Role::Root) {
             return Err(Status::Forbidden.reason.into());
         }
 
@@ -54,26 +51,21 @@ impl UpdatePolicy {
                 &ctx.locale,
                 "nut.logs.role.clear"
             )?;
+            let nbf = NaiveDate::parse_from_str(&self.nbf, utils::DATE_FORMAT)?;
+            let exp = NaiveDate::parse_from_str(&self.exp, utils::DATE_FORMAT)?;
             for it in policies.iter() {
-                let role = it.role_name.parse::<RoleType>()?;
-                let rid = match it.resource_id {
-                    Some(ref v) => Some(v.parse()?),
-                    None => None,
-                };
-
-                let nbf = NaiveDate::parse_from_str(&self.nbf, utils::DATE_FORMAT)?;
-                let exp = NaiveDate::parse_from_str(&self.exp, utils::DATE_FORMAT)?;
-                dao::policy::apply_by_range(db, &user, &role, &it.resource_type, &rid, &nbf, &exp)?;
+                let role = it.role.parse()?;
+                dao::policy::apply(db, &user, &role, &it.resource, &nbf, &exp)?;
                 l!(
                     db,
                     &user,
                     &ctx.client_ip,
                     &ctx.locale,
-                    "nut.logs.role.apply.range",
+                    "nut.logs.role.apply",
                     &Some(json!({
                             "name":format!("{}", role),
-                            "type": it.resource_type,
-                            "id": rid,
+                            "type": it.resource,
+                            "id": user,
                             "exp": exp.format(utils::DATE_FORMAT).to_string(),
                             "nbf": nbf.format(utils::DATE_FORMAT).to_string(),
                         }))
