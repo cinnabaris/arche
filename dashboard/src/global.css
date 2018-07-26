@@ -1,0 +1,7 @@
+@import '~antd/dist/antd.css';
+@import '~ant-design-pro/dist/ant-design-pro.css';
+@import '~react-quill/dist/quill.snow.css';
+body {
+  margin: 0;
+  padding: 0;
+}

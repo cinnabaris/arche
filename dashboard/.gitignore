@@ -1,0 +1,7 @@
+# build
+/dist/
+/node_modules/
+
+# umi
+/src/pages/.umi/
+/src/pages/.umi-production
