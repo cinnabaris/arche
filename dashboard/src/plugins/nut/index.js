@@ -1,10 +1,6 @@
 export default {
+  menus: [],
   routes: [{
-      path: '/',
-      component: () =>
-        import ('./Home')
-    },
-    {
       path: '/users/sign-in',
       component: () =>
         import ('./users/SignIn')

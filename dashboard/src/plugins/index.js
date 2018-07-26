@@ -1,11 +1,13 @@
 import nut from './nut'
+import caring from './caring'
+import forum from './forum'
 
-const plugins = [nut]
+const plugins = [caring, forum, nut]
 
-const routes = plugins.reduce((ac, it) => {
+export const routes = plugins.reduce((ac, it) => {
   return ac.concat(it.routes)
 }, [])
 
-export default {
-  routes
-}
+export const menus = plugins.reduce((ac, it) => {
+  return ac.concat(it.menus)
+}, [])

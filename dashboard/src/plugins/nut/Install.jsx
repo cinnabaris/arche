@@ -1,85 +1,44 @@
-import React, {
-  Component
-} from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {
-  injectIntl,
-  intlShape,
-  FormattedMessage
-} from 'react-intl'
-import {
-  connect
-} from 'react-redux'
-import {
-  push
-} from 'connected-react-router'
-import {
-  Form,
-  Input,
-  message
-} from 'antd'
+import {injectIntl, intlShape, FormattedMessage} from 'react-intl'
+import {connect} from 'react-redux'
+import {push} from 'connected-react-router'
+import {Form, Input, message} from 'antd'
 
-import {
-  Submit,
-  formItemLayout
-} from '../../../components/form'
-import {
-  client,
-  failed
-} from '../../../request'
-import Layout from './Layout'
+import Layout from './users/Layout'
+import {Submit, formItemLayout} from '../components/form'
+import {client, INSTALL, failed} from '../request'
 
 const FormItem = Form.Item
 
 class Widget extends Component {
   handleSubmit = (e) => {
-    const {
-      push
-    } = this.props
-    const {
-      formatMessage
-    } = this.props.intl
+    const {push} = this.props
+    const {formatMessage} = this.props.intl
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client().request(`mutation form($name: String!, $email: String!, $password: String!){
-            signUpUser(name: $name, email: $email, password: $password) {
-              createdAt
-            }
-          }`, values).then((rst) => {
-          message.info(formatMessage({
-            id: "nut.users.confirm.success"
-          }))
+        client().request(INSTALL, values).then((rst) => {
+          message.info(formatMessage({id: "flashes.success"}))
           push('/users/sign-in')
         }).catch(failed)
       }
     })
   }
   checkPassword = (rule, value, callback) => {
-    const {
-      formatMessage
-    } = this.props.intl
-    const {
-      getFieldValue
-    } = this.props.form
+    const {formatMessage} = this.props.intl
+    const {getFieldValue} = this.props.form
     if (value && value !== getFieldValue('password')) {
-      callback(formatMessage({
-        id: "validations.password-confirmation"
-      }));
+      callback(formatMessage({id: "validations.password-confirmation"}));
     } else {
       callback();
     }
   }
   render() {
-    const {
-      formatMessage
-    } = this.props.intl
-    const {
-      getFieldDecorator
-    } = this.props.form
-    return (<Layout title="nut.users.sign-up.title">
+    const {formatMessage} = this.props.intl
+    const {getFieldDecorator} = this.props.form
+    return (<Layout title="nut.install.title">
       <Form onSubmit={this.handleSubmit}>
-
         <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.username" />} hasFeedback={true}>
           {
             getFieldDecorator('name', {
@@ -146,6 +105,4 @@ Widget.propTypes = {
   push: PropTypes.func.isRequired
 }
 
-export default connect(state => ({}), {
-  push
-})(Form.create()(injectIntl(Widget)))
+export default connect(state => ({}), {push})(Form.create()(injectIntl(Widget)))
