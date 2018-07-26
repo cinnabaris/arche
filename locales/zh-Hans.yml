@@ -2,7 +2,48 @@ languages:
   en-US:                   English,
   zh-Hans:                 简体中文,
   zh-Hant:                 繁體中文
+flashes:
+  success:                 操作成功
+  warning:                 警告信息
+  error:                   错误信息
+buttons:
+  submit:                  提交
+attributes:
+  password:                密码
+  password-confirmation:   密码确认
+  email:                   电子邮箱
+  username:                用户名
+validations:
+  email:                   邮箱格式不对
+  required:                不能为空
+  password:                密码长度应该在6到32位之间
+header:
+  sign-out:
+    confirm:               你确定要退出登录么？
+footer:
+  license:                 版权
+  help:                    帮助
+site:
+  copyright:               版权信息
+  title:                   标题
+  subhead:                 副标题
 nut:
+  leave-words:
+    new:
+      title:               给我们留言
+  users:
+    sign-in:
+      title:               现有账户登录
+    sign-up:
+      title:               新用户注册
+    forgot-password:
+      title:               忘记密码？
+    reset-password:
+      title:               重置密码
+    confirm:
+      title:               没有收到激活邮件？
+    unlock:
+      title:               没有收到解锁邮件？
   emails:
     user:
       confirm:
