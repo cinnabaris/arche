@@ -31,10 +31,16 @@ class Widget extends Component {
     }
   }
   componentDidMount() {
+    const {
+      dispatch
+    } = this.props
     const intl = detectIntl();
     client().request(`query locales($lang: String!){
       listLocaleByLang(lang: $lang) {
         code, message
+      }
+      listUserPolicy {
+        role, resource
       }
     }`, {
       lang: intl.locale
@@ -50,6 +56,10 @@ class Widget extends Component {
           messages
         }
       })
+      dispatch({
+        type: 'currentUser/refresh',
+        authority: JSON.stringify(rst.listUserPolicy),
+      });
     }).catch(failed)
   }
   render() {

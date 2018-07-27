@@ -8,6 +8,7 @@ import {
   FormattedMessage
 } from 'react-intl'
 import HeaderSearch from 'ant-design-pro/lib/HeaderSearch'
+import RenderAuthorized from 'ant-design-pro/lib/Authorized'
 import {
   Icon,
   Layout,
@@ -16,15 +17,18 @@ import {
   Modal,
   Row
 } from 'antd'
-import router from 'umi/router';
+import router from 'umi/router'
+import {
+  connect
+} from 'dva'
 
 import {
   client,
   failed
 } from '../utils/request'
-import Authorized, {
+import {
   is_sign_in
-} from '../utils/Authorized'
+} from '../utils/authorized'
 import NoticeBar from './NoticeBar'
 import Footer from './Footer'
 import menus from './menus'
@@ -41,6 +45,9 @@ class Widget extends Component {
     this.state = {}
   }
   handleHeaderClick = (e) => {
+    const {
+      dispatch
+    } = this.props
     const {
       formatMessage
     } = this.props.intl
@@ -71,7 +78,9 @@ class Widget extends Component {
               message.info(formatMessage({
                 id: "flashes.success"
               }))
-              console.log('sign out') // TODO
+              dispatch({
+                type: 'currentUser/sign-out'
+              });
             }).catch(failed)
           }
         })
@@ -82,8 +91,10 @@ class Widget extends Component {
   }
   render() {
     const {
-      children
+      children,
+      currentUser
     } = this.props
+    const Authorized = RenderAuthorized(currentUser.authority)
     return (<Layout>
       <Sider breakpoint="lg" collapsedWidth="0" trigger={null} collapsible="collapsible" collapsed={this.state.collapsed}>
         <div className="sider-logo"/>
@@ -150,7 +161,12 @@ class Widget extends Component {
 
 Widget.propTypes = {
   children: PropTypes.node.isRequired,
-  intl: intlShape.isRequired
+  intl: intlShape.isRequired,
+  currentUser: PropTypes.object.isRequired,
 }
 
-export default injectIntl(Widget)
+export default connect(({
+  currentUser
+}) => ({
+  currentUser,
+}))(injectIntl(Widget))
