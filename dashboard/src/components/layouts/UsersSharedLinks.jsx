@@ -51,7 +51,7 @@ class Widget extends Component {
       children,
       title
     } = this.props
-    return (<Col xs={{span: 22, offset: 1}} lg={{span: 12, offset: 6}}>
+    return (<Col xs={{span: 22, offset: 1}} lg={{span: 14, offset: 2}}>
       <Card title={(<FormattedMessage id={title}/>)} extra={(<Icon onClick={()=>window.open("/", "_blank")} type="home"/>)}>
         {children}
         <Menu

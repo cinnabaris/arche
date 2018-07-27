@@ -12,34 +12,43 @@ import {
   Input,
   message
 } from 'antd'
+import {
+  withRouter
+} from 'react-router-dom'
 
-import Layout from "../../components/layouts/UsersSharedLinks"
+import Layout from "../../../components/layouts/UsersSharedLinks"
 import {
   Submit,
   formItemLayout
-} from '../../components/form'
+} from '../../../components/form'
 import {
   client,
   failed
-} from '../../utils/request'
+} from '../../../utils/request'
 
 const FormItem = Form.Item
 
 class Widget extends Component {
   handleSubmit = (e) => {
     const {
+      match
+    } = this.props
+    const {
       formatMessage
     } = this.props.intl
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client().request(`mutation form($name: String!, $email: String!, $password: String!){
-            signUpUser(name: $name, email: $email, password: $password) {
+        client().request(`mutation form($token: String!, $password: String!){
+            resetUserPassword(token: $token, password: $password) {
               createdAt
             }
-          }`, values).then((rst) => {
+          }`, {
+          token: match.params.token,
+          password: values.password
+        }).then((rst) => {
           message.info(formatMessage({
-            id: "nut.users.confirm.success"
+            id: "nut.emails.user.reset-password.success"
           }))
           router.push('/users/sign-in')
         }).catch(failed)
@@ -68,46 +77,18 @@ class Widget extends Component {
     const {
       getFieldDecorator
     } = this.props.form
-    return (<Layout title="nut.users.sign-up.title">
+    return (<Layout title="nut.users.reset-password.title">
       <Form onSubmit={this.handleSubmit}>
-
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.username" />} hasFeedback={true}>
-          {
-            getFieldDecorator('name', {
-              rules: [
-                {
-                  required: true,
-                  message: formatMessage({id: "validations.required"})
-                }
-              ]
-            })(<Input/>)
-          }
-        </FormItem>
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.email" />} hasFeedback={true}>
-          {
-            getFieldDecorator('email', {
-              rules: [
-                {
-                  type: 'email',
-                  message: formatMessage({id: "validations.email"})
-                }, {
-                  required: true,
-                  message: formatMessage({id: "validations.required"})
-                }
-              ]
-            })(<Input/>)
-          }
-        </FormItem>
         <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.password" />} hasFeedback={true}>
           {
             getFieldDecorator('password', {
               rules: [
-                {
+              {
                   required: true,
                   max: 30,
                   min: 6,
-                  message: formatMessage({id: "validations.password"})
-                }
+                message: formatMessage({id: "validations.password"})
+              }
               ]
             })(<Input type="password"/>)
           }
@@ -116,12 +97,12 @@ class Widget extends Component {
           {
             getFieldDecorator('passwordConfirmation', {
               rules: [
-                {
+              {
                   required: true,
-                  message: formatMessage({id: "validations.required"})
-                }, {
+                message: formatMessage({id: "validations.required"})
+              }, {
                   validator: this.checkPassword
-                }
+              }
               ]
             })(<Input type="password"/>)
           }
@@ -136,4 +117,4 @@ Widget.propTypes = {
   intl: intlShape.isRequired
 }
 
-export default Form.create()(injectIntl(Widget))
+export default withRouter(Form.create()(injectIntl(Widget)))

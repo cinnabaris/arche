@@ -13,10 +13,12 @@ attributes:
   password-confirmation:   密码确认
   email:                   电子邮箱
   username:                用户名
+  content:                 内容
 validations:
   email:                   邮箱格式不对
   required:                不能为空
   password:                密码长度应该在6到32位之间
+  password-confirmation:   两次密码输入不一致
 header:
   sign-out:
     confirm:               你确定要退出登录么？
@@ -28,9 +30,12 @@ site:
   title:                   标题
   subhead:                 副标题
 nut:
+  install:
+    title:                 初始化安装
   leave-words:
     new:
       title:               给我们留言
+      body-helper:         请留下联系方式以便我们回复
   users:
     sign-in:
       title:               现有账户登录
@@ -38,23 +43,29 @@ nut:
       title:               新用户注册
     forgot-password:
       title:               忘记密码？
+      success:             您将会在几分钟内收到重置密码邮件
     reset-password:
       title:               重置密码
     confirm:
       title:               没有收到激活邮件？
+      success:             您将会在几分钟内收到激活账户邮件
     unlock:
       title:               没有收到解锁邮件？
+      success:             您将会在几分钟内收到解锁账户邮件
   emails:
     user:
       confirm:
         subject:           激活信息
         body:              你可以通过点击如下链接来激活账户：<br/> <a href="{{home}}/my/users/confirm/{{token}}">激活我的账户</a>
+        success:           激活账户成功，请重新登录。
       unlock:
         subject:           解锁信息
         body:              您可以通过点击如下链接来解锁账户：<br/> <a href="{{home}}/my/users/unlock/{{token}}">解锁我的账户</a> 你的账户由于多次未成功的登录而被锁定
+        success:           解锁账户成功，请重新登录。
       reset-password:
         subject:           重置密码信息
         body:              有人申请了重置密码，你可以点击如下链接继续： <br/> <a href="{{home}}/my/users/reset-password/{{token}}">重置我的密码</a><br/>如果此申请不是您发起的，请忽略本邮件。只有您提交了新的密码才会修改。
+        success:           重置密码成功，请重新登录。
   errors:
     user:
       email-already-exist: 该邮件账户已经存在

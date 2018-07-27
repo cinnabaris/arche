@@ -1,6 +1,13 @@
-import React, {Component} from 'react'
-import {Form, Button} from 'antd'
-import {FormattedMessage} from 'react-intl'
+import React, {
+  Component
+} from 'react'
+import {
+  Form,
+  Button
+} from 'antd'
+import {
+  FormattedMessage
+} from 'react-intl'
 
 const FormItem = Form.Item
 
@@ -12,7 +19,7 @@ export const formItemLayout = {
       span: 24
     },
     sm: {
-      span: 8
+      span: 6
     }
   },
   wrapperCol: {
@@ -20,7 +27,7 @@ export const formItemLayout = {
       span: 24
     },
     sm: {
-      span: 16
+      span: 18
     }
   }
 }
@@ -40,7 +47,9 @@ export const tailFormItemLayout = {
 
 export class Submit extends Component {
   render() {
-    const {children} = this.props
+    const {
+      children
+    } = this.props
     return (<FormItem {...tailFormItemLayout}>
       <Button type="primary" htmlType="submit">
         <FormattedMessage id="buttons.submit"/>
