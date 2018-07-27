@@ -18,6 +18,9 @@ import {
 import {
   detect as detectIntl
 } from '../utils/locale'
+import {
+  get as getToken
+} from '../utils/token'
 import Layout from './Layout'
 
 class Widget extends Component {
@@ -35,6 +38,14 @@ class Widget extends Component {
       dispatch
     } = this.props
     const intl = detectIntl();
+
+    var token = getToken()
+    if (token) {
+      dispatch({
+        type: 'currentUser/refresh',
+        token
+      })
+    }
     client().request(`query locales($lang: String!){
       listLocaleByLang(lang: $lang) {
         code, message

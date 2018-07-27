@@ -247,22 +247,19 @@ class Widget extends Component {
     const {
       formatMessage
     } = this.props.intl
-    var items = [{
-      key: "doc",
-      children: (<Icon type="question-circle-o"/>)
-    }]
+    var items = []
     if (is_sign_in(auth)) {
       items.push({
-        key: "search",
-        children: (<HeaderSearch placeholder={formatMessage({id:"header.search.placeholder"})}/>),
+        key: "sign-out",
+        children: (<Icon type="logout"/>)
       })
       items.push({
         key: "notice-bar",
         children: (<NoticeBar/>)
       })
       items.push({
-        key: "sign-out",
-        children: (<Icon type="logout"/>)
+        key: "search",
+        children: (<HeaderSearch placeholder={formatMessage({id:"header.search.placeholder"})}/>),
       })
     } else {
       items.push({
@@ -270,6 +267,10 @@ class Widget extends Component {
         children: (<Icon type="login"/>)
       })
     }
+    items.push({
+      key: "doc",
+      children: (<Icon type="question-circle-o"/>)
+    })
     return items
   }
   render() {
@@ -302,7 +303,7 @@ class Widget extends Component {
                 ? 'menu-unfold'
                 : 'menu-fold'}/>
             </Menu.Item>
-            {this.headerMenus(currentUser.authority).map((it) => (<Menu.Item key={it.key}>
+            {this.headerMenus(currentUser.authority).map((it) => (<Menu.Item style={{float: 'right'}} key={it.key}>
               {it.children}
             </Menu.Item>))}
           </Menu>

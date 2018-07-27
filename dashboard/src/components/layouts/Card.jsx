@@ -20,16 +20,16 @@ class Widget extends Component {
     } = this.props
     return (<Col xs={{
       span: 22,
-          offset: 1
-      }} lg={{
-          span: 16,
-          offset: 4
-      }}>
-        <Card title={(<FormattedMessage {...title}/>)}>
-          {children}
-          <Head title={title}/>
-        </Card>
-      </Col>)
+      offset: 1
+    }} lg={{
+      span: 16,
+      offset: 1
+    }}>
+      <Card title={(<FormattedMessage {...title}/>)}>
+        {children}
+        <Head title={title}/>
+      </Card>
+    </Col>)
   }
 }
 

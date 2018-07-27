@@ -8,7 +8,8 @@ import {
   intlShape
 } from 'react-intl'
 import {
-  message
+  message,
+  Spin
 } from 'antd'
 import withRouter from 'umi/withRouter'
 
@@ -36,7 +37,7 @@ class Widget extends Component {
     }).catch(failed)
   }
   render() {
-    return (<div/>);
+    return (<Spin size="large"/>)
   }
 }
 

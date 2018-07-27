@@ -11,12 +11,14 @@ buttons:
 attributes:
   password:                密码
   password-confirmation:   密码确认
+  current-password:        当前密码
+  new-password:            新密码
   email:                   电子邮箱
   username:                用户名
   content:                 内容
   created-at:              创建时间
   updated-at:              修改时间
-  ip:                      IP地址  
+  ip:                      IP地址
 validations:
   email:                   邮箱格式不对
   required:                不能为空
@@ -115,6 +117,9 @@ nut:
         subject:           重置密码信息
         body:              有人申请了重置密码，你可以点击如下链接继续： <br/> <a href="{{home}}/my/users/reset-password/{{token}}">重置我的密码</a><br/>如果此申请不是您发起的，请忽略本邮件。只有您提交了新的密码才会修改。
         success:           重置密码成功，请重新登录。
+  attributes:
+    user:
+      logo:                头像
   errors:
     user:
       email-already-exist: 该邮件账户已经存在
