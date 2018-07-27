@@ -18,6 +18,7 @@ import {
 import {
   detect as detectIntl
 } from '../utils/locale'
+import Layout from './Layout'
 
 class Widget extends Component {
   constructor(props) {
@@ -59,11 +60,7 @@ class Widget extends Component {
       intl
     } = this.state
     return (<IntlProvider locale={intl.locale} messages={intl.messages}>
-      <div>
-        <div>header</div>
-        {children}
-        <div>footer</div>
-      </div>
+      <Layout>{children}</Layout>
     </IntlProvider>)
   }
 }

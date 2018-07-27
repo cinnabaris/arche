@@ -3,7 +3,6 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import {
-  Row,
   Col,
   Card,
   Icon,
@@ -12,9 +11,9 @@ import {
 import {
   FormattedMessage
 } from 'react-intl'
-import router from 'umi/router';
+import router from 'umi/router'
 
-import Head from './Head'
+import Head from '../Head'
 
 class Widget extends Component {
   constructor(props) {
@@ -52,29 +51,21 @@ class Widget extends Component {
       children,
       title
     } = this.props
-    return (<Row>
-      <Col xs={{
-          span: 22,
-          offset: 1
-      }} lg={{
-          span: 12,
-          offset: 6
-      }}>
-        <Card title={(<FormattedMessage id={title}/>)} extra={(<Icon onClick={()=>window.open("/", "_blank")} type="home"/>)}>
-          {children}
-          <Menu
-            onClick={(e)=>router.push(e.key)}
-            mode="inline"
-          >
-            {this.state.items.map((it)=>(<Menu.Item key={it.to}>
-              <Icon type={it.icon} />
-              <FormattedMessage id={it.label}/>
-            </Menu.Item>))}
-          </Menu>
-          <Head title={{id: title}}/>
-        </Card>
-      </Col>
-    </Row>)
+    return (<Col xs={{span: 22, offset: 1}} lg={{span: 12, offset: 6}}>
+      <Card title={(<FormattedMessage id={title}/>)} extra={(<Icon onClick={()=>window.open("/", "_blank")} type="home"/>)}>
+        {children}
+        <Menu
+          onClick={(e)=>router.push(e.key)}
+          mode="inline"
+        >
+          {this.state.items.map((it)=>(<Menu.Item key={it.to}>
+            <Icon type={it.icon} />
+            <FormattedMessage id={it.label}/>
+          </Menu.Item>))}
+        </Menu>
+        <Head title={{id: title}}/>
+      </Card>
+    </Col>)
   }
 }
 

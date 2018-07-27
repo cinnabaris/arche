@@ -1,17 +1,31 @@
+import React, {
+  Component
+} from 'react'
+import PropTypes from 'prop-types'
 import {
   Helmet
 } from "react-helmet"
-import PropTypes from 'prop-types'
+import {
+  intlShape,
+  injectIntl
+} from 'react-intl'
 
-const Widget = ({
-  title
-}) => (<Helmet>
-  <title>{title.id}|subhead|title</title>
-</Helmet>)
-
+class Widget extends Component {
+  render() {
+    const {
+      formatMessage
+    } = this.props.intl
+    return (<Helmet>
+      <title>
+        {formatMessage(this.props.title)}|{formatMessage({id: 'site.subhead'})}|{formatMessage({id: 'site.title'})}
+      </title>
+    </Helmet>);
+  }
+}
 
 Widget.propTypes = {
-  title: PropTypes.object.isRequired,
-};
+  intl: intlShape.isRequired,
+  title: PropTypes.object.isRequired
+}
 
-export default Widget
+export default injectIntl(Widget)

@@ -1,11 +1,12 @@
 import RenderAuthorized from 'ant-design-pro/lib/Authorized'
 
 import {
-  client
+  client,
+  failed
 } from './request'
 
 export const is_sign_in = (roles) => {
-  console.log(roles)
+  console.log('must sign in', roles)
   return false
 }
 
@@ -32,12 +33,8 @@ export const reload = (roles) => {
         role, resource
       }
     }`, {}).then((rst) => {
-    // TODO to roles string
-    console.log(rst.listUserPolicy)
-    // this.$store.commit('updatePolicies', rst.listUserPolicy)
-    // this.auth()
-    // Authorized = RenderAuthorized(roles)
-  }).catch(console.error)
+    Authorized = RenderAuthorized(JSON.stringify(rst.listUserPolicy))
+  }).catch(failed)
 }
 
 export default Authorized
