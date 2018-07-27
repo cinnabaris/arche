@@ -60,7 +60,7 @@ class Widget extends Component {
           }`, {}).then((rst) => {
             dispatch({
               type: 'currentUser/refresh',
-              authority: JSON.stringify(rst.listUserPolicy),
+              authority: rst.listUserPolicy,
             })
           }).catch(failed)
           router.push('/users/logs')

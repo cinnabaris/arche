@@ -20,6 +20,8 @@ validations:
   password:                密码长度应该在6到32位之间
   password-confirmation:   两次密码输入不一致
 header:
+  search:
+    placeholder:           站内搜索
   sign-out:
     confirm:               你确定要退出登录么？
 footer:
@@ -30,6 +32,11 @@ site:
   title:                   标题
   subhead:                 副标题
 nut:
+  dashboard:
+    self:
+      title:               个人参数
+    site:
+      title:               站点设置
   install:
     title:                 初始化安装
   leave-words:
@@ -37,6 +44,12 @@ nut:
       title:               给我们留言
       body-helper:         请留下联系方式以便我们回复
   users:
+    logs:
+      title:               日志
+    profile:
+      title:               个人信息
+    change-password:
+      title:               修改密码
     sign-in:
       title:               现有账户登录
     sign-up:
@@ -52,6 +65,39 @@ nut:
     unlock:
       title:               没有收到解锁邮件？
       success:             您将会在几分钟内收到解锁账户邮件
+  admin:
+    site:
+      status:
+        title:             当前状态
+      info:
+        title:             基本信息
+      author:
+        title:             管理员
+      seo:
+        title:             搜索引擎优化
+      smtp:
+        title:             邮件发送
+    users:
+      index:
+        title:             用户
+    members:
+      index:
+        title:             会员
+    cards:
+      index:
+        title:             区域卡片
+    links:
+      index:
+        title:             链接导航
+    friend-links:
+      index:
+        title:             友情链接
+    leave-words:
+      index:
+        title:             留言板
+    locales:
+      index:
+        title:             国际化
   emails:
     user:
       confirm:
@@ -92,3 +138,46 @@ nut:
         range:             应用权限{{name}}@{{type}}/{{id}}?nbf={{nbf}}&exp={{exp}}
       deny:                禁止权限{{name}}@{{type}}/{{id}}
       clear:               清理权限
+cbeta:
+  dashboard:
+    title:                 电子书
+forum:
+  dashboard:
+    title:                 交流论坛
+  topics:
+    index:
+      title:               话题
+  tags:
+    index:
+      title:               标签
+  posts:
+    index:
+      title:               评论
+library:
+  dashboard:
+    title:                 图书馆
+hotel:
+  dashboard:
+    title:                 住宿管理
+shop:
+  dashboard:
+    title:                 在线商店
+pos:
+  dashboard:
+    title:                 POS机
+todo:
+  dashboard:
+    title:                 任务管理
+caring:
+  dashboard:
+    title:                 会员关怀
+donate:
+  dashboard:
+    title:                 捐赠
+ops:
+  vpn:
+    dashboard:
+      title:               VPN系统
+  email:
+    dashboard:
+      title:               邮件系统

@@ -8,7 +8,6 @@ import {
   FormattedMessage
 } from 'react-intl'
 import HeaderSearch from 'ant-design-pro/lib/HeaderSearch'
-import RenderAuthorized from 'ant-design-pro/lib/Authorized'
 import {
   Icon,
   Layout,
@@ -27,11 +26,16 @@ import {
   failed
 } from '../utils/request'
 import {
-  is_sign_in
+  is_sign_in,
+  is_administrator,
+  is_manager,
+  FORUM,
+  POS,
+  LIBRARY,
+  HOTEL
 } from '../utils/authorized'
 import NoticeBar from './NoticeBar'
 import Footer from './Footer'
-import menus from './menus'
 
 const {
   Header,
@@ -89,29 +93,195 @@ class Widget extends Component {
         console.log(e.key)
     }
   }
+  siderMenus = (auth) => {
+    var items = []
+    if (!is_sign_in(auth)) {
+      return items
+    }
+
+    items.push({
+      icon: 'user',
+      label: 'nut.dashboard.self.title',
+      children: [{
+        label: 'nut.users.logs.title',
+        to: '/users/logs'
+      }, {
+        label: 'nut.users.profile.title',
+        to: '/users/profile'
+      }, {
+        label: 'nut.users.change-password.title',
+        to: '/users/change-password'
+      }]
+    })
+
+    if (is_administrator(auth)) {
+      items.push({
+        icon: 'setting',
+        label: 'nut.dashboard.site.title',
+        children: [{
+          label: 'nut.admin.site.status.title',
+          to: '/admin/site/status'
+        }, {
+          label: 'nut.admin.site.info.title',
+          to: '/admin/site/info'
+        }, {
+          label: 'nut.admin.site.author.title',
+          to: '/admin/site/author'
+        }, {
+          label: 'nut.admin.site.seo.title',
+          to: '/admin/site/seo'
+        }, {
+          label: 'nut.admin.site.smtp.title',
+          to: '/admin/site/smtp'
+        }, {
+          label: 'nut.admin.users.index.title',
+          to: '/admin/users'
+        }, {
+          label: 'nut.admin.members.index.title',
+          to: '/admin/members'
+        }, {
+          label: 'nut.admin.locales.index.title',
+          to: '/admin/locales'
+        }, {
+          label: 'nut.admin.friend-links.index.title',
+          to: '/admin/friend-links'
+        }, {
+          label: 'nut.admin.links.index.title',
+          to: '/admin/links'
+        }, {
+          label: 'nut.admin.cards.index.title',
+          to: '/admin/cards'
+        }, {
+          label: 'nut.admin.leave-words.index.title',
+          to: '/admin/leave-words'
+        }]
+      })
+    }
+    var forum = {
+      icon: 'share-alt',
+      label: 'forum.dashboard.title',
+      children: [{
+        label: 'forum.topics.index.title',
+        to: '/forum/topics'
+      }, {
+        label: 'forum.posts.index.title',
+        to: '/forum/posts'
+      }]
+    }
+    if (is_manager(auth, FORUM)) {
+      forum.children.push({
+        label: 'forum.tags.index.title',
+        to: '/forum/tags'
+      })
+    }
+    items.push(forum)
+    items.push({
+      icon: 'book',
+      label: 'cbeta.dashboard.title',
+      children: []
+    })
+    if (is_manager(auth, LIBRARY)) {
+      items.push({
+        icon: 'idcard',
+        label: 'library.dashboard.title',
+        children: []
+      })
+    }
+    if (is_manager(auth, HOTEL)) {
+      items.push({
+        icon: 'fork',
+        label: 'hotel.dashboard.title',
+        children: []
+      })
+    }
+
+    items.push({
+      icon: 'shopping-cart',
+      label: 'shop.dashboard.title',
+      children: []
+    })
+
+    if (is_manager(auth, POS)) {
+      items.push({
+        icon: 'qrcode',
+        label: 'pos.dashboard.title',
+        children: []
+      })
+    }
+
+    items.push({
+      icon: 'paper-clip',
+      label: 'todo.dashboard.title',
+      children: []
+    })
+
+    items.push({
+      icon: 'team',
+      label: 'caring.dashboard.title',
+      children: []
+    })
+
+    if (is_administrator(auth)) {
+      items.push({
+        icon: 'bank',
+        label: 'donate.dashboard.title',
+        children: []
+      })
+      items.push({
+        icon: 'usb',
+        label: 'ops.vpn.dashboard.title',
+        children: []
+      })
+      items.push({
+        icon: 'mail',
+        label: 'ops.email.dashboard.title',
+        children: []
+      })
+    }
+    return items
+  }
+  headerMenus = (auth) => {
+    const {
+      formatMessage
+    } = this.props.intl
+    if (is_sign_in(auth)) {
+      return [{
+          key: "search",
+          children: (<HeaderSearch placeholder={formatMessage({id:"header.search.placeholder"})}/>),
+        },
+        {
+          key: "doc",
+          children: (<Icon type="question-circle-o"/>)
+        },
+        {
+          key: "notice-bar",
+          children: (<NoticeBar/>)
+        },
+        {
+          key: "sign-out",
+          children: (<Icon type="logout"/>)
+        }
+      ]
+    }
+    return []
+  }
   render() {
     const {
       children,
       currentUser
     } = this.props
-    const Authorized = RenderAuthorized(currentUser.authority)
+
     return (<Layout>
       <Sider breakpoint="lg" collapsedWidth="0" trigger={null} collapsible="collapsible" collapsed={this.state.collapsed}>
         <div className="sider-logo"/>
         <Menu onClick={(e)=>router.push(e.key)} theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-          {
-            menus.map((it) => {
-              return Authorized.check(it.authority, (<Menu.SubMenu key={it.key} title={(<span><Icon type={it.icon}/><FormattedMessage {...it.label}/></span>)}>
-                {
-                  it.children.map((jt) => {
-                    return Authorized.check(jt.authority, (<Menu.Item key={jt.key}>
-                      <FormattedMessage {...jt.label}/>
-                    </Menu.Item>), null)
-                  })
-                }
-              </Menu.SubMenu>), null)
-            })
-          }
+          {this.siderMenus(currentUser.authority).map((it) => (<Menu.SubMenu key={it.label} title={(<span><Icon type={it.icon}/><FormattedMessage id={it.label}/></span>)}>
+            {
+              it.children.map((jt) => (<Menu.Item key={jt.to}>
+                <FormattedMessage id={jt.label}/>
+              </Menu.Item>))
+            }
+            </Menu.SubMenu>))}
         </Menu>
       </Sider>
       <Layout>
@@ -125,24 +295,9 @@ class Widget extends Component {
                 ? 'menu-unfold'
                 : 'menu-fold'}/>
             </Menu.Item>
-            <Menu.Item key="search">
-              <Authorized authority={is_sign_in} noMatch={null}>
-                <HeaderSearch placeholder="站内搜索"/>
-              </Authorized>
-            </Menu.Item>
-            <Menu.Item key="doc">
-              <Icon type="question-circle-o"/>
-            </Menu.Item>
-            <Menu.Item>
-              <Authorized authority={is_sign_in} noMatch={null}>
-                <NoticeBar/>
-              </Authorized>
-            </Menu.Item>
-            <Menu.Item key="sign-out">
-              <Authorized authority={is_sign_in} noMatch={null}>
-                <Icon type="logout"/>
-              </Authorized>
-            </Menu.Item>
+            {this.headerMenus(currentUser.authority).map((it) => (<Menu.Item key={it.key}>
+              {it.children}
+            </Menu.Item>))}
           </Menu>
         </Header>
         <Content style={{

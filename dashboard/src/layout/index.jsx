@@ -58,7 +58,7 @@ class Widget extends Component {
       })
       dispatch({
         type: 'currentUser/refresh',
-        authority: JSON.stringify(rst.listUserPolicy),
+        authority: rst.listUserPolicy,
       });
     }).catch(failed)
   }
