@@ -19,7 +19,7 @@ class Widget extends Component {
       title,
       columns
     } = this.props
-    return (<Col span={22} offset={4}>
+    return (<Col xs={{span: 24}} lg={{span: 22, offset: 1}}>
       <Head title={title}/>
       <Table title={() => (<FormattedMessage {...title}/>)} bordered={true} rowKey="id" dataSource={items} columns={columns}/>
     </Col>);

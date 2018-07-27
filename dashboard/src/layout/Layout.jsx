@@ -62,6 +62,9 @@ class Widget extends Component {
       case 'doc':
         window.open('https://github.com/cinnabaris/arche', "_blank")
         return
+      case 'sign-in':
+        router.push('/users/sign-in')
+        return
       case 'toggle':
         this.setState({
           collapsed: !this.state.collapsed
@@ -244,26 +247,30 @@ class Widget extends Component {
     const {
       formatMessage
     } = this.props.intl
+    var items = [{
+      key: "doc",
+      children: (<Icon type="question-circle-o"/>)
+    }]
     if (is_sign_in(auth)) {
-      return [{
-          key: "search",
-          children: (<HeaderSearch placeholder={formatMessage({id:"header.search.placeholder"})}/>),
-        },
-        {
-          key: "doc",
-          children: (<Icon type="question-circle-o"/>)
-        },
-        {
-          key: "notice-bar",
-          children: (<NoticeBar/>)
-        },
-        {
-          key: "sign-out",
-          children: (<Icon type="logout"/>)
-        }
-      ]
+      items.push({
+        key: "search",
+        children: (<HeaderSearch placeholder={formatMessage({id:"header.search.placeholder"})}/>),
+      })
+      items.push({
+        key: "notice-bar",
+        children: (<NoticeBar/>)
+      })
+      items.push({
+        key: "sign-out",
+        children: (<Icon type="logout"/>)
+      })
+    } else {
+      items.push({
+        key: "sign-in",
+        children: (<Icon type="login"/>)
+      })
     }
-    return []
+    return items
   }
   render() {
     const {
@@ -281,7 +288,7 @@ class Widget extends Component {
                 <FormattedMessage id={jt.label}/>
               </Menu.Item>))
             }
-            </Menu.SubMenu>))}
+          </Menu.SubMenu>))}
         </Menu>
       </Sider>
       <Layout>

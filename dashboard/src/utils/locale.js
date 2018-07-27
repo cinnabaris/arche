@@ -3,6 +3,7 @@ import dataEn from 'react-intl/locale-data/en'
 import dataZh from 'react-intl/locale-data/zh'
 import 'moment/locale/zh-cn'
 import 'moment/locale/zh-tw'
+import moment from 'moment'
 
 const KEY = 'locale'
 
@@ -23,18 +24,19 @@ export const detect = () => {
   const lang = get()
   switch (lang) {
     case 'zh-Hans':
+      moment.locale('zh-cn')
       return {
         locale: lang,
-        data: dataZh,
-        moment: 'zh-cn'
+        data: dataZh
       }
     case 'zh-Hant':
+      moment.locale('zh-tw')
       return {
         locale: lang,
-        data: dataZh,
-        moment: 'zh-tw'
+        data: dataZh
       }
     default:
+      moment.locale()
       return {
         locale: 'en-US',
         data: dataEn,

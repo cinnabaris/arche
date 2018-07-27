@@ -14,6 +14,9 @@ attributes:
   email:                   电子邮箱
   username:                用户名
   content:                 内容
+  created-at:              创建时间
+  updated-at:              修改时间
+  ip:                      IP地址  
 validations:
   email:                   邮箱格式不对
   required:                不能为空
