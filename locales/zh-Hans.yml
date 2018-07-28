@@ -19,6 +19,10 @@ attributes:
   created-at:              创建时间
   updated-at:              修改时间
   ip:                      IP地址
+  name:                    名称
+  host:                    主机
+  port:                    端口
+  user:                    用户
 validations:
   email:                   邮箱格式不对
   required:                不能为空
@@ -77,7 +81,7 @@ nut:
       info:
         title:             基本信息
       author:
-        title:             管理员
+        title:             作者
       seo:
         title:             搜索引擎优化
       smtp:
@@ -118,6 +122,17 @@ nut:
         body:              有人申请了重置密码，你可以点击如下链接继续： <br/> <a href="{{home}}/my/users/reset-password/{{token}}">重置我的密码</a><br/>如果此申请不是您发起的，请忽略本邮件。只有您提交了新的密码才会修改。
         success:           重置密码成功，请重新登录。
   attributes:
+    site:
+      title:               '主标题'
+      subhead:             '副标题'
+      keywords:            '关键字'
+      description:         '简介'
+      copyright:           '版权'
+    seo:
+      google:
+        site-verify-code:  谷歌网站验证ID
+      baidu:
+        site-verify-code:  百度网站验证ID
     user:
       logo:                头像
   errors:

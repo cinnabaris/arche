@@ -192,10 +192,10 @@ graphql_object!(
                 password: password,
             })
         }
-        field updateSiteSeo(&executor, google: String, baidu: String) -> FieldResult<H> {
+        field updateSiteSeo(&executor, google_site_verify_code: String, baidu_site_verify_code: String) -> FieldResult<H> {
             gq!(executor, nut::graphql::site::mutation::UpdateSeo{
-                google: google,
-                baidu: baidu,
+                google_site_verify_code: google_site_verify_code,
+                baidu_site_verify_code: baidu_site_verify_code,
             })
         }
         field updateSiteAuthor(&executor, name: String, email: String) -> FieldResult<H> {

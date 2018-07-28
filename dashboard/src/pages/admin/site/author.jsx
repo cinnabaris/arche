@@ -15,16 +15,16 @@ import {
 import {
   Submit,
   formItemLayout
-} from '../../components/form'
-import Card from '../../components/layouts/Card'
+} from '../../../components/form'
+import Card from '../../../components/layouts/Card'
 import {
   client,
   failed
-} from '../../utils/request'
-import Authorized from '../../components/Authorized'
+} from '../../../utils/request'
+import Authorized from '../../../components/Authorized'
 import {
-  is_sign_in
-} from '../../utils/authorized'
+  is_administrator
+} from '../../../utils/authorized'
 
 const FormItem = Form.Item
 
@@ -36,14 +36,11 @@ class Widget extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        client().request(`mutation form($name: String!, $logo: String!){
-            updateUserProfile(name: $name, logo: $logo) {
+        client().request(`mutation form($name: String!, $email: String!){
+            updateSiteAuthor(name: $name, email: $email) {
               createdAt
             }
-          }`, {
-          logo: values.logo,
-          name: values.name
-        }).then((rst) => {
+          }`, values).then((rst) => {
           message.info(formatMessage({
             id: "flashes.success"
           }))
@@ -56,14 +53,12 @@ class Widget extends Component {
       setFieldsValue
     } = this.props.form
     client().request(`query info{
-        getUserProfile {
-          name,
-          logo,
-          email
+        getSiteAuthor{
+          name, email
         }
       }`).then((rst) => {
-      setFieldsValue(rst.getUserProfile)
-    }).catch(failed)
+      setFieldsValue(rst.getSiteAuthor)
+    }).catch(() => {})
   }
   render() {
     const {
@@ -72,9 +67,9 @@ class Widget extends Component {
     const {
       getFieldDecorator
     } = this.props.form
-    return (<Authorized check={is_sign_in}>
+    return (<Authorized check={is_administrator}>
       <Card title={{
-        id: "nut.users.profile.title"
+        id: "nut.admin.site.author.title"
       }}>
         <Form onSubmit={this.handleSubmit}>
           <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.username" />} hasFeedback={true}>
@@ -94,16 +89,6 @@ class Widget extends Component {
                   type: 'email',
                   message: formatMessage({id: "validations.email"})
                 }, {
-                  required: true,
-                  message: formatMessage({id: "validations.required"})
-                }]
-              })(<Input disabled={true}/>)
-            }
-          </FormItem>
-          <FormItem {...formItemLayout} label={<FormattedMessage id = "nut.attributes.user.logo" />} hasFeedback={true}>
-            {
-              getFieldDecorator('logo', {
-                rules: [{
                   required: true,
                   message: formatMessage({id: "validations.required"})
                 }]

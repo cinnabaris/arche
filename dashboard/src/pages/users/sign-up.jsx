@@ -75,10 +75,10 @@ class Widget extends Component {
           {
             getFieldDecorator('name', {
               rules: [
-                {
+              {
                   required: true,
-                  message: formatMessage({id: "validations.required"})
-                }
+                message: formatMessage({id: "validations.required"})
+              }
               ]
             })(<Input/>)
           }
@@ -87,13 +87,13 @@ class Widget extends Component {
           {
             getFieldDecorator('email', {
               rules: [
-                {
+              {
                   type: 'email',
-                  message: formatMessage({id: "validations.email"})
-                }, {
+                message: formatMessage({id: "validations.email"})
+              }, {
                   required: true,
-                  message: formatMessage({id: "validations.required"})
-                }
+                message: formatMessage({id: "validations.required"})
+              }
               ]
             })(<Input/>)
           }
@@ -102,12 +102,12 @@ class Widget extends Component {
           {
             getFieldDecorator('password', {
               rules: [
-                {
+              {
                   required: true,
                   max: 30,
                   min: 6,
-                  message: formatMessage({id: "validations.password"})
-                }
+                message: formatMessage({id: "validations.password"})
+              }
               ]
             })(<Input type="password"/>)
           }
@@ -116,12 +116,12 @@ class Widget extends Component {
           {
             getFieldDecorator('passwordConfirmation', {
               rules: [
-                {
+              {
                   required: true,
-                  message: formatMessage({id: "validations.required"})
-                }, {
+                message: formatMessage({id: "validations.required"})
+              }, {
                   validator: this.checkPassword
-                }
+              }
               ]
             })(<Input type="password"/>)
           }

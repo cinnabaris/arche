@@ -22,8 +22,16 @@ pub fn seo(ctx: &Context) -> Result<Seo> {
     ctx.admin()?;
     let db = ctx.db.deref();
     Ok(Seo {
-        google: settings::get(db, &ctx.app.encryptor, &"site.seo.google".to_string())?,
-        baidu: settings::get(db, &ctx.app.encryptor, &"site.seo.baidu".to_string())?,
+        google_site_verify_code: settings::get(
+            db,
+            &ctx.app.encryptor,
+            &"site.seo.google.site-verify-code".to_string(),
+        )?,
+        baidu_site_verify_code: settings::get(
+            db,
+            &ctx.app.encryptor,
+            &"site.seo.baidu.site-verify-code".to_string(),
+        )?,
     })
 }
 
@@ -40,6 +48,7 @@ pub fn info(ctx: &Context) -> Result<Info> {
         keywords: t!(db, &ctx.locale, "site.keywords"),
         description: t!(db, &ctx.locale, "site.description"),
         copyright: t!(db, &ctx.locale, "site.copyright"),
+        languages: i18n::languages(db)?,
     })
 }
 

@@ -61,7 +61,7 @@ class Widget extends Component {
       columns
     } = this.state
     return (<Authorized check={is_sign_in}>
-      <Layout title={{
+      <Layout rowKey="id" title={{
         id: "nut.users.logs.title"
       }} items={items} columns={columns}/>
     </Authorized>)

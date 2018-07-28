@@ -17,11 +17,12 @@ class Widget extends Component {
     const {
       items,
       title,
+      rowKey,
       columns
     } = this.props
     return (<Col xs={{span: 24}} lg={{span: 22, offset: 1}}>
       <Head title={title}/>
-      <Table title={() => (<FormattedMessage {...title}/>)} bordered={true} rowKey="id" dataSource={items} columns={columns}/>
+      <Table title={() => (<FormattedMessage {...title}/>)} bordered rowKey={rowKey} dataSource={items} columns={columns}/>
     </Col>);
   }
 }
@@ -29,6 +30,7 @@ class Widget extends Component {
 Widget.propTypes = {
   title: PropTypes.object.isRequired,
   items: PropTypes.array.isRequired,
+  rowKey: PropTypes.string.isRequired,
   columns: PropTypes.array.isRequired
 }
 

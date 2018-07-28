@@ -10,8 +10,8 @@ pub struct Smtp {
 
 #[derive(GraphQLObject, Debug, Deserialize, Serialize)]
 pub struct Seo {
-    pub google: String,
-    pub baidu: String,
+    pub google_site_verify_code: String,
+    pub baidu_site_verify_code: String,
 }
 
 #[derive(GraphQLObject, Debug, Deserialize, Serialize)]
@@ -27,6 +27,7 @@ pub struct Info {
     pub keywords: String,
     pub description: String,
     pub copyright: String,
+    pub languages: Vec<String>,
 }
 
 #[derive(GraphQLObject, Debug, Deserialize, Serialize)]

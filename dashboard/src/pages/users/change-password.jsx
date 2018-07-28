@@ -21,6 +21,10 @@ import {
   failed
 } from '../../utils/request'
 import Card from '../../components/layouts/Card'
+import Authorized from '../../components/Authorized'
+import {
+  is_sign_in
+} from '../../utils/authorized'
 
 const FormItem = Form.Item
 
@@ -78,53 +82,49 @@ class Widget extends Component {
       getFieldDecorator
     } = this.props.form
 
-    return (<Card title={{
+    return (<Authorized check={is_sign_in}>
+      <Card title={{
         id: "nut.users.change-password.title"
-    }}>
-      <Form onSubmit={this.handleSubmit}>
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.current-password" />} hasFeedback={true}>
-          {
-            getFieldDecorator('currentPassword', {
-              rules: [
-              {
+      }}>
+        <Form onSubmit={this.handleSubmit}>
+          <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.current-password" />} hasFeedback={true}>
+            {
+              getFieldDecorator('currentPassword', {
+                rules: [{
                   required: true,
-                message: formatMessage({id: "validations.required"})
-              }
-              ]
-            })(<Input type="password"/>)
-          }
-        </FormItem>
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.new-password" />} hasFeedback={true}>
-          {
-            getFieldDecorator('newPassword', {
-              rules: [
-              {
+                  message: formatMessage({id: "validations.required"})
+                }]
+              })(<Input type="password"/>)
+            }
+          </FormItem>
+          <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.new-password" />} hasFeedback={true}>
+            {
+              getFieldDecorator('newPassword', {
+                rules: [{
                   required: true,
                   max: 30,
                   min: 6,
-                message: formatMessage({id: "validations.password"})
-              }
-              ]
-            })(<Input type="password"/>)
-          }
-        </FormItem>
-        <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.password-confirmation" />} hasFeedback={true}>
-          {
-            getFieldDecorator('passwordConfirmation', {
-              rules: [
-              {
+                  message: formatMessage({id: "validations.password"})
+                }]
+              })(<Input type="password"/>)
+            }
+          </FormItem>
+          <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.password-confirmation" />} hasFeedback={true}>
+            {
+              getFieldDecorator('passwordConfirmation', {
+                rules: [{
                   required: true,
-                message: formatMessage({id: "validations.required"})
-              }, {
+                  message: formatMessage({id: "validations.required"})
+                }, {
                   validator: this.checkPassword
-              }
-              ]
-            })(<Input type="password"/>)
-          }
-        </FormItem>
-        <Submit/>
-      </Form>
-    </Card>)
+                }]
+              })(<Input type="password"/>)
+            }
+          </FormItem>
+          <Submit/>
+        </Form>
+      </Card>
+    </Authorized>)
   }
 }
 

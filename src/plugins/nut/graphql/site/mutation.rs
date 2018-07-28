@@ -44,8 +44,8 @@ impl UpdateSmtp {
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSeo {
-    pub google: String,
-    pub baidu: String,
+    pub google_site_verify_code: String,
+    pub baidu_site_verify_code: String,
 }
 
 impl UpdateSeo {
@@ -57,15 +57,15 @@ impl UpdateSeo {
             settings::set(
                 db,
                 &ctx.app.encryptor,
-                &"site.seo.google".to_string(),
-                &self.google,
+                &"site.seo.google.site-verify-code".to_string(),
+                &self.google_site_verify_code,
                 false,
             )?;
             settings::set(
                 db,
                 &ctx.app.encryptor,
-                &"site.seo.baidu".to_string(),
-                &self.baidu,
+                &"site.seo.baidu.site-verify-code".to_string(),
+                &self.baidu_site_verify_code,
                 false,
             )?;
             Ok(())
