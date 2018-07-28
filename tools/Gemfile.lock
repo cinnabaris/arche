@@ -86,7 +86,7 @@ GEM
     pg (1.0.0)
     puma (3.12.0)
     rack (2.0.5)
-    rack-test (1.0.0)
+    rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.2.0)
       actioncable (= 5.2.0)
