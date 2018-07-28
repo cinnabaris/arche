@@ -181,6 +181,8 @@ nut:
       facebook:            Facebook
       skype:               Skype
       weibo:               微博
+    card:
+      action:              动作
   errors:
     user:
       email-already-exist: 该邮件账户已经存在

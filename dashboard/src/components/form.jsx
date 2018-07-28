@@ -1,6 +1,7 @@
 import React, {
   Component
 } from 'react'
+import PropTypes from 'prop-types'
 import {
   Form,
   Button
@@ -9,6 +10,7 @@ import {
   FormattedMessage
 } from 'react-intl'
 import lodash from 'lodash'
+import ReactQuill from 'react-quill'
 
 const FormItem = Form.Item
 
@@ -47,6 +49,69 @@ export const tailFormItemLayout = {
     }
   }
 }
+
+export class Quill extends Component {
+  render() {
+    const {
+      value,
+      onChange
+    } = this.props
+    const modules = {
+      toolbar: [
+        [{
+          'font': []
+        }],
+        [{
+          size: []
+        }],
+        [
+          'bold', 'italic', 'underline', 'strike', 'blockquote'
+        ],
+        [{
+          'list': 'ordered'
+        }, {
+          'list': 'bullet'
+        }, {
+          'indent': '-1'
+        }, {
+          'indent': '+1'
+        }],
+        [
+          'link', 'image', 'video'
+        ],
+        ['clean']
+      ],
+      clipboard: {
+        // toggle to add extra line breaks when pasting HTML:
+        matchVisual: false
+      }
+    }
+
+    const formats = [
+      'header',
+      'font',
+      'size',
+      'bold',
+      'italic',
+      'underline',
+      'strike',
+      'blockquote',
+      'list',
+      'bullet',
+      'indent',
+      'link',
+      'image',
+      'video'
+    ]
+    return (<ReactQuill modules={modules} formats={formats} value={value} onChange={onChange} theme="snow"/>)
+  }
+}
+
+Quill.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired
+}
+
 
 export class Submit extends Component {
   render() {
