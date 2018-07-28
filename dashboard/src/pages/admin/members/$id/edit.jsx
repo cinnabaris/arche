@@ -21,7 +21,8 @@ import moment from 'moment'
 
 import {
   Submit,
-  formItemLayout
+  formItemLayout,
+  DATE_FORMAT
 } from '../../../../components/form'
 import Card from '../../../../components/layouts/Card'
 import {
@@ -32,9 +33,6 @@ import Authorized from '../../../../components/Authorized'
 import {
   is_administrator
 } from '../../../../utils/authorized'
-import {
-  DATE_FORMAT
-} from '../../../../utils/moment'
 
 const FormItem = Form.Item
 

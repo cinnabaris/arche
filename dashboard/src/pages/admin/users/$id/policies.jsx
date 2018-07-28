@@ -18,7 +18,8 @@ import {
 
 import {
   Submit,
-  formItemLayout
+  formItemLayout,
+  DATE_FORMAT
 } from '../../../../components/form'
 import Card from '../../../../components/layouts/Card'
 import {
@@ -30,9 +31,7 @@ import {
   is_administrator,
   MANAGER
 } from '../../../../utils/authorized'
-import {
-  DATE_FORMAT
-} from '../../../../utils/moment'
+
 
 const FormItem = Form.Item
 const RangePicker = DatePicker.RangePicker;

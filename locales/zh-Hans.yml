@@ -35,6 +35,12 @@ attributes:
   gender-f:                女
   contact:                 联系信息
   birthday:                生日
+  position:                位置
+  x:                       X轴坐标
+  y:                       Y轴坐标
+  url:                     地址
+  title:                   标题
+  logo:                    图标
 validations:
   email:                   邮箱格式不对
   required:                不能为空

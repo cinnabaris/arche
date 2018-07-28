@@ -8,10 +8,13 @@ import {
 import {
   FormattedMessage
 } from 'react-intl'
+import lodash from 'lodash'
 
 const FormItem = Form.Item
 
 export const DATE_FORMAT = "YYYY-MM-DD"
+
+export const sort_orders = () => lodash.range(-9, 10)
 
 export const formItemLayout = {
   labelCol: {
