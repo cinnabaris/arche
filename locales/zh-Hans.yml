@@ -35,7 +35,8 @@ attributes:
   gender-f:                女
   contact:                 联系信息
   birthday:                生日
-  position:                位置
+  position:                排序
+  loc:                     位置
   x:                       X轴坐标
   y:                       Y轴坐标
   url:                     地址

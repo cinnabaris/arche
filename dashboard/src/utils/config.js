@@ -1,0 +1,1 @@
+export const links_loc_options = ['header', 'footer', 'sider']

@@ -29,20 +29,20 @@ class Widget extends Component {
     this.state = {
       items: [],
       columns: [{
-        title: (<FormattedMessage id="attributes.position"/>),
-        dataIndex: 'position',
-        width: 80,
-        key: 'position'
+        title: (<FormattedMessage id="attributes.loc"/>),
+        render: (text, record) => `${record.loc}(${record.x}, ${record.y})`,
+        width: 180,
+        key: 'loc'
       }, {
-        title: (<FormattedMessage id="attributes.url"/>),
-        render: (text, record) => <a target="_blank" rel="noopener noreferrer" href={record.home}>{record.title}</a>,
-        key: 'url'
+        title: (<FormattedMessage id="attributes.name"/>),
+        render: (text, record) => <a target="_blank" rel="noopener noreferrer" href={record.href}>{record.label}</a>,
+        key: 'name'
       }, {
-        title: (<span><FormattedMessage id="buttons.operator"/>&nbsp;<Button onClick={()=>router.push(`/admin/friend-links/new`)} size="small" shape="circle" type="primary" icon="file-add"/></span>),
+        title: (<span><FormattedMessage id="buttons.operator"/>&nbsp;<Button onClick={()=>router.push(`/admin/links/new`)} size="small" shape="circle" type="primary" icon="file-add"/></span>),
         width: 120,
         render: (text, record) => (<span>
-          <Button size="small" onClick={()=>router.push(`/admin/friend-links/${record.id}/edit`)} shape="circle" type="dashed" icon="edit"/>
-          <Popconfirm title={<FormattedMessage id="flashes.confirm-to-remove" values={{name:record.title}} />} onConfirm={(e) => this.handleRemove(record.id)}>
+          <Button size="small" onClick={()=>router.push(`/admin/links/${record.id}/edit`)} shape="circle" type="dashed" icon="edit"/>
+          <Popconfirm title={<FormattedMessage id="flashes.confirm-to-remove" values={{name:record.label}} />} onConfirm={(e) => this.handleRemove(record.id)}>
             <Button size="small" shape="circle" type="danger" icon="delete"/>
           </Popconfirm>
         </span>),
@@ -55,7 +55,7 @@ class Widget extends Component {
       formatMessage
     } = this.props.intl
     client().request(`mutation form($id: String!){
-          removeFriendLink(id: $id) {
+          removeLink(id: $id) {
             createdAt
           }
         }`, {
@@ -72,12 +72,12 @@ class Widget extends Component {
   }
   componentDidMount() {
     client().request(`query list{
-        listFriendLink{
-          id, title, home, position
+        listLink{
+          id, label, href, loc, x, y
         }
       }`).then((rst) => {
       this.setState({
-        items: rst.listFriendLink
+        items: rst.listLink
       })
     }).catch(failed)
   }
@@ -88,12 +88,11 @@ class Widget extends Component {
     } = this.state
     return (<Authorized check={is_administrator}>
       <Layout rowKey="id" title={{
-        id: "nut.admin.friend-links.index.title"
+        id: "nut.admin.links.index.title"
       }} items={items} columns={columns}/>
     </Authorized>)
   }
 }
-
 
 Widget.propTypes = {
   intl: intlShape.isRequired
