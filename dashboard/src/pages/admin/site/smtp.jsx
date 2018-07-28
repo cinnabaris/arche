@@ -49,11 +49,6 @@ class Widget extends Component {
       }
     })
   }
-  handlePortChange = (v) => {
-    this.props.form.setFieldsValue({
-      port: v
-    });
-  }
   checkPassword = (rule, value, callback) => {
     const {
       formatMessage
@@ -114,7 +109,7 @@ class Widget extends Component {
             {
               getFieldDecorator('port', {
                 rules: []
-              })(<Select onChange={this.handlePortChange}>
+              })(<Select>
                 {[25, 465, 587].map((it)=>(<Select.Option key={it} value={it}>{it}</Select.Option>))}
               </Select>)
             }
