@@ -6,6 +6,7 @@ flashes:
   success:                 操作成功
   warning:                 警告信息
   error:                   错误信息
+  confirm-to-remove:       你确定要删除{name}么？
 buttons:
   submit:                  提交
   operator:                操作
@@ -29,12 +30,20 @@ attributes:
   date-range:              日期区间
   datetime-range:          日期时间区间
   time-range:              时间区间
+  gender:                  性别
+  gender-m:                男
+  gender-f:                女
+  contact:                 联系信息
+  birthday:                生日
 validations:
   email:                   邮箱格式不对
   required:                不能为空
   password:                密码长度应该在6到32位之间
   password-confirmation:   两次密码输入不一致
   date-range:              请选择时间区间
+  date:                    请选择日期
+  time:                    请选择时间
+  datetime:                请选择日期时间
 header:
   search:
     placeholder:           站内搜索
@@ -152,6 +161,17 @@ nut:
       logo:                头像
       last-sign-in:        上次登录
       current-sign-in:     本次登录
+    member:
+      nick-name:           昵称
+      real-name:           姓名
+      address:             住址
+      phone:               电话
+      line:                Line
+      email:               邮箱
+      wechat:              微信
+      facebook:            Facebook
+      skype:               Skype
+      weibo:               微博
   errors:
     user:
       email-already-exist: 该邮件账户已经存在
