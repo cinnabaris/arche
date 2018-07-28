@@ -123,3 +123,4 @@ rabbitmqctl set_permissions -p v-host who-am-i ".*" ".*" ".*"
 -   [LINE Developers](https://developers.line.me/en/)
 -   [Material Icons](https://material.io/tools/icons/?style=baseline)
 -   [Material Design Icons](https://materialdesignicons.com/)
+-   [UTF-8 Miscellaneous Symbols](https://www.w3schools.com/charsets/ref_utf_misc_symbols.asp)
