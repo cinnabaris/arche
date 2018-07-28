@@ -73,6 +73,15 @@ table! {
 }
 
 table! {
+    caring_topics_users (id) {
+        id -> Bigint,
+        topic_id -> Bigint,
+        user_id -> Bigint,
+        created_at -> Datetime,
+    }
+}
+
+table! {
     forum_posts (id) {
         id -> Bigint,
         user_id -> Bigint,
@@ -329,6 +338,7 @@ allow_tables_to_appear_in_same_query!(
     cards,
     caring_posts,
     caring_topics,
+    caring_topics_users,
     forum_posts,
     forum_tags,
     forum_topics,

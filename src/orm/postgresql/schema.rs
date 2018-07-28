@@ -73,6 +73,15 @@ table! {
 }
 
 table! {
+    caring_topics_users (id) {
+        id -> Int8,
+        topic_id -> Int8,
+        user_id -> Int8,
+        created_at -> Timestamp,
+    }
+}
+
+table! {
     forum_posts (id) {
         id -> Int8,
         user_id -> Int8,
@@ -329,6 +338,7 @@ allow_tables_to_appear_in_same_query!(
     cards,
     caring_posts,
     caring_topics,
+    caring_topics_users,
     forum_posts,
     forum_tags,
     forum_topics,

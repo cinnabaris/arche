@@ -19,5 +19,12 @@ class CreateCaringTopics < ActiveRecord::Migration[5.2]
     add_index :caring_topics, :name
     add_index :caring_topics, :gender
     add_index :caring_topics, :status
+
+    create_table :caring_topics_users do |t|
+      t.references :topic, null: false
+      t.references :user, null: false
+      t.datetime :created_at, null: false
+    end
+    add_index :caring_topics_users, %i[topic_id user_id], unique: true
   end
 end
