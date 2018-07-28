@@ -50,7 +50,6 @@ class Widget extends Component {
     })
   }
   handlePortChange = (v) => {
-    console.log(v);
     this.props.form.setFieldsValue({
       port: v
     });

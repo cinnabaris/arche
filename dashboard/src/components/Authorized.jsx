@@ -14,7 +14,7 @@ class Widget extends Component {
       children,
       check
     } = this.props
-    if (check(currentUser.authority)) {
+    if (check(currentUser)) {
       return children
     }
     return (<Exception type="403" />);

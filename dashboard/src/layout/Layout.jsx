@@ -283,7 +283,7 @@ class Widget extends Component {
       <Sider breakpoint="lg" collapsedWidth="0" trigger={null} collapsible="collapsible" collapsed={this.state.collapsed}>
         <div className="sider-logo"/>
         <Menu onClick={(e)=>router.push(e.key)} theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-          {this.siderMenus(currentUser.authority).map((it) => (<Menu.SubMenu key={it.label} title={(<span><Icon type={it.icon}/><FormattedMessage id={it.label}/></span>)}>
+          {this.siderMenus(currentUser).map((it) => (<Menu.SubMenu key={it.label} title={(<span><Icon type={it.icon}/><FormattedMessage id={it.label}/></span>)}>
             {
               it.children.map((jt) => (<Menu.Item key={jt.to}>
                 <FormattedMessage id={jt.label}/>
@@ -303,7 +303,7 @@ class Widget extends Component {
                 ? 'menu-unfold'
                 : 'menu-fold'}/>
             </Menu.Item>
-            {this.headerMenus(currentUser.authority).map((it) => (<Menu.Item style={{float: 'right'}} key={it.key}>
+            {this.headerMenus(currentUser).map((it) => (<Menu.Item style={{float: 'right'}} key={it.key}>
               {it.children}
             </Menu.Item>))}
           </Menu>

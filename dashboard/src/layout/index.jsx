@@ -10,6 +10,9 @@ import {
   addLocaleData,
   IntlProvider
 } from 'react-intl'
+import {
+  LocaleProvider
+} from 'antd'
 
 import {
   client,
@@ -42,7 +45,7 @@ class Widget extends Component {
     var token = getToken()
     if (token) {
       dispatch({
-        type: 'currentUser/refresh',
+        type: 'currentUser/sign-in',
         token
       })
     }
@@ -81,7 +84,9 @@ class Widget extends Component {
       intl
     } = this.state
     return (<IntlProvider locale={intl.locale} messages={intl.messages}>
-      <Layout>{children}</Layout>
+      <LocaleProvider locale={intl.antd}>
+        <Layout>{children}</Layout>
+      </LocaleProvider>
     </IntlProvider>)
   }
 }

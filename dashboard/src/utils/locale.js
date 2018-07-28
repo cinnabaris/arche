@@ -4,6 +4,9 @@ import dataZh from 'react-intl/locale-data/zh'
 import 'moment/locale/zh-cn'
 import 'moment/locale/zh-tw'
 import moment from 'moment'
+import antdZhCn from 'antd/lib/locale-provider/zh_CN'
+import antdZhTw from 'antd/lib/locale-provider/zh_TW'
+import antdEnUs from 'antd/lib/locale-provider/en_US'
 
 const KEY = 'locale'
 
@@ -27,20 +30,23 @@ export const detect = () => {
       moment.locale('zh-cn')
       return {
         locale: lang,
-        data: dataZh
+        data: dataZh,
+        antd: antdZhCn
       }
     case 'zh-Hant':
       moment.locale('zh-tw')
       return {
         locale: lang,
-        data: dataZh
+        data: dataZh,
+        antd: antdZhTw
       }
     default:
       moment.locale()
       return {
         locale: 'en-US',
         data: dataEn,
-        moment: null
+        moment: null,
+        antd: antdEnUs
       }
   }
 }

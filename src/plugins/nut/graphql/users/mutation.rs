@@ -279,6 +279,9 @@ impl Lock {
         let db = ctx.db.deref();
         let now = Utc::now().naive_utc();
         let id = self.id.parse::<i64>()?;
+        if dao::policy::is(db, &id, &Role::Root) {
+            return Err(Status::Forbidden.reason.into());
+        }
         db.transaction::<_, Error, _>(|| {
             let it = users::dsl::users.filter(users::dsl::id.eq(&id));
             update(it)

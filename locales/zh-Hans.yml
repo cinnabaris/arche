@@ -8,6 +8,9 @@ flashes:
   error:                   错误信息
 buttons:
   submit:                  提交
+  operator:                操作
+  edit:                    编辑
+  remove:                  删除
 attributes:
   password:                密码
   password-confirmation:   密码确认
@@ -23,11 +26,15 @@ attributes:
   host:                    主机
   port:                    端口
   user:                    用户
+  date-range:              日期区间
+  datetime-range:          日期时间区间
+  time-range:              时间区间
 validations:
   email:                   邮箱格式不对
   required:                不能为空
   password:                密码长度应该在6到32位之间
   password-confirmation:   两次密码输入不一致
+  date-range:              请选择时间区间
 header:
   search:
     placeholder:           站内搜索
@@ -89,6 +96,14 @@ nut:
     users:
       index:
         title:             用户
+        lock:
+          confirm:         你确定要锁定用户{name}么？
+      policies:
+        title:             '权限管理'
+        admin:             '系统管理员'
+        forum:             '论坛管理员'
+        caring:            '会员关怀管理员'
+        library:           '图书馆管理员'
     members:
       index:
         title:             会员
@@ -135,6 +150,8 @@ nut:
         site-verify-code:  百度网站验证ID
     user:
       logo:                头像
+      last-sign-in:        上次登录
+      current-sign-in:     本次登录
   errors:
     user:
       email-already-exist: 该邮件账户已经存在
