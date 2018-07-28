@@ -15,7 +15,8 @@ import {
 import Layout from "../../components/layouts/UsersSharedLinks"
 import {
   Submit,
-  formItemLayout
+  formItemLayout,
+  MEDIA_TYPE_TEXT
 } from '../../components/form'
 import {
   client,
@@ -38,7 +39,7 @@ class Widget extends Component {
             }
           }`, {
           body: values.body,
-          mediaType: 'text'
+          mediaType: MEDIA_TYPE_TEXT
         }).then((rst) => {
           message.info(formatMessage({
             id: "flashes.success"

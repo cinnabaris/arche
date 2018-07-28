@@ -18,7 +18,8 @@ import {
   Submit,
   formItemLayout,
   sort_orders,
-  Quill
+  Quill,
+  MEDIA_TYPE_HTML
 } from '../../../components/form'
 import Card from '../../../components/layouts/Card'
 import {
@@ -59,7 +60,7 @@ class Widget extends Component {
               createdAt
             }
           }`, Object.assign({}, values, {
-          mediaType: 'html',
+          mediaType: MEDIA_TYPE_HTML,
           body: this.state.body
         })).then((rst) => {
           message.info(formatMessage({
