@@ -44,6 +44,8 @@ attributes:
   title:                   标题
   logo:                    图标
   member:                  会员
+  age:                     年龄
+  status:                  状态
 validations:
   email:                   邮箱格式不对
   required:                不能为空
@@ -252,7 +254,25 @@ caring:
       title:               事件
   attributes:
     topic:
+      reason:              原因
       tag:                 类型
+      tag-marriage:        结婚
+      tag-divorcement:     离婚
+      tag-birth:           生子
+      tag-death:           死亡
+      tag-employment:      上班
+      tag-unemployment:    失业
+      tag-moving:          乔迁
+      tag-sickness:        生病
+      tag-recovery:        康复
+      tag-opening:         开业
+      tag-closing:         结业
+      tag-enrollment:      入学
+      tag-graduation:      毕业
+      status-close:        关闭
+      status-complete:     完成
+      status-pause:        暂停
+      status-open:         开放
 donate:
   dashboard:
     title:                 捐赠

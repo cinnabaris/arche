@@ -93,7 +93,7 @@ class Widget extends Component {
               })(<Input/>)
             }
           </FormItem>
-          <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.url" />}>
+          <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.content" />}>
             <Quill value={this.state.body} onChange={this.handleBodyChange} />
           </FormItem>
           <FormItem {...formItemLayout} label={<FormattedMessage id = "attributes.url" />} hasFeedback={true}>
