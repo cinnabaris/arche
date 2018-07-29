@@ -22,17 +22,19 @@ import {
 } from 'dva'
 
 import {
+  set as setLocale
+} from '../utils/locale'
+import {
   client,
   failed
 } from '../utils/request'
 import {
   is_sign_in,
   is_administrator,
-  is_manager,
-  FORUM,
-  POS,
-  LIBRARY,
-  HOTEL
+  is_forum_manager,
+  is_pos_manager,
+  is_library_manager,
+  is_hotel_manager
 } from '../utils/authorized'
 import NoticeBar from './NoticeBar'
 import Footer from './Footer'
@@ -46,7 +48,9 @@ const {
 class Widget extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      languages: []
+    }
   }
   handleHeaderClick = (e) => {
     const {
@@ -55,6 +59,13 @@ class Widget extends Component {
     const {
       formatMessage
     } = this.props.intl
+
+    const lang = 'lang-';
+    if (e.key.startsWith(lang)) {
+      setLocale(e.key.substring(lang.length))
+      return
+    }
+
     switch (e.key) {
       case 'home':
         window.open("/", "_blank")
@@ -171,7 +182,7 @@ class Widget extends Component {
         to: '/forum/posts'
       }]
     }
-    if (is_manager(auth, FORUM)) {
+    if (is_forum_manager(auth)) {
       forum.children.push({
         label: 'forum.tags.index.title',
         to: '/forum/tags'
@@ -183,14 +194,14 @@ class Widget extends Component {
       label: 'cbeta.dashboard.title',
       children: []
     })
-    if (is_manager(auth, LIBRARY)) {
+    if (is_library_manager(auth)) {
       items.push({
         icon: 'idcard',
         label: 'library.dashboard.title',
         children: []
       })
     }
-    if (is_manager(auth, HOTEL)) {
+    if (is_hotel_manager(auth)) {
       items.push({
         icon: 'fork',
         label: 'hotel.dashboard.title',
@@ -204,7 +215,7 @@ class Widget extends Component {
       children: []
     })
 
-    if (is_manager(auth, POS)) {
+    if (is_pos_manager(auth)) {
       items.push({
         icon: 'qrcode',
         label: 'pos.dashboard.title',
@@ -221,7 +232,13 @@ class Widget extends Component {
     items.push({
       icon: 'team',
       label: 'caring.dashboard.title',
-      children: []
+      children: [{
+        label: 'caring.topics.index.title',
+        to: '/caring/topics'
+      }, {
+        label: 'caring.posts.index.title',
+        to: '/caring/posts'
+      }]
     })
 
     if (is_administrator(auth)) {
@@ -273,6 +290,17 @@ class Widget extends Component {
     })
     return items
   }
+  componentDidMount() {
+    client().request(`query info{
+        getSiteInfo{
+          languages
+        }
+      }`, {}).then((rst) => {
+      this.setState({
+        languages: rst.getSiteInfo.languages
+      })
+    }).catch(failed)
+  }
   render() {
     const {
       children,
@@ -306,6 +334,9 @@ class Widget extends Component {
             {this.headerMenus(currentUser).map((it) => (<Menu.Item style={{float: 'right'}} key={it.key}>
               {it.children}
             </Menu.Item>))}
+            <Menu.SubMenu style={{float: 'right'}} key="switch-languages" title={<Icon type="global" />}>
+              {this.state.languages.map((it)=><Menu.Item key={`lang-${it}`}><FormattedMessage id={`languages.${it}`}/></Menu.Item>)}
+            </Menu.SubMenu>
           </Menu>
         </Header>
         <Content style={{

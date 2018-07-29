@@ -1,6 +1,6 @@
 languages:
-  en-US:                   English,
-  zh-Hans:                 简体中文,
+  en-US:                   English
+  zh-Hans:                 简体中文
   zh-Hant:                 繁體中文
 flashes:
   success:                 操作成功
@@ -12,6 +12,7 @@ buttons:
   operator:                操作
   edit:                    编辑
   remove:                  删除
+  new:                     新增
 attributes:
   password:                密码
   password-confirmation:   密码确认
@@ -42,6 +43,7 @@ attributes:
   url:                     地址
   title:                   标题
   logo:                    图标
+  member:                  会员
 validations:
   email:                   邮箱格式不对
   required:                不能为空
@@ -242,6 +244,15 @@ todo:
 caring:
   dashboard:
     title:                 会员关怀
+  topics:
+    index:
+      title:               任务
+  posts:
+    index:
+      title:               事件
+  attributes:
+    topic:
+      tag:                 类型
 donate:
   dashboard:
     title:                 捐赠
