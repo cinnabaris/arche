@@ -3,7 +3,7 @@ use log;
 
 use super::super::{
     env,
-    plugins::{forum, nut},
+    plugins::{caring, forum, nut},
 };
 use super::{context::Context, H};
 
@@ -15,6 +15,19 @@ graphql_object!(Query: Context |&self| {
         env::version()
     }
 
+    //--------------------caring--------------------
+    field showCaringPost(&executor, id: String) -> FieldResult<caring::graphql::posts::Post> {
+        gq!(executor, caring::graphql::posts::Show{id: id})
+    }
+    field listCaringPost(&executor) -> FieldResult<Vec<caring::graphql::posts::Post>> {
+        ge!(caring::graphql::posts::list(executor.context()))
+    }
+    field showCaringTopic(&executor, id: String) -> FieldResult<caring::graphql::topics::Topic> {
+        gq!(executor, caring::graphql::topics::Show{id: id})
+    }
+    field listCaringTopic(&executor) -> FieldResult<Vec<caring::graphql::topics::Topic>> {
+        ge!(caring::graphql::topics::list(executor.context()))
+    }
     //--------------------forum---------------------
     field showForumPost(&executor, id: String) -> FieldResult<forum::graphql::posts::Post> {
         gq!(executor, forum::graphql::posts::Show{id: id})

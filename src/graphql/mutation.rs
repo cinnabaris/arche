@@ -1,12 +1,74 @@
 use juniper::{self, FieldResult};
 
-use super::super::plugins::{forum, nut};
+use super::super::plugins::{caring, forum, nut};
 use super::{context::Context, H};
 
 pub struct Mutation;
 
 graphql_object!(
     Mutation: Context | &self | {
+        //-----------------------caring---------------
+        field createCaringPost(&executor, topic_id: String, method: String, body: String, media_type: String, begin: String, end: String) -> FieldResult<H> {
+            gq!(executor, caring::graphql::posts::Create{
+                topic_id: topic_id,
+                method: method,
+                body: body,
+                media_type: media_type,
+                begin: begin,
+                end: end,
+            })
+        }
+        field updateCaringPost(&executor, id: String, method: String, body: String, media_type: String, begin: String, end: String) -> FieldResult<H> {
+            gq!(executor, caring::graphql::posts::Update{
+                id: id,
+                method: method,
+                body: body,
+                media_type: media_type,
+                begin: begin,
+                end: end,
+            })
+        }
+        field removeCaringPost(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, caring::graphql::posts::Remove{
+                id: id,
+            })
+        }
+        field createCaringTopic(&executor, member_id: String, tag: String, name: String, gender: String, age: i32, phone: Option<String>, email: Option<String>, address: Option<String>, reason: String, media_type: String, status: String) -> FieldResult<H> {
+            gq!(executor, caring::graphql::topics::Create{
+                member_id: member_id,
+                tag: tag,
+                name: name,
+                gender: gender,
+                age: age,
+                phone: phone,
+                email: email,
+                address: address,
+                reason: reason,
+                media_type: media_type,
+                status: status,
+            })
+        }
+        field updateCaringTopic(&executor, id: String, tag: String, name: String, gender: String, age: i32, phone: Option<String>, email: Option<String>, address: Option<String>, reason: String, media_type: String, status: String) -> FieldResult<H> {
+            gq!(executor, caring::graphql::topics::Update{
+                id: id,
+                tag: tag,
+                name: name,
+                gender: gender,
+                age: age,
+                phone: phone,
+                email: email,
+                address: address,
+                reason: reason,
+                media_type: media_type,
+                status: status,
+            })
+        }
+        field removeCaringTopic(&executor, id: String) -> FieldResult<H> {
+            gq!(executor, caring::graphql::topics::Remove{
+                id: id,
+            })
+        }
+
         //-----------------------forum----------------
         field createForumTag(&executor, name: String) -> FieldResult<H> {
             gq!(executor, forum::graphql::tags::Create{

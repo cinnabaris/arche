@@ -2,7 +2,11 @@ use sodiumoxide::crypto::secretbox;
 
 use super::errors::Result;
 
+// https://docs.rs/chrono/0.4.0/chrono/format/strftime/index.html
 pub const DATE_FORMAT: &'static str = "%Y-%m-%d";
+pub const TIME_FORMAT: &'static str = "%H:%M:%S";
+// 2001-07-08T00:34:60.026490+09:30 	ISO 8601 / RFC 3339 date & time format.
+pub const DATETIME_FORMAT: &'static str = "%+";
 
 pub struct Encryptor {
     key: secretbox::Key,

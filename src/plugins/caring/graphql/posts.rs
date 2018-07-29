@@ -1,3 +1,4 @@
+use std::convert::From;
 use std::ops::Deref;
 
 use chrono::{DateTime, NaiveDateTime, Utc};
@@ -8,21 +9,41 @@ use validator::Validate;
 use super::super::super::super::{
     errors::{Error, Result},
     graphql::{context::Context, H},
-    orm::schema::forum_posts,
+    orm::schema::{caring_posts, caring_topics, caring_topics_users},
     rfc::UtcDateTime,
+    utils::DATETIME_FORMAT,
 };
-use super::super::dao;
+use super::super::models;
 
 #[derive(GraphQLObject, Debug, Serialize)]
 pub struct Post {
     pub id: String,
     pub user_id: String,
     pub topic_id: String,
-    pub post_id: Option<String>,
+    pub method: String,
     pub body: String,
     pub media_type: String,
+    pub begin: DateTime<Utc>,
+    pub end: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub editable: bool,
+}
+
+impl From<models::Post> for Post {
+    fn from(it: models::Post) -> Self {
+        Self {
+            id: it.id.to_string(),
+            user_id: it.user_id.to_string(),
+            topic_id: it.topic_id.to_string(),
+            method: it.method,
+            body: it.body,
+            media_type: it.media_type,
+            begin: it.begin.to_utc(),
+            end: it.end.to_utc(),
+            updated_at: it.updated_at.to_utc(),
+            editable: false,
+        }
+    }
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
@@ -37,36 +58,18 @@ impl Show {
         let id: i64 = self.id.parse()?;
         let user = ctx.current_user()?;
         let db = ctx.db.deref();
-        let is_manager = dao::is_manager(db, user.id);
 
-        let (user_id, topic_id, post_id, body, media_type, updated_at) =
-            forum_posts::dsl::forum_posts
-                .select((
-                    forum_posts::dsl::user_id,
-                    forum_posts::dsl::topic_id,
-                    forum_posts::dsl::post_id,
-                    forum_posts::dsl::body,
-                    forum_posts::dsl::media_type,
-                    forum_posts::dsl::updated_at,
-                ))
-                .filter(forum_posts::dsl::id.eq(&id))
-                .first::<(i64, i64, Option<i64>, String, String, NaiveDateTime)>(db)?;
+        let it = caring_posts::dsl::caring_posts
+            .filter(caring_posts::dsl::id.eq(&id))
+            .first::<models::Post>(db)?;
 
-        Ok(Post {
-            id: self.id.clone(),
-            user_id: user_id.to_string(),
-            topic_id: topic_id.to_string(),
-            post_id: match post_id {
-                Some(id) => Some(id.to_string()),
-                None => None,
-            },
-            body: body,
-            media_type: media_type,
-            editable: is_manager || user_id == user.id,
-            updated_at: updated_at.to_utc(),
-        })
+        let editable = user.id == it.user_id;
+        let mut ret: Post = it.into();
+        ret.editable = editable;
+        Ok(ret)
     }
 }
+
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct Remove {
     #[validate(length(min = "1"))]
@@ -80,16 +83,15 @@ impl Remove {
         let user = ctx.current_user()?;
         let db = ctx.db.deref();
 
-        if !dao::is_manager(db, user.id) && user.id != id {
+        if caring_posts::dsl::caring_posts
+            .select(caring_posts::dsl::user_id)
+            .filter(caring_posts::dsl::id.eq(&id))
+            .first::<i64>(db)? != user.id
+        {
             return Err(Status::Forbidden.reason.into());
         }
-
         db.transaction::<_, Error, _>(|| {
-            let it = forum_posts::dsl::forum_posts.filter(forum_posts::dsl::post_id.eq(Some(id)));
-            update(it)
-                .set(forum_posts::dsl::post_id.eq(&None::<i64>))
-                .execute(db)?;
-            let it = forum_posts::dsl::forum_posts.filter(forum_posts::dsl::id.eq(&id));
+            let it = caring_posts::dsl::caring_posts.filter(caring_posts::dsl::id.eq(&id));
             delete(it).execute(db)?;
             Ok(())
         })?;
@@ -100,49 +102,49 @@ impl Remove {
 pub fn list(ctx: &Context) -> Result<Vec<Post>> {
     let user = ctx.current_user()?;
     let db = ctx.db.deref();
-    let is_manager = dao::is_manager(db, user.id);
-    let items = forum_posts::dsl::forum_posts
-        .select((
-            forum_posts::dsl::id,
-            forum_posts::dsl::user_id,
-            forum_posts::dsl::topic_id,
-            forum_posts::dsl::post_id,
-            forum_posts::dsl::body,
-            forum_posts::dsl::media_type,
-            forum_posts::dsl::updated_at,
-        ))
-        .order(forum_posts::dsl::updated_at.desc())
-        .load::<(i64, i64, i64, Option<i64>, String, String, NaiveDateTime)>(db)?;
 
-    Ok(items
-        .iter()
-        .map(
-            |(id, user_id, topic_id, post_id, body, media_type, updated_at)| Post {
-                id: id.to_string(),
-                user_id: user_id.to_string(),
-                topic_id: topic_id.to_string(),
-                post_id: match post_id {
-                    Some(ref id) => Some(id.to_string()),
-                    None => None,
-                },
-                body: body.clone(),
-                media_type: media_type.clone(),
-                editable: is_manager || *user_id == user.id,
-                updated_at: updated_at.to_utc(),
-            },
-        )
-        .collect())
+    // topic owner
+    let mut ids = caring_topics::dsl::caring_topics
+        .select(caring_topics::dsl::id)
+        .filter(caring_topics::dsl::user_id.eq(&user.id))
+        .load::<i64>(db)?;
+    // topic member
+    ids.extend(
+        caring_topics_users::dsl::caring_topics_users
+            .select(caring_topics_users::dsl::topic_id)
+            .filter(caring_topics_users::dsl::user_id.eq(&user.id))
+            .load::<i64>(db)?
+            .iter(),
+    );
+
+    let mut items = Vec::new();
+    for id in ids {
+        let it = caring_posts::dsl::caring_posts
+            .filter(caring_posts::dsl::id.eq(&id))
+            .first::<models::Post>(db)?;
+        let editable = it.user_id == user.id;
+        let mut v: Post = it.into();
+        v.editable = editable;
+        items.push(v);
+    }
+
+    Ok(items)
 }
 
 #[derive(GraphQLInputObject, Debug, Validate, Deserialize)]
 pub struct Create {
     #[validate(length(min = "1"))]
     pub topic_id: String,
-    pub post_id: Option<String>,
+    #[validate(length(min = "1"))]
+    pub method: String,
     #[validate(length(min = "1"))]
     pub body: String,
     #[validate(length(min = "1"))]
     pub media_type: String,
+    #[validate(length(min = "1"))]
+    pub begin: String,
+    #[validate(length(min = "1"))]
+    pub end: String,
 }
 
 impl Create {
@@ -150,22 +152,40 @@ impl Create {
         self.validate()?;
         let user = ctx.current_user()?;
         let db = ctx.db.deref();
+        let topic = self.topic_id.parse::<i64>()?;
+
+        // only owner of member of topic can create post
+        if caring_topics::dsl::caring_topics
+            .select(caring_topics::dsl::user_id)
+            .filter(caring_topics::dsl::id.eq(&topic))
+            .first::<i64>(db)? != user.id
+        {
+            if let Err(_) = caring_topics_users::dsl::caring_topics_users
+                .select(caring_topics_users::dsl::id)
+                .filter(caring_topics_users::dsl::user_id.eq(&user.id))
+                .filter(caring_topics_users::dsl::topic_id.eq(&topic))
+                .first::<i64>(db)
+            {
+                return Err(Status::Forbidden.reason.into());
+            }
+        }
 
         let now = Utc::now().naive_utc();
-        let topic_id = self.topic_id.parse::<i64>()?;
-        let post_id = match self.post_id {
-            Some(ref id) => Some(id.parse::<i64>()?),
-            None => None,
-        };
-        insert_into(forum_posts::dsl::forum_posts)
+        insert_into(caring_posts::dsl::caring_posts)
             .values((
-                forum_posts::dsl::user_id.eq(&user.id),
-                forum_posts::dsl::topic_id.eq(&topic_id),
-                forum_posts::dsl::post_id.eq(&post_id),
-                forum_posts::dsl::body.eq(&self.body),
-                forum_posts::dsl::media_type.eq(&self.media_type),
-                forum_posts::dsl::updated_at.eq(&now),
-                forum_posts::dsl::created_at.eq(&now),
+                caring_posts::dsl::user_id.eq(&user.id),
+                caring_posts::dsl::topic_id.eq(&topic),
+                caring_posts::dsl::method.eq(&self.method),
+                caring_posts::dsl::body.eq(&self.body),
+                caring_posts::dsl::media_type.eq(&self.media_type),
+                caring_posts::dsl::begin.eq(&NaiveDateTime::parse_from_str(
+                    &self.begin,
+                    DATETIME_FORMAT,
+                )?),
+                caring_posts::dsl::end
+                    .eq(&NaiveDateTime::parse_from_str(&self.end, DATETIME_FORMAT)?),
+                caring_posts::dsl::updated_at.eq(&now),
+                caring_posts::dsl::created_at.eq(&now),
             ))
             .execute(db)?;
         Ok(H::new())
@@ -177,9 +197,15 @@ pub struct Update {
     #[validate(length(min = "1"))]
     pub id: String,
     #[validate(length(min = "1"))]
+    pub method: String,
+    #[validate(length(min = "1"))]
     pub body: String,
     #[validate(length(min = "1"))]
     pub media_type: String,
+    #[validate(length(min = "1"))]
+    pub begin: String,
+    #[validate(length(min = "1"))]
+    pub end: String,
 }
 
 impl Update {
@@ -189,17 +215,21 @@ impl Update {
         let user = ctx.current_user()?;
         let db = ctx.db.deref();
 
-        if !dao::is_manager(db, user.id) && user.id != id {
+        if caring_posts::dsl::caring_posts
+            .select(caring_posts::dsl::user_id)
+            .filter(caring_posts::dsl::id.eq(&id))
+            .first::<i64>(db)? != user.id
+        {
             return Err(Status::Forbidden.reason.into());
         }
 
         let now = Utc::now().naive_utc();
-        let it = forum_posts::dsl::forum_posts.filter(forum_posts::dsl::id.eq(&id));
+        let it = caring_posts::dsl::caring_posts.filter(caring_posts::dsl::id.eq(&id));
         update(it)
             .set((
-                forum_posts::dsl::body.eq(&self.body),
-                forum_posts::dsl::media_type.eq(&self.media_type),
-                forum_posts::dsl::updated_at.eq(&now),
+                caring_posts::dsl::body.eq(&self.body),
+                caring_posts::dsl::media_type.eq(&self.media_type),
+                caring_posts::dsl::updated_at.eq(&now),
             ))
             .execute(db)?;
         Ok(H::new())
