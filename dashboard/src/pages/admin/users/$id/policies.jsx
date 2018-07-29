@@ -62,7 +62,7 @@ class Widget extends Component {
           }
           return ar
         }, []))
-        console.log(policies)
+
         client().request(`mutation form($user: String!, $policies: String!, $nbf: String!, $exp: String!){
             updateUserPolicy(user: $user, policies: $policies, nbf: $nbf, exp: $exp) {
               createdAt
