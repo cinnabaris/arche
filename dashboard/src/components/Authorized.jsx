@@ -12,10 +12,14 @@ class Widget extends Component {
     const {
       currentUser,
       children,
-      check
+      check,
+      hidden
     } = this.props
     if (check(currentUser)) {
       return children
+    }
+    if (hidden) {
+      return (<span/>)
     }
     return (<Exception type="403" />);
   }
@@ -25,6 +29,7 @@ Widget.propTypes = {
   check: PropTypes.func.isRequired,
   currentUser: PropTypes.object.isRequired,
   children: PropTypes.node.isRequired,
+  hidden: PropTypes.bool,
 }
 
 export default connect(({
